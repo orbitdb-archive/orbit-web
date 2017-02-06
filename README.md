@@ -40,10 +40,12 @@ npm run build
 
 `npm run build:debug`
 
+#### Distribution Package
+
+`npm run dist`
+
+**This script will add `dist/` to IPFS and the last hash in the output is a distributable directory in IPFS.**
+
 ### Clean
 
 `make clean`
-
-### Publish
-
-`make publish`
