@@ -12,6 +12,9 @@ build: deps
 start: build
 	npm run start
 
+dist: build
+	npm run dist
+
 clean:
 	rm -rf dist/
 	rm -rf node_modules/

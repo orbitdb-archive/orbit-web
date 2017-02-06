@@ -30,9 +30,7 @@ npm start
 
 or
 
-```
-npm run build
-```
+`npm run build`
 
 #### Debug
 
@@ -41,6 +39,10 @@ npm run build
 `npm run build:debug`
 
 #### Distribution Package
+
+`make dist`
+
+or
 
 `npm run dist`
 
