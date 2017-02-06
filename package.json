@@ -1,19 +1,15 @@
 {
   "name": "orbit-web",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "Orbit Web App",
   "author": "Haad",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/orbitdb/orbit-web"
+  "repository": "https://github.com/orbitdb/orbit-web.git",
+  "main": "src/components/App.js",
+  "build": {
+    "src": "src",
+    "target": "dist"
   },
-  "engines": {
-    "node": "^6.x.x"
-  },
-  "src": "src",
-  "test": "test",
-  "dist": "dist",
   "dependencies": {
     "clipboard": "^1.5.16",
     "emoji-annotation-to-unicode": "^0.2.4",
@@ -80,7 +76,6 @@
     "build": "npm run build:dist",
     "build:dist": "grunt build && webpack -p --config config/webpack.config.dist.js --hide-modules --progress",
     "build:debug": "webpack --config config/webpack.config.js --display-modules --sort-modules-by size --progress --hot",
-    "publish": "ipfs add -r dist/",
     "start": "cd dist && ../node_modules/.bin/http-server -c-1 -p 8081 & open http://localhost:8081/index.html & wait"
   }
 }

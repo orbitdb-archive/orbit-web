@@ -26,7 +26,7 @@ npm start
 
 #### Release
 
-`make`
+`make build`
 
 or
 
@@ -43,3 +43,7 @@ npm run build
 ### Clean
 
 `make clean`
+
+### Publish
+
+`make publish`

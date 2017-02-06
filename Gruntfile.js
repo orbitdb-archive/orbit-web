@@ -29,7 +29,7 @@ module.exports = function (grunt) {
         port: 8000,
         webpack: webpackDevConfig,
         publicPath: '/assets/',
-        contentBase: './<%= pkg.src %>/',
+        contentBase: './<%= pkg.build.src %>/',
         headers: {
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Credentials": "true"
@@ -51,7 +51,7 @@ module.exports = function (grunt) {
           keepalive: true,
           middleware: function (connect) {
             return [
-              mountFolder(connect, pkgConfig.dist)
+              mountFolder(connect, pkg.build.target)
             ]
           }
         }
@@ -84,27 +84,27 @@ module.exports = function (grunt) {
           {
             flatten: true,
             expand: true,
-            src: ['<%= pkg.src %>/*'],
-            dest: '<%= pkg.dist %>/',
+            src: ['<%= pkg.build.src %>/*'],
+            dest: '<%= pkg.build.target %>/',
             filter: 'isFile'
           },
           {
             flatten: true,
             expand: true,
-            src: ['<%= pkg.src %>/images/*'],
-            dest: '<%= pkg.dist %>/images/'
+            src: ['<%= pkg.build.src %>/images/*'],
+            dest: '<%= pkg.build.target %>/images/'
           },
           {
             flatten: true,
             expand: true,
-            src: ['<%= pkg.src %>/icons/**/*'],
-            dest: '<%= pkg.dist %>/icons/'
+            src: ['<%= pkg.build.src %>/icons/**/*'],
+            dest: '<%= pkg.build.target %>/icons/'
           },
           {
             flatten: true,
             expand: true,
-            src: ['<%= pkg.src %>/lib/**/*.js'],
-            dest: '<%= pkg.dist %>/lib/'
+            src: ['<%= pkg.build.src %>/lib/**/*.js'],
+            dest: '<%= pkg.build.target %>/lib/'
           }
         ]
       }
@@ -115,7 +115,7 @@ module.exports = function (grunt) {
         files: [{
           dot: true,
           src: [
-            '<%= pkg.dist %>'
+            '<%= pkg.build.target %>'
           ]
         }]
       },
