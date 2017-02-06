@@ -5,15 +5,15 @@ export function defaultIpfsDaemonSettings(ipfsDataDir) {
     Addresses: {
       API: '/ip4/127.0.0.1/tcp/0',
       Swarm: [
-        // '/ip4/127.0.0.1/tcp/32333/ws',
         '/ip4/0.0.0.0/tcp/0'
       ],
       Gateway: '/ip4/0.0.0.0/tcp/0'
     },
-    // Use local webrtc-star server: https://github.com/libp2p/js-libp2p-webrtc-star
-    // SignalServer: '0.0.0.0:9090',
-    SignalServer: '178.62.241.75',
-    // SignalServer: '/dns4/star-signal.cloud.ipfs.team', // coming soon
+    // How to use a local webrtc-star server: 
+    // https://github.com/libp2p/js-libp2p-webrtc-star
+    // SignalServer: '0.0.0.0:9090', // localhost
+    // SignalServer: '178.62.241.75', // old dev server
+    SignalServer: 'star-signal.cloud.ipfs.team', // IPFS dev server
     API: {
       HTTPHeaders: {
         "Access-Control-Allow-Origin": ['*'],
