@@ -14,7 +14,7 @@ const linkProps = { target: '_blank', rel: 'nofollow' }
 
 // Higlight specified words (ie. username)
 function _highlight(items, highlightWords) {
-  const props = { className: 'highlight', key: Math.random() }
+  const props = { className: 'highlight' }
   return flatten(items.map((item) => {
     return MentionHighlighter.highlight(item, highlightWords, props)
   }))

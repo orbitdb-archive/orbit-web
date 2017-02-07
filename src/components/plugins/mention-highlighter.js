@@ -18,7 +18,7 @@ let MentionHighlighter = () => {
           if (match) {
             return React.createElement(
               'span',
-              assign({className: options.className}, options),
+              assign({className: options.className, key: Math.random()}, options),
               word + " "
             );
           } else {
