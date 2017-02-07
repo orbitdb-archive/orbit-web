@@ -1,6 +1,6 @@
 {
   "name": "orbit-web",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Orbit Web App",
   "author": "Haad",
   "license": "MIT",
@@ -73,7 +73,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "grunt serve",
     "build": "npm run build:dist",
-    "build:dist":  "grunt build && webpack --config config/webpack.config.dist.js --hide-modules --progress && uglifyjs dist/assets/app.js -o dist/assets/app.js",
+    "build:dist": "grunt build && webpack --config config/webpack.config.dist.js --hide-modules --progress && uglifyjs dist/assets/app.js -o dist/assets/app.js",
     "build:debug": "grunt build && webpack --config config/webpack.config.js --display-modules --sort-modules-by size --progress --hot",
     "dist": "ipfs add -r dist/",
     "start": "cd dist && ../node_modules/.bin/http-server -c-1 -p 8081 & open http://localhost:8081/index.html & wait"
