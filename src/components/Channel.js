@@ -328,7 +328,7 @@ class Channel extends React.Component {
           onShowProfile={this.onShowProfile.bind(this)}
           onDragEnter={this.onDragEnter.bind(this)}
           onScrollToPreview={this.onScrollToPreview.bind(this)}
-          highlightWords={username}
+          highlightWords={[username]}
           colorifyUsername={colorifyUsernames}
           useEmojis={useEmojis}
           style={style}
@@ -340,7 +340,7 @@ class Channel extends React.Component {
           onShowProfile={this.onShowProfile}
           onDragEnter={this.onDragEnter}
           onScrollToPreview={this.onScrollToPreview}
-          highlightWords={username}
+          highlightWords={[username]}
           colorifyUsername={colorifyUsernames}
           useEmojis={useEmojis}
           style={style}

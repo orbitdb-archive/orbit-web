@@ -18,7 +18,7 @@ let MentionHighlighter = () => {
           if (match) {
             return React.createElement(
               'span',
-              assign({className: options.highlightClassName}, options),
+              assign({className: options.className}, options),
               word + " "
             );
           } else {

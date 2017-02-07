@@ -1,29 +1,19 @@
-import React  from 'react';
-import assign from 'object-assign';
+import React  from 'react'
+import assign from 'object-assign'
 
 let ReactIpfsLink = () => {
   return {
     linkify(text, options = {}) {
-      if (!text) return [];
-
-      options.ipfsUrl = options.ipfsUrl || 'https://ipfs.io/ipfs/';
-
+      if (!text) return []
       return text.split(' ').map(word => {
-        let match = word.length === 46 && word.startsWith('Qm');
-        if (match) {
-          let url = options.ipfsUrl + word;
-
-          return React.createElement(
-            'a',
-            assign({href: url}, options),
-            word + " "
-          );
-        } else {
-          return word + " ";
-        }
-      });
+        let match = word.length === 46 && word.startsWith('Qm')
+        let url = 'https://ipfs.io/ipfs/' + word
+        return match
+          ? React.createElement('a', assign({href: url, key: word + Math.random()}, options), word + " ")
+          : word + " "
+      })
     }
-  };
-};
+  }
+}
 
-export default ReactIpfsLink();
+export default ReactIpfsLink()

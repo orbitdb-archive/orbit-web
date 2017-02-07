@@ -32,7 +32,6 @@
     "pleasejs": "^0.4.2",
     "react": "^15.4.2",
     "react-addons-css-transition-group": "^15.4.2",
-    "react-autolink": "^0.2.1",
     "react-dom": "^15.4.2",
     "react-dropzone": "^3.9.2",
     "react-emoji": "haadcode/react-emoji#a0a3c5dd069bfcd068fe3f51391917ec7facba13",
