@@ -8,7 +8,7 @@
 
 Browser application for [Orbit](https://github.com/orbitdb/orbit). 
 
-**NOTE!** *Orbit is still more or less experimental. It means Orbit is currently not* ***secure****, APIs will change and builds can break over the coming months. If you come across problems, it would help greatly to open issues so that we can fix them as quickly as possible.*
+**NOTE!** *Orbit is still more or less experimental. It means Orbit is currently ***not secure****, APIs will change and builds can break over the coming months. If you come across problems, it would help greatly to open issues so that we can fix them as quickly as possible.*
 
 <img src="https://raw.githubusercontent.com/orbitdb/orbit-web/master/screenshots/screenshot1.png" width="49%">
 <img src="https://raw.githubusercontent.com/orbitdb/orbit-web/master/screenshots/screenshot2.png" width="49%">
