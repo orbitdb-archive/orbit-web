@@ -34,8 +34,8 @@ $channel-name-min-height: 1.6em;
   max-height: $channel-name-max-height;
   min-height: $channel-name-min-height;
 
-  font-family: "Lato";
-  font-weight: 100;
+  // font-family: "Lato";
+  // font-weight: 100;
   font-size: 2em;
   color: rgb(240, 240, 240);
 
@@ -48,8 +48,8 @@ $channel-name-min-height: 1.6em;
     flex: 1 0 33%;
     justify-content: flex-start;
 
-    font-family: "Lato";
-    font-weight: 100;
+    // font-family: "Lato";
+    // font-weight: 100;
     font-size: 1em;
     color: rgb(240, 240, 240);
   }
@@ -62,40 +62,39 @@ $channel-name-min-height: 1.6em;
     padding-right: 0.2em;
     // justify-content: flex-start;
 
-    font-family: "Lato";
-    font-weight: 100;
+    // font-family: "Lato";
+    // font-weight: 100;
     font-size: 0.5em;
     color: rgba(240, 240, 240, 0.6);
   }
 
   .channel:hover {
-    font-weight: 100;
+    font-weight: bold;
     color: rgba(240, 240, 240, 0.9);
   }
 
   .unreadMessages {
+    font-weight: bold;
+    font-size: 0.6em;
+
+    color: rgba(240, 240, 240, 0.9);
+    background-color: rgba(240, 240, 240, 0.1);
+    border-radius: 32px;
+
     display: flex;
-    margin-left: 0.3em;
-    margin-right: 0em;
-    padding: 0.1em;
+    justify-content: center;
+
     height: 1.1em;
     width: 1.2em;
 
-    justify-content: center;
-
-    font-family: "Lato";
-    font-weight: 300;
-    font-size: 0.6em;
-    color: rgba(240, 240, 240, 0.9);
-
-    background-color: rgba(240, 240, 240, 0.1);
-    border-radius: 32px;
+    margin-left: 0.3em;
+    margin-right: 0em;
+    padding: 0.1em;
   }
 
   .hasMentions {
     background-color: $main-color;
   }
-
 }
 
 .channelHeaderAnimation-enter {

@@ -6,12 +6,11 @@ input[type=submit], input[type=button], .submitButton {
   align-self: center;
   box-sizing: border-box;
 
-  // TODO: move to Fonts.scss
   font-family: "Lato";
-  font-weight: 300;
+  font-weight: normal;
   font-size: 0.8em;
 
-  color: rgba(220, 220, 220, 0.2);
+  color: rgba(220, 220, 220, 0.4);
   background-color: rgba(0, 0, 0, 0);
   border: 0;
 

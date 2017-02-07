@@ -101,6 +101,12 @@ module.exports = function (grunt) {
             dest: '<%= pkg.build.target %>/icons/'
           },
           {
+            expand: true,
+            cwd: '<%= pkg.build.src %>/fonts/',
+            src: ['**/*.woff2', '**/*.txt}'],
+            dest: '<%= pkg.build.target %>/fonts/'
+          },
+          {
             flatten: true,
             expand: true,
             src: ['<%= pkg.build.src %>/lib/**/*.js'],

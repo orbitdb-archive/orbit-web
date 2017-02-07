@@ -16,8 +16,6 @@ $timestamp-color:  rgba(240, 240, 240, 0.6);
 }
 
 .Message2 {
-  // font-family: "Cousine";
-  // font-size: 0.8em;
   font-weight: 100;
 
   display: flex;
@@ -59,7 +57,7 @@ $timestamp-color:  rgba(240, 240, 240, 0.6);
     display: flex;
     color: $timestamp-color;
     font-style: italic;
-    font-weight: 300;
+    font-weight: bold;
     font-size: 0.8em;
     padding-left: 1em;
     padding-right: 1em;

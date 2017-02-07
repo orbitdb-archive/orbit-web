@@ -46,7 +46,7 @@ $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
   .download {
     user-select: none;
     visibility: hidden;
-    font-weight: 100;
+    // font-weight: 100;
     font-size: 0.9em;
     cursor: pointer;
     margin-left: 0.75em;
@@ -60,7 +60,7 @@ $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
   a {
     color: $directory-link-color;
     text-decoration: none;
-    font-weight: 400;
+    font-weight: bold;
   }
 }
 
@@ -82,7 +82,7 @@ $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
   .size {
     visibility: visible;
     font-size: 0.8em;
-    font-weight: 100;
+    // font-weight: 100;
     color: rgba(128, 196, 128, 0.8);
     cursor: default;
   }

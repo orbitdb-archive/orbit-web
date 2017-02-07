@@ -8,8 +8,6 @@
   height: 100%;
   margin: 0;
 
-  font-family: "Source Sans Pro";
-  font-weight: 300;
   font-size: 1.0em;
   color: rgba(240, 240, 240, 0.9);
 
@@ -24,6 +22,7 @@
   }
 
   .key {
+    font-weight: bold;
     display: inline-block;
     vertical-align: top;
     min-width: 12em;

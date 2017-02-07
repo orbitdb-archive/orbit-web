@@ -16,10 +16,6 @@ $timestamp-color:  rgba(240, 240, 240, 0.6);
 }
 
 .Message {
-  // font-family: "Cousine";
-  // font-size: 0.8em;
-	font-weight: 100;
-
   display: flex;
   flex: 1 1 100%;
   flex-direction: row;
@@ -36,8 +32,8 @@ $timestamp-color:  rgba(240, 240, 240, 0.6);
   .Timestamp {
     display: flex;
     color: $timestamp-color;
-    font-weight: 300;
     font-size: 0.8em;
+    font-weight: bold;
     padding-left: 0.2em;
     padding-right: 0.5em;
     border-right: 1px solid rgba(255, 255, 255, 0.2);
@@ -48,7 +44,7 @@ $timestamp-color:  rgba(240, 240, 240, 0.6);
     margin-right: 0.5em;
     display: flex;
     flex: 1;
-    overflow: hidden;
+    // overflow: hidden;
   }
 
   .popout {

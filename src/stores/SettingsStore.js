@@ -11,7 +11,6 @@ const defaultSettings = {
   theme: Themes.Default,
   useEmojis: true,
   colorifyUsernames: true,
-  spacing: 0.1,
   font: 'Lato',
   monospaceFont: 'Roboto Mono',
   useMonospaceFont: false,

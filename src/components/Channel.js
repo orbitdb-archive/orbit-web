@@ -311,14 +311,15 @@ class Channel extends React.Component {
   }
 
   renderMessages() {
-    const { messages, username, channelName, loading, loadingText, reachedChannelStart, appSettings } = this.state
-    const { colorifyUsernames, useEmojis, useMonospaceFont, font, monospaceFont, spacing } = appSettings
+    const { messages, username, channelName, appSettings } = this.state
+    const { colorifyUsernames, useEmojis, useMonospaceFont, font, monospaceFont } = appSettings
+
     const style = {
       fontFamily: useMonospaceFont ? monospaceFont : font,
       fontSize: useMonospaceFont ? '0.9em' : '1.0em',
-      fontWeight: useMonospaceFont ? '100' : '300',
-      padding: spacing,
+      fontWeight: useMonospaceFont ? 'normal' : 'bold'
     }
+
     const elements = messages.map((message) => {
       if (appSettings.useLargeMessage) {
         return <Message2
@@ -332,7 +333,7 @@ class Channel extends React.Component {
           colorifyUsername={colorifyUsernames}
           useEmojis={useEmojis}
           style={style}
-        />   
+        />
       } else {
         return <Message
           message={message}

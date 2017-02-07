@@ -1,8 +1,6 @@
 $text-color: rgba(228, 228, 228, 0.9);
 
 .LoadingView {
-  font-family: "Source Sans Pro";
-  font-weight: 100;
   font-size: 0.9em;
   padding: 0.1em;
   color: rgb(128, 128, 128);
@@ -12,6 +10,15 @@ $text-color: rgba(228, 228, 228, 0.9);
   height: 100%;
   box-sizing: border-box;
   z-index: 100;
+
+  h1 {
+    font-size: 4.5em;
+    text-transform: uppercase;
+    color: rgba(240, 240, 240, 0.8);
+    z-index: 1;
+    margin: 0;
+    padding: 0;
+  }
 
   .header {
     position: absolute;
@@ -32,7 +39,7 @@ $text-color: rgba(228, 228, 228, 0.9);
   }
 
   .logs {
-    font-family: "Source Sans Pro";
+    font-family: "Roboto Mono";
     position: absolute;
     bottom: 0;
     width: 100%;
@@ -40,22 +47,11 @@ $text-color: rgba(228, 228, 228, 0.9);
   }
 
   .text {
-    font-family: "Source Sans Pro";
+    font-family: "Roboto Mono";
     color: rgba(240, 240, 240, 0.9);
     background-color: rgba(16, 16, 16, 0.5);
     padding-left: 0.5em;
     padding-right: 0.5em;
-  }
-
-  h1 {
-    font-family: "Lato";
-    font-size: 4.5em;
-    font-weight: 100;
-    text-transform: uppercase;
-    color: rgba(240, 240, 240, 0.8);
-    z-index: 1;
-    margin: 0;
-    padding: 0;
   }
 
   .error {

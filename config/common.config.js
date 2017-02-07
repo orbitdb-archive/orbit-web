@@ -26,37 +26,46 @@ module.exports = {
       'stores': path.join(__dirname, '../src/stores/'),
       'actions': path.join(__dirname, '../src/actions/'),
       'lib': path.join(__dirname, '../src/lib/'),
-      'utils': path.join(__dirname, '../src/utils/')
+      'utils': path.join(__dirname, '../src/utils/'),
+      'fonts': path.join(__dirname, '../src/fonts')
     }
   },
   module: {
-    loaders: [
-    {
-      test: /\.(js|jsx)$/,
-      exclude: /node_modules/,
-      loader: 'babel-loader',
-      query: babelPlugins
-    }, 
-    {
-      test: /\.css$/,
-      loader: 'style-loader!css-loader'
-    }, 
-    {
-      test: /\.scss/,
-      loader: 'style-loader!css-loader!sass-loader?outputStyle=expanded'
-    }, 
-    {
-      test: /\.(png|jpg|woff|woff2)$/,
-      loader: 'url-loader?limit=8192'
-    }, 
-    {
-      test: /\.(png|jpg)$/,
-      loader: 'file-loader?name=[path][name].[ext]',
-    }, 
-    {
-      test: /\.json$/,
-      loader: 'json-loader'
-    }
+    rules: [
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        query: babelPlugins
+      }, 
+      {
+        test: /\.css$/,
+        use: [
+          'style-loader', 
+          { loader: 'css-loader', options: { url: false }}
+        ]
+      }, 
+      {
+        test: /\.scss/,
+        exclude: /\.(woff|woff2|ttf)$/,
+        use: [
+          'style-loader', 
+          { loader: 'css-loader', options: { url: false }}, 
+          'sass-loader'
+        ]
+      },
+      {
+        test: /\.(png|jpg)$/,
+        use: { loader: 'url-loader', options: { limit: 8192 }}
+      }, 
+      {
+        test: /\.(png|jpg)$/,
+        use: { loader: 'file-loader', options: { name: '[path][name].[ext]' }}
+      }, 
+      {
+        test: /\.json$/,
+        loader: 'json-loader'
+      }
     ]
   },
   externals: {

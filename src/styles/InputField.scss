@@ -4,6 +4,9 @@ $border:         1px solid $input-border-color;
 $border-focused: 1px solid $main-color;
 
 input[type=text], input[type=password], input[type=checkbox] {
+  font-family: "Lato";
+  font-weight: bold;
+
   color: $input-text-color;
   background-color: rgba(0, 0, 0, 0.0);
 
@@ -16,9 +19,6 @@ input[type=text], input[type=password], input[type=checkbox] {
 
   margin-left: 0.25em;
   margin-right: 0.25em;
-
-  font-family: "Lato";
-  font-weight: 100;
 }
 
 input[type=text]:focus, input[type=password]:focus {

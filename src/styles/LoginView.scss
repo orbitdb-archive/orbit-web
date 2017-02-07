@@ -1,8 +1,6 @@
 $text-color: rgba(228, 228, 228, 0.9);
 
 .LoginView {
-  font-family: "Source Sans Pro";
-  font-weight: 100;
   font-size: 0.9em;
   padding: 0.1em;
   color: rgb(128, 128, 128);
@@ -58,9 +56,9 @@ $text-color: rgba(228, 228, 228, 0.9);
   }
 
   h1 {
-    font-family: "Lato";
+    // font-family: "Lato";
+    // font-weight: 100;
     font-size: 4.5em;
-    font-weight: 100;
     // padding: 1.0em;
     text-transform: uppercase;
     color: rgba(240, 240, 240, 0.8);

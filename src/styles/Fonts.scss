@@ -1,0 +1,27 @@
+// Fonts from https://github.com/google/fonts
+
+@font-face {
+  font-family: 'Lato';
+  // Loading strategy:
+  // If .woff2 supported, load local font file
+  // If not, load from google
+  // Last resort is to load from src/fonts (for offline development)
+  // NOTE! .ttf files are not included in the dist build
+  src: url('fonts/lato/Lato-Thin.woff2') format('woff2'),
+       url('https://fonts.googleapis.com/css?family=Lato'),
+       url('fonts/lato/Lato-Thin.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'LatoBold';
+  src: url('fonts/lato/Lato-Light.woff2') format('woff2'),
+       url('https://fonts.googleapis.com/css?family=Lato'),
+       url('fonts/lato/Lato-Light.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Roboto Mono';
+  src: url('fonts/robotomono/RobotoMono-Light.woff2') format('woff2'),
+       url('https://fonts.googleapis.com/css?family=Roboto+Mono'),
+       url('fonts/robotomono/RobotoMono-Light.ttf') format('truetype');
+}

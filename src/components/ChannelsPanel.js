@@ -118,7 +118,7 @@ class ChannelsPanel extends React.Component {
           <div className="ChannelsPanel" style={align}>
 
             <div style={{ opacity: 0.8, zIndex: -1 }}>
-              <BackgroundAnimation size="320" startY="58" theme={this.state.theme} />
+              <BackgroundAnimation size="320" startY="58" theme={this.state.theme} style={{ alignItems: 'flex-start' }}/>
             </div>
 
             <TransitionGroup {...transitionProps} transitionName={this.state.leftSide ? "panelHeaderAnimationRight" : "panelHeaderAnimationLeft"}>

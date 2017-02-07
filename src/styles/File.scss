@@ -7,11 +7,12 @@ $directory-link-hover-color:  rgba(136, 204, 255, 1);
 $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
 
 .File {
+  font-weight: bold;
   padding-left: 0.3em;
   padding-right: 0.3em;
   // display: inline-block;
   white-space: nowrap;
-  font-weight: 300;
+  // font-weight: 300;
   // width: 100%;
   overflow: hidden;
   box-sizing: content-box;
@@ -76,9 +77,9 @@ $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
   // }
 
   .download {
+    font-weight: normal;
     user-select: none;
     visibility: hidden;
-    font-weight: 100;
     margin: 0;
     font-size: 0.9em;
     cursor: pointer;
@@ -87,13 +88,14 @@ $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
   }
 
   .pin {
+    font-weight: normal;
     visibility: hidden;
-    font-weight: 100;
     // margin-left: 0.5em;
     // margin-right: 0.5em;
   }
 
   .size {
+    font-weight: normal;
     visibility: hidden;
     margin-left: 0.25em;
     margin-right: 0.5em;
@@ -161,7 +163,7 @@ $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
   .size {
     visibility: visible;
     font-size: 0.8em;
-    font-weight: 100;
+    font-weight: normal;
     color: rgba(128, 196, 128, 0.8);
     cursor: default;
   }

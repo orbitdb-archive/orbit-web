@@ -38,8 +38,8 @@ $channel-name-min-height: 1.5em;
     margin-bottom: 0.5em;
     color: $placeholder-color;
     font-size: 0.8em;
-    font-weight: 300;
-    font-family: "Lato";
+    // font-family: "Lato";
+    font-weight: bold;
     text-transform: uppercase;
   }
 
@@ -86,8 +86,9 @@ $channel-name-min-height: 1.5em;
     }
 
     .unreadMessages {
-      color: $main-text-color;
+      font-weight: bold;
       font-size: 0.5em;
+      color: $main-text-color;
       border-radius: 32px;
       background-color: rgba(240, 240, 240, 0.1);
       display: flex;
@@ -134,8 +135,8 @@ $channel-name-min-height: 1.5em;
     justify-content: center;
     box-sizing: border-box;
 
-    font-family: "Lato";
-    font-weight: 100;
+    // font-family: "Lato";
+    // font-weight: 100;
     font-size: 2.6em;
     color: rgba(228, 228, 228, 0.6);
 
@@ -160,12 +161,12 @@ $channel-name-min-height: 1.5em;
 
     padding: 0em 0.2em;
 
-    font-family: "Lato";
-    font-weight: 100;
+    // font-family: "Lato";
+    // font-weight: 100;
     color: rgba(228, 228, 228, 0.6);
 
     .text {
-      font-weight: 300;
+      font-weight: bold;
       color: rgba(228, 228, 228, 0.3);
     }
   }
@@ -184,8 +185,8 @@ $channel-name-min-height: 1.5em;
     justify-content: center;
     box-sizing: border-box;
 
-    font-family: "Lato";
-    font-weight: 100;
+    // font-family: "Lato";
+    // font-weight: 100;
     font-size: 1.2em;
     color: rgba(220, 220, 220, 0.8);
 

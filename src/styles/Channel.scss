@@ -36,15 +36,13 @@ $controls-height: 2.8em;
 .newMessagesBar {
   position: absolute;
   bottom: 2.75em;
-  width: 100%;
-  background-color: rgba(32, 32, 32, 0.8);
   display: flex;
   justify-content: center;
+  width: 100%;
   padding: 0.2em;
 
-  font-family: "Lato";
-  font-weight: 300;
-
+  font-weight: bold;
+  background-color: rgba(32, 32, 32, 0.8);
   cursor: s-resize;
 
   .newMessagesNumber {
@@ -138,7 +136,6 @@ $controls-height: 2.8em;
   margin: 0.5em 0.5em;
   margin-right: 1em;
   max-width: 30em;
-  font-weight: 300;
   color: $main-text-color;
   background-color: rgb(26, 26, 26);
   display: flex;
@@ -215,7 +212,7 @@ input[type=button], .channelOptionsButton {
     padding-left: 0.75em;
     padding-right: 0.75em;
     font-size: 1.1em;
-    font-weight: 400;
+    font-weight: bold;
   }
 
 .Controls {
@@ -229,8 +226,7 @@ input[type=button], .channelOptionsButton {
   border-top: 1px solid $bar-border-color;
   border-bottom: 1px solid $bar-border-color;
 
-  font-family: "Source Sans Pro";
-  font-weight: 100;
+  // font-weight: bold;
   color: rgb(128, 128, 128);
 
   .replyto {
@@ -255,12 +251,9 @@ input[type=button], .channelOptionsButton {
 
   color: rgba(228, 228, 228, 0.8);
   font-size: 0.6em;
-  font-weight: 300;
-  font-family: "Lato";
+  font-weight: bold;
   display: flex;
   justify-content: center;
-  // -webkit-user-select: none;
-  // user-select: none;
   cursor: default;
   display: flex;
   align-items: center;
@@ -296,7 +289,7 @@ input[type=button], .channelOptionsButton {
     justify-content: center;
     background-color: rgb(36, 36, 36);
     color: $second-text-color;
-    font-weight: 300;
+    font-weight: bold;
     font-size: 0.8em;
     padding: 0.2em;
     // user-select: none;
@@ -341,8 +334,7 @@ input[type=button], .channelOptionsButton {
   white-space: nowrap;
 
   padding: 0.5em;
-  font-family: "Lato";
-  font-weight: 300;
+  font-weight: bold;
   font-size: 4em;
   color: $main-text-color;
   background-color: rgba(0, 0, 0, 0.6);

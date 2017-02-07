@@ -36,7 +36,7 @@ import Header from 'components/Header'
 import Themes from 'app/Themes'
 
 import 'normalize.css'
-import '../styles/main.css'
+import 'styles/Main.scss'
 import 'styles/App.scss'
 import 'styles/Scrollbars.scss'
 import 'highlight.js/styles/atom-one-dark.css'
