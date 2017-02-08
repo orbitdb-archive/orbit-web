@@ -29,6 +29,7 @@ $channel-name-min-height: 1.5em;
   flex: 1 1 100%;
 
   box-shadow: 8px 0px 12px 0px rgba(0,0,0,0.2);
+  font-weight: bold;
 
   .panelHeader {
     display: flex;
@@ -36,7 +37,8 @@ $channel-name-min-height: 1.5em;
     height: 2em;
     margin: 0em 1.25em;
     margin-bottom: 0.5em;
-    color: $placeholder-color;
+    color: rgb(128, 128, 128);
+    // color: $placeholder-color;
     font-size: 0.8em;
     // font-family: "Lato";
     font-weight: bold;
@@ -135,10 +137,11 @@ $channel-name-min-height: 1.5em;
     justify-content: center;
     box-sizing: border-box;
 
+    font-weight: normal;
     // font-family: "Lato";
     // font-weight: 100;
     font-size: 2.6em;
-    color: rgba(228, 228, 228, 0.6);
+    color: rgba(228, 228, 228, 0.8);
 
     padding: 0em 0.2em;
     margin-top: 0.05em;
@@ -163,11 +166,11 @@ $channel-name-min-height: 1.5em;
 
     // font-family: "Lato";
     // font-weight: 100;
-    color: rgba(228, 228, 228, 0.6);
+    // color: rgba(228, 228, 228, 0.6);
 
     .text {
       font-weight: bold;
-      color: rgba(228, 228, 228, 0.3);
+      color: rgba(196, 196, 196, 0.5);
     }
   }
 

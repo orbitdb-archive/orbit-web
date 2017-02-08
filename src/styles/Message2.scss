@@ -24,9 +24,9 @@ $timestamp-color:  rgba(240, 240, 240, 0.6);
   justify-content: flex-start;
   align-items: flex-start;
   background-color: rgb(35, 35, 35);
-  border-bottom: 1px solid rgba(34, 34, 34, 0);
+  // border-bottom: 1px solid rgba(34, 34, 34, 0);
   padding-bottom: 0;
-
+  padding-top: 0.2em;
   color: rgba(255, 255, 255, 0.6);
 
   overflow: hidden;
@@ -44,10 +44,20 @@ $timestamp-color:  rgba(240, 240, 240, 0.6);
   }
 
   .Avatar {
-    width: 2em;
-    height: 2em;
-    margin: 0em 0.25em 0em 0.65em;
+    width: 2.25rem;
+    height: 2.25rem;
+    margin: 0em 0.25em 0em 0.5em;
+    margin-top: 0.1em;
     background-color: rgba(255, 255, 255, 0.1);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.25em;
+    font-family: "LatoBold";
+    color: rgb(95, 95, 95);
+
     // background-image: url('../images/earth.png') cover;
     // background-size: cover;
     // background-repeat: no-repeat;
@@ -59,13 +69,13 @@ $timestamp-color:  rgba(240, 240, 240, 0.6);
     font-style: italic;
     font-weight: bold;
     font-size: 0.8em;
-    padding-left: 1em;
+    padding-left: 0.5em;
     padding-right: 1em;
     // border-right: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   .Content2 {
-    padding: 0.1em 0em 0.75em 0em;
+    padding: 0.1em 0em 0.5em 0em;
     margin-left: 0.2em;
     margin-right: 0.5em;
     display: flex;

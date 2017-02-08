@@ -91,6 +91,9 @@ var App = React.createClass({
     this.unsubscribeFromSettingsStore = SettingsStore.listen((settings) => {
       this.setState({ theme: Themes[settings.theme] || null, leftSidePanel: settings.leftSidePanel })
     })
+
+    // window.onblur = () => AppActions.windowLostFocus()
+    // window.onfocus = () => AppActions.windowOnFocus()
   },
   _handleAppStateChange: function(state) {
     let prefix = '', suffix = ''
@@ -246,7 +249,6 @@ var App = React.createClass({
         onOpenSwarmView={this.openSwarmView}
         onOpenSettings={this.openSettings}
         onDisconnect={this.disconnect}
-        channels={ChannelStore.channels}
         currentChannel={location}
         username={this.state.user ? this.state.user.name : ""}
         requirePassword={this.state.requirePassword}

@@ -10,25 +10,20 @@ $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
   font-weight: bold;
   padding-left: 0.3em;
   padding-right: 0.3em;
-  // display: inline-block;
   white-space: nowrap;
-  // font-weight: 300;
-  // width: 100%;
   overflow: hidden;
   box-sizing: content-box;
 
   .content {
-    // width: 100%;
-    // margin-bottom: 0.2em;
     box-sizing: content-box;
   }
 
   .preview {
-    max-width: 90vw;
+    width: 100vw;
     margin-top: 0.5em;
     margin-bottom: 0.5em;
-    margin-left: 0.25em;
-    margin-right: 0.25em;
+    margin-left: 0.2em;
+    margin-right: 0.2em;
 
     padding-left: 0.5em;
     padding-right: 0.5em;
@@ -49,8 +44,6 @@ $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
 
   .preview:hover {
     border-left: 1px dotted rgba(224, 224, 224, 0.5);
-    // border-left: 1px dotted $main-color-highligth;
-    // -webkit-filter: hue-rotate(50deg) saturate(80%) brightness(80%) !important;
   }
 
   .smallText {
@@ -60,7 +53,6 @@ $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
 
   pre {
     margin: 0;
-    // margin-right: 0.25em;
     box-sizing: content-box;
     overflow-x: auto;
     overflow-y: auto;
@@ -77,7 +69,6 @@ $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
   // }
 
   .download {
-    font-weight: normal;
     user-select: none;
     visibility: hidden;
     margin: 0;
@@ -88,14 +79,12 @@ $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
   }
 
   .pin {
-    font-weight: normal;
     visibility: hidden;
     // margin-left: 0.5em;
     // margin-right: 0.5em;
   }
 
   .size {
-    font-weight: normal;
     visibility: hidden;
     margin-left: 0.25em;
     margin-right: 0.5em;
@@ -130,26 +119,19 @@ $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
   // border-radius: 4px;
 
   .download {
+    font-size: 0.8em;
     visibility: visible;
+    background-color: rgb(44, 44, 44);
     color: $directory-link-color2;
-    padding-left: 0.2em;
-    padding-right: 0.2em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    margin-right: 0.2em;
+    border: 0px solid;
+    border-radius: 8px;
   }
 
   .download:hover {
     background-color: rgba(128, 128, 128, 0.2);
-    color: $directory-link-hover-color2;
-  }
-
-  .pin {
-    visibility: visible;
-    color: $directory-link-color2;
-    margin-right: 0.5em;
-    cursor: pointer;
-  }
-
-  .pin:hover {
-    background-color: rgba(128, 128, 128, 0.4);
     color: $directory-link-hover-color2;
   }
 
@@ -163,9 +145,9 @@ $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
   .size {
     visibility: visible;
     font-size: 0.8em;
-    font-weight: normal;
-    color: rgba(128, 196, 128, 0.8);
+    color: rgba(112, 180, 112, 1);
     cursor: default;
+    margin-right: 0.75em;
   }
 
   a {

@@ -27,7 +27,7 @@ let ReactAutolink = () => {
 
           return React.createElement(
             'a',
-            assign({href: strStartsWith(url, 'http') ? url : `http://${url}`, key: Math.random()}, options),
+            assign({href: strStartsWith(url, 'http') ? url : `http://${url}`, key: Math.random() * 10000}, options),
             url
           )
         } else {

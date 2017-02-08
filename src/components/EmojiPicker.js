@@ -39,7 +39,7 @@ const emojify = (emojis, highlightedIndex, onMouseEnter, onClick) => {
   return emojis
   .map(e => ReactEmoji.emojify(e.shortname, emojiOpts))
   .map((e, index) => {
-    return <li key={index}
+    return <li key={index.toString()}
       onMouseEnter={ (e) => { e.preventDefault(); onMouseEnter(index); }}
       onClick={ (e) => { e.preventDefault(); onClick(index); }}
       className={index === highlightedIndex ? 'selected' : ''}>{e}</li>

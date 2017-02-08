@@ -1,7 +1,7 @@
-'use strict';
+'use strict'
 
-import React, { PropTypes } from 'react';
-import Halogen from 'halogen';
+import React, { PropTypes } from 'react'
+import MoonLoader from 'components/plugins/MoonLoader'
 
 class Spinner extends React.Component {
 
@@ -10,21 +10,25 @@ class Spinner extends React.Component {
     isLoading: PropTypes.bool,
     color: PropTypes.string,
     size: PropTypes.string,
-  };
+  }
 
   static defaultProps = {
     className: 'spinner',
-  };
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextProps.isLoading !== this.props.isLoading
+  }
 
   render() {
-    const { className, isLoading, color, size } = this.props;
+    const { className, isLoading, color, size } = this.props
     return (
       <div className={className}>
-        <Halogen.MoonLoader className="spinnerIcon" loading={isLoading} color={color} size={size} />
+        <MoonLoader className="spinnerIcon" loading={isLoading} color={color} size={size} />
       </div>
-    );
+    )
   }
 
 }
 
-export default Spinner;
+export default Spinner

@@ -17,23 +17,23 @@ class Message extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      post: props.message,
-      user: props.message.meta.from,
+      post: props.post,
+      user: props.post.meta.from,
       hasHighlights: false,
-      isCommand: props.message.content && props.message.content.startsWith('/me'),
-      formattedTime: getFormattedTime(props.message.meta.ts),
+      isCommand: props.post.content && props.post.content.startsWith('/me'),
+      formattedTime: getFormattedTime(props.post.meta.ts),
       showSignature: false,
       showProfile: null
     }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return this.state.post !== nextState.post
+    return (this.state.post !== nextState.post && this.state.post.hash !== nextState.post.hash)
       || this.state.user !== nextState.user
   }
 
   renderContent() {
-    const { highlightWords, useEmojis } = this.props
+    const { highlightWords, useEmojis, entry } = this.props
     const { isCommand, post } = this.state
     const contentClass = isCommand ? "Content command" : "Content"
     let content = (<div></div>)

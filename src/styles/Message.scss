@@ -22,10 +22,12 @@ $timestamp-color:  rgba(240, 240, 240, 0.6);
   justify-content: flex-start;
   align-items: baseline;
   background-color: rgb(35, 35, 35);
-  border-bottom: 1px solid rgba(34, 34, 34, 0);
-  padding-bottom: 0;
+  // border-bottom: 1px solid rgba(34, 34, 34, 0);
+  // padding-top: 0.0em;
+  padding-bottom: 0.15em;
 
-  color: rgba(255, 255, 255, 0.6);
+  font-weight: bold;
+  // color: rgba(250, 250, 250, 0.2);
 
   overflow: hidden;
 
@@ -33,8 +35,7 @@ $timestamp-color:  rgba(240, 240, 240, 0.6);
     display: flex;
     color: $timestamp-color;
     font-size: 0.8em;
-    font-weight: bold;
-    padding-left: 0.2em;
+    padding-left: 0.25em;
     padding-right: 0.5em;
     border-right: 1px solid rgba(255, 255, 255, 0.2);
   }
@@ -67,16 +68,16 @@ $timestamp-color:  rgba(240, 240, 240, 0.6);
     padding: 1.0em;
   }
 
-  .Verified {
-    font-size: 0.6em;
-    display: flex;
-    align-self: center;
-    margin-right: 0.5em;
-    color: rgb(64, 64, 64);
-  }
+  // .Verified {
+  //   font-size: 0.6em;
+  //   display: flex;
+  //   align-self: center;
+  //   margin-right: 0.5em;
+  //   color: rgb(64, 64, 64);
+  // }
 
-  .Verified:hover {
-    color: rgb(128, 128, 128);
-  }
+  // .Verified:hover {
+  //   color: rgb(128, 128, 128);
+  // }
 
 }

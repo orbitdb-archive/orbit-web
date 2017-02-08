@@ -4,6 +4,7 @@ import Reflux from 'reflux'
 import AppActions from 'actions/AppActions'
 import NetworkActions from 'actions/NetworkActions'
 import ChannelActions from 'actions/ChannelActions'
+import MessageStore from 'stores/MessageStore'
 import AppStateStore from 'stores/AppStateStore'
 import Logger from 'logplease'
 
@@ -12,7 +13,9 @@ const logger = Logger.create('ChannelStore', { color: Logger.Colors.Blue })
 const ChannelStore = Reflux.createStore({
   listenables: [AppActions, NetworkActions, ChannelActions],
   init: function() {
-    this.channels = []
+    this.channels = {}
+    this.peers = {}
+    this.timers = {}
   },
   onInitialize: function(orbit) {
     this.orbit = orbit
@@ -22,8 +25,11 @@ const ChannelStore = Reflux.createStore({
     return this.channels[channel]
   },
   onDisconnect: function() {
-    this.channels = []
-    this.trigger(this.channels)
+    this.channels = {}
+    this.peers = {}
+    Object.keys(this.timers).forEach((e) => clearInterval(this.timers[e]))
+    this.timers = {}
+    this.trigger(this.channels, this.peers)
   },
   onJoinChannel: function(channel, password) {
     // TODO: check if still needed?
@@ -31,18 +37,33 @@ const ChannelStore = Reflux.createStore({
       return
 
     logger.debug(`Join channel #${channel}`)
-    this.orbit.join(channel).then((channelName) => {
-      logger.debug(`Joined channel #${channel}`)
-      NetworkActions.joinedChannel(channel)
-      this.channels = this.orbit.channels
-      this.trigger(this.channels)
-    })
+    this.orbit.join(channel)
+      .then(() => {
+        logger.debug(`Joined channel #${channel}`)
+        NetworkActions.joinedChannel(channel)
+        this.channels = Object.assign({}, this.orbit.channels)
+        setImmediate(() => this.trigger(this.channels, this.peers))
+
+        this.timers[channel] = setInterval(() => {
+          this.orbit._ipfs.pubsub.peers(channel)
+            .then((peers) => {
+              this.peers[channel] = peers
+              setImmediate(() => {
+                this.trigger(this.channels, this.peers)
+              })
+            })
+            .catch((e) => console.error(e))
+        }, 1000)
+      })
   },
   onLeaveChannel: function(channel) {
     logger.debug(`Leave channel #${channel}`)
     this.orbit.leave(channel)
-    this.channels = this.orbit.channels
-    this.trigger(this.channels)
+    this.channels = Object.assign({}, this.orbit.channels)
+    delete this.peers[channel]
+    // delete this.channels[channel]
+    clearInterval(this.timers[channel])
+    this.trigger(this.channels, this.peers)
   }
 })
 

@@ -17,7 +17,7 @@ class SendMessage extends React.Component {
       theme: props.theme,
       useEmojis: props.useEmojis,
       emojiPickerActive: false,
-      replyto: null,
+      // replyto: null,
       lastWord: null
     };
   }
@@ -25,10 +25,14 @@ class SendMessage extends React.Component {
   componentDidMount() {
     this.unsubscribe = Actions.onPanelClosed.listen(() => this.refs.message.focus());
     this.unsubscribe2 = Actions.focusOnSendMessage.listen(() => this.refs.message.focus());
-    this.refs.message.focus();
+    this.timer = setTimeout(() => {
+      if (this.refs.message) 
+        this.refs.message.focus()
+    }, 30)
   }
 
   componentWillUnmount() {
+    clearTimeout(this.timer)
     this.unsubscribe();
     this.unsubscribe2();
   }
@@ -36,18 +40,24 @@ class SendMessage extends React.Component {
   componentWillReceiveProps(nextProps) {
     this.setState({
       theme: nextProps.theme,
-      replyto: nextProps.replyto
+      // replyto: nextProps.replyto
     });
   }
 
   sendMessage(event) {
+    if(!this.r) this.r = 0
+    this.r++
+
     event.preventDefault();
-    var text = this.refs.message.value.trim();
-    this.props.onSendMessage(text, this.state.replyto);
-    this.refs.message.value = '';
-    this.refs.message.focus();
-    this.setState({ replyto: null })
-    return;
+    const inputField = this.refs.message
+    var text = inputField.value.trim();
+    this.props.onSendMessage(text, this.state.replyto)
+    // this.props.onSendMessage(text, this.state.replyto), () => {
+    inputField.value = '';
+    inputField.focus();      
+    //   this.r--
+    // });
+    // this.setState({ replyto: null })
   }
 
   onCloseEmojiPicker() {

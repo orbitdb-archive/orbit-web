@@ -21,7 +21,8 @@ class ChannelsPanel extends React.Component {
     super(props);
     this.state = {
       currentChannel: props.currentChannel,
-      openChannels: props.channels,
+      // openChannels: props.channels,
+      openChannels: {},
       leftSide: props.left,
       joiningToChannel: props.joiningToChannel,
       username: props.username,
@@ -33,10 +34,16 @@ class ChannelsPanel extends React.Component {
     };
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return Object.keys(this.state.openChannels).length !== Object.keys(nextState.openChannels).length
+      || nextProps.currentChannel !== this.props.currentChannel
+      || nextState.appState.unreadMessages[this.props.currentChannel] !== this.state.appState.unreadMessages[this.props.currentChannel]
+  }
+
   componentWillReceiveProps(nextProps) {
     this.setState({
       currentChannel: nextProps.currentChannel,
-      openChannels: nextProps.channels,
+      // openChannels: nextProps.channels,
       leftSide: nextProps.left,
       joiningToChannel: nextProps.joiningToChannel || this.state.joiningToChannel,
       requirePassword: nextProps.requirePassword,
@@ -47,12 +54,12 @@ class ChannelsPanel extends React.Component {
   }
 
   componentDidMount() {
-    this.stopListeningAppState = AppStateStore.listen((appState) => {
-      this.setState({ appState: appState });
-    });
-
     this.unsubscribeFromChannelStore = ChannelStore.listen((channels) => {
       this.setState({ openChannels: channels });
+    });
+
+    this.stopListeningAppState = AppStateStore.listen((appState) => {
+      this.setState({ appState: appState });
     });
 
     this.setState({ openChannels: ChannelStore.channels });
@@ -85,10 +92,10 @@ class ChannelsPanel extends React.Component {
     const mentionsCount = this.state.appState.mentions[name] ? this.state.appState.mentions[name] : 0;
     const className = "unreadMessages " + (mentionsCount > 0 ? "hasMentions" : "");
     return (
-      <div className="row link" key={Math.random()}>
-        <span className='channelName' onClick={this.handleJoinChannel.bind(this, name, "")} key={Math.random()}>#{name}</span>
+      <div className="row link" key={Math.random().toString()}>
+        <span className='channelName' onClick={this.handleJoinChannel.bind(this, name, "")} key={Math.random().toString()}>#{name}</span>
         {hasUnreadMessages ? <span className={className} style={this.state.theme}>{hasUnreadMessages ? unreadMessagesCount : ""}</span> : ""}
-        <span className='closeChannelButton' onClick={NetworkActions.leaveChannel.bind(this, name)} key={Math.random()}>Close</span>
+        <span className='closeChannelButton' onClick={NetworkActions.leaveChannel.bind(this, name)} key={Math.random().toString()}>Close</span>
       </div>
     );
   }

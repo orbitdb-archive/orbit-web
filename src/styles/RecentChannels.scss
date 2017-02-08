@@ -11,22 +11,22 @@
     margin: 1em;
     margin-top: 0;
     margin-bottom: 0;
-    // font-weight: 100;
     box-sizing: border-box;
+
+    font-weight: bold;
 
     .link {
       box-sizing: border-box;
       vertical-align: middle;
       cursor: pointer;
-      color: rgba(228, 228, 228, 0.3);
-      // font-weight: 100;
+      color: rgb(196, 196, 196);
       margin-right: 0.2em;
       margin-bottom: 0.1em;
     }
 
     .link:hover {
       background-color: rgb(48, 48, 48);
-      color: rgb(228, 228, 228);
+      color: rgb(250, 250, 250);
       border: 0px solid transparent;
     }
 
