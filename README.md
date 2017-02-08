@@ -6,7 +6,7 @@
 
 > A distributed, peer-to-peer chat application built on [IPFS](http://ipfs.io)
 
-Browser application for [Orbit](https://github.com/orbitdb/orbit). 
+Browser application for [Orbit](https://github.com/orbitdb/orbit).
 
 **NOTE!** *Orbit is still more or less experimental. It means Orbit is currently ***not secure****, APIs will change and builds can break over the coming months. If you come across problems, it would help greatly to open issues so that we can fix them as quickly as possible.*
 
@@ -94,6 +94,12 @@ or
 `npm run dist`
 
 *This script will add `dist/` to IPFS and the last hash in the output is a distributable directory in IPFS.*
+
+### Publish
+
+*This automatically opens an issue in ipfs/ops-requests with the hash of the build. You will need to have a GitHub basic authentication token called `$NODE_GITHUB_ISSUE_BOT` with `repos` scope enabled in order for this to work.*
+
+`make publish` 
 
 ### Clean
 
