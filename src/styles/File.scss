@@ -59,29 +59,16 @@ $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
     width: 100%;
   }
 
-  // .preview {
-  //   margin-top: 0.25em;
-  //   margin-bottom: 0.25em;
-  //   // margin-right: 1.0em;
-  //   // box-shadow: 4px 4px 4px 0px rgba(32, 32, 32, 1);
-  //   // // height: 200px;
-  //   // border: 1px solid rgba(32, 32, 32, 0.5);
-  // }
-
   .download {
     user-select: none;
     visibility: hidden;
     margin: 0;
     font-size: 0.9em;
     cursor: pointer;
-    // margin-left: 0.5em;
-    // margin-right: 0.5em;
   }
 
   .pin {
     visibility: hidden;
-    // margin-left: 0.5em;
-    // margin-right: 0.5em;
   }
 
   .size {
@@ -91,7 +78,6 @@ $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
   }
 
   .text {
-    // margin-right: 0.25em;
     color: $directory-link-color;
     text-decoration: none;
     cursor: pointer;
@@ -114,9 +100,6 @@ $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
 
 .File:hover {
   color: $directory-link-hover-color2;
-  // background-color: $directory-hover-color;
-  // border: 0px solid transparent;
-  // border-radius: 4px;
 
   .download {
     font-size: 0.8em;

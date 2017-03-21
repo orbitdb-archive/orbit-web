@@ -22,12 +22,9 @@ $timestamp-color:  rgba(240, 240, 240, 0.6);
   justify-content: flex-start;
   align-items: baseline;
   background-color: rgb(35, 35, 35);
-  // border-bottom: 1px solid rgba(34, 34, 34, 0);
-  // padding-top: 0.0em;
   padding-bottom: 0.15em;
 
   font-weight: bold;
-  // color: rgba(250, 250, 250, 0.2);
 
   overflow: hidden;
 
@@ -45,7 +42,6 @@ $timestamp-color:  rgba(240, 240, 240, 0.6);
     margin-right: 0.5em;
     display: flex;
     flex: 1;
-    // overflow: hidden;
   }
 
   .popout {
@@ -67,17 +63,4 @@ $timestamp-color:  rgba(240, 240, 240, 0.6);
     background: rgb(32, 32, 32);
     padding: 1.0em;
   }
-
-  // .Verified {
-  //   font-size: 0.6em;
-  //   display: flex;
-  //   align-self: center;
-  //   margin-right: 0.5em;
-  //   color: rgb(64, 64, 64);
-  // }
-
-  // .Verified:hover {
-  //   color: rgb(128, 128, 128);
-  // }
-
 }

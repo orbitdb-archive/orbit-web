@@ -61,7 +61,6 @@ const ChannelStore = Reflux.createStore({
     this.orbit.leave(channel)
     this.channels = Object.assign({}, this.orbit.channels)
     delete this.peers[channel]
-    // delete this.channels[channel]
     clearInterval(this.timers[channel])
     this.trigger(this.channels, this.peers)
   }

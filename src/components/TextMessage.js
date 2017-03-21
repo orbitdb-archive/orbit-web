@@ -53,12 +53,6 @@ function _autolink(items) {
 }
 
 class TextMessage extends React.Component {
-  // static propTypes = {
-  //   text: PropTypes.string,
-  //   useEmojis: PropTypes.bool,
-  //   highlightWords: PropTypes.array
-  // };
-
   constructor(props) {
     super(props)
 
