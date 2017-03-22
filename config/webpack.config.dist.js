@@ -11,7 +11,7 @@ const extractCommons = new webpack.optimize.CommonsChunkPlugin({
 
 let config = {
   output: {
-    path: 'dist/assets/',
+    path: path.resolve(process.cwd(), 'dist/assets/'),
     publicPath: '/assets/',
     filename: 'app.js'
   },
