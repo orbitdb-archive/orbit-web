@@ -8,7 +8,7 @@ import Themes from 'app/Themes'
 const appName = 'anonet.app'
 
 const defaultSettings = {
-  theme: Themes.Default,
+  theme: 'Default',
   useEmojis: true,
   colorifyUsernames: true,
   font: 'Lato',
@@ -38,9 +38,8 @@ const SettingsStore = Reflux.createStore({
     // Load from local storage
     this.settings = Object.assign({}, defaultSettings)
     const settings = JSON.parse(localStorage.getItem(this._getSettingsKey())) || {}
-    Object.assign(this.settings, settings)
+    this.settings = Object.assign(this.settings, settings)
     this._save() // Save the defaults for a new user
-
     this.trigger(this.settings, settingsDescriptions)
   },
   onGet: function(callback) {

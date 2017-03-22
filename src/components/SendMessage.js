@@ -1,80 +1,84 @@
-'use strict';
+'use strict'
 
-import React from 'react';
+import React from 'react'
 import EmojiPicker from './EmojiPicker'
-import Actions from "actions/UIActions";
-import AutoCompleter from "./AutoCompleter.js";
-import 'styles/SendMessage.scss';
-import UsersStore from 'stores/UsersStore';
-import TransitionGroup from "react-addons-css-transition-group";
+import Actions from "actions/UIActions"
+import AutoCompleter from "./AutoCompleter.js"
+import 'styles/SendMessage.scss'
+import UsersStore from 'stores/UsersStore'
+import TransitionGroup from "react-addons-css-transition-group"
 
 class SendMessage extends React.Component {
   constructor(props) {
-    super(props);
-    this.autoComplete = new AutoCompleter();
-    this.autoComplete.onUpdated = (text) => this.refs.message.value = text;
+    super(props)
+    this.autoComplete = new AutoCompleter()
+    this.autoComplete.onUpdated = (text) => this.refs.message.value = text
     this.state = {
       theme: props.theme,
       useEmojis: props.useEmojis,
       emojiPickerActive: false,
-      replyto: null,
       lastWord: null
-    };
+    }
   }
 
   componentDidMount() {
-    this.unsubscribe = Actions.onPanelClosed.listen(() => this.refs.message.focus());
-    this.unsubscribe2 = Actions.focusOnSendMessage.listen(() => this.refs.message.focus());
-    this.refs.message.focus();
+    this.unsubscribe = Actions.onPanelClosed.listen(() => this.refs.message.focus())
+    this.unsubscribe2 = Actions.focusOnSendMessage.listen(() => this.refs.message.focus())
+    this.timer = setTimeout(() => {
+      if (this.refs.message) 
+        this.refs.message.focus()
+    }, 30)
   }
 
   componentWillUnmount() {
-    this.unsubscribe();
-    this.unsubscribe2();
+    clearTimeout(this.timer)
+    this.unsubscribe()
+    this.unsubscribe2()
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
       theme: nextProps.theme,
-      replyto: nextProps.replyto
-    });
+    })
   }
 
   sendMessage(event) {
-    event.preventDefault();
-    var text = this.refs.message.value.trim();
-    this.props.onSendMessage(text, this.state.replyto);
-    this.refs.message.value = '';
-    this.refs.message.focus();
-    this.setState({ replyto: null })
-    return;
+    if(!this.r) this.r = 0
+    this.r++
+
+    event.preventDefault()
+    const inputField = this.refs.message
+    var text = inputField.value.trim()
+    this.props.onSendMessage(text, this.state.replyto)
+    inputField.value = ''
+    inputField.focus()      
   }
 
   onCloseEmojiPicker() {
-    this.setState({ emojiPickerActive : false });
-    this.refs.message.focus();
+    this.setState({ emojiPickerActive : false })
+    this.refs.message.focus()
   }
 
   onSelectEmoji (emojiText) {
-    let text = this.refs.message.value.split(' ');
-    text.pop();
-    text.push(emojiText);
-    this.refs.message.value = text.join(' ');
+    let text = this.refs.message.value.split(' ')
+    text.pop()
+    text.push(emojiText)
+    this.refs.message.value = text.join(' ')
   }
 
   onInput() {
-    const lastWord = this.refs.message.value.split(' ').pop();
-    this.setState({ lastWord: lastWord });
+    const lastWord = this.refs.message.value.split(' ').pop()
+    this.setState({ lastWord: lastWord })
     if (lastWord.startsWith(':')) {
-      this.setState({ emojiPickerActive: this.props.useEmojis });
+      this.setState({ emojiPickerActive: this.props.useEmojis })
     }
   }
 
   onKeyDown(event) {
     const userNames = Object.keys(UsersStore.users).map((e) => UsersStore.users[e].name)
-    this.autoComplete.onKeyDown(event, this.refs.message.value, userNames);
+    this.autoComplete.onKeyDown(event, this.refs.message.value, userNames)
     if (this.state.emojiPickerActive) {
-      this.refs.emojipicker.onKeyDown(event);
+      this.refs.emojipicker.onKeyDown(event)
     }
   }
 
@@ -111,8 +115,8 @@ class SendMessage extends React.Component {
             />
         </form>
       </div>
-    );
+    )
   }
 }
 
-export default SendMessage;
+export default SendMessage

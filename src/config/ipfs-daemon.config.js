@@ -20,6 +20,15 @@ export function defaultIpfsDaemonSettings(ipfsDataDir) {
         "Access-Control-Allow-Methods": ["PUT", "GET", "POST"],
         "Access-Control-Allow-Credentials": ["true"]
       }
-    }
+    },
+    Discovery: {
+      MDNS: {
+        Enabled: false,
+        Interval: 10
+      },
+      webRTCStar: {
+        Enabled: true
+      }
+    },    
   }
 }

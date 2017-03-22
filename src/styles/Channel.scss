@@ -84,7 +84,7 @@ $controls-height: 2.8em;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5em;
+  padding: 0.35em;
   margin-left: 0.2em;
   margin-right: 0.2em;
   color: $main-text-color;
@@ -154,7 +154,6 @@ $controls-height: 2.8em;
     flex-direction: column;
     justify-content: flex-end;
     align-items: flex-end;
-    // align-self: flex-end;
     flex: 1;
     margin-left: 1vw;
   }
@@ -167,7 +166,6 @@ $controls-height: 2.8em;
   input[type=submit] {
     margin-top: 0.2em;
     font-size: 0.8em;
-    // width: 90%;
     align-self: flex-end;
   }
 
@@ -226,11 +224,9 @@ input[type=button], .channelOptionsButton {
   border-top: 1px solid $bar-border-color;
   border-bottom: 1px solid $bar-border-color;
 
-  // font-weight: bold;
   color: rgb(128, 128, 128);
 
   .replyto {
-    // flex: 0 0 30%;
     min-width: 5vw;
     max-width: 30vw;
     justify-content: flex-start;
@@ -243,7 +239,6 @@ input[type=button], .channelOptionsButton {
 }
 
 .statusMessage {
-  // position: absolute;
   bottom: 1.2em;
   right: 1em;
   margin-right: 0.5em;
@@ -279,21 +274,35 @@ input[type=button], .channelOptionsButton {
   position: relative;
   box-sizing: border-box;
   width: 100%;
-  // height: 100%;
   overflow: auto;
   -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
 
+  .dateSeparator {
+    display: flex;
+    justify-content: flex-start;
+    padding-left: 0.3em;
+    font-weight: bold;
+    font-size: 0.7em;
+    color: rgb(228, 228, 228);
+    background-color: rgb(35, 35, 35);
+    border-top: 0.5em solid white;
+    border-bottom: 0.5em solid white;
+    border-color: rgb(35, 35, 35);
+    cursor: default;
+  }
+
   .firstMessage {
     display: flex;
     justify-content: center;
-    background-color: rgb(36, 36, 36);
-    color: $second-text-color;
+    background-color: rgb(35, 35, 35);
+    color: rgb(160, 160, 160);
     font-weight: bold;
-    font-size: 0.8em;
-    padding: 0.2em;
-    // user-select: none;
-    // -webkit-user-select: none;
+    font-style: italic;
+    font-size: 0.7em;
+    padding: 0.5em;
+    user-select: none;
+    -webkit-user-select: none;
     cursor: default;
   }
 

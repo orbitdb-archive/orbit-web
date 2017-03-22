@@ -147,7 +147,12 @@ class LoginView extends React.Component{
         <button type='button' className='ConfigurationButton submitButton' onClick={this.configureIpfs.bind(this)}>
           Configuration
         </button>
-        <BackgroundAnimation size={this.state.logoSize} circleSize={2} theme={this.state.theme}/>
+        <BackgroundAnimation 
+          size={this.state.logoSize} 
+          circleSize={2} 
+          theme={this.state.theme}
+          onClick={this.focusUsername.bind(this)}
+        />
       </div>
     );
   }

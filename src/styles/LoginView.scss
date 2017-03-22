@@ -1,6 +1,7 @@
 $text-color: rgba(228, 228, 228, 0.9);
 
 .LoginView {
+  font-weight: bold;
   font-size: 0.9em;
   padding: 0.1em;
   color: rgb(128, 128, 128);
@@ -112,7 +113,7 @@ $text-color: rgba(228, 228, 228, 0.9);
       font-size: 1em;
 
       .hint {
-        color: rgba(196, 196, 196, 0.4);
+        color: rgba(196, 196, 196, 0.8);
       }
     }
 

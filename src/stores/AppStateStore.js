@@ -88,8 +88,6 @@ const AppStateStore = Reflux.createStore({
   },
   onWindowOnFocus: function() {
     this.state.hasFocus = true
-    delete this.state.unreadMessages[this.state.currentChannel]
-    delete this.state.mentions[this.state.currentChannel]
     this.trigger(this.state)
   }
 })

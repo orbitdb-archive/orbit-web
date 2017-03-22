@@ -27,7 +27,7 @@ function _emojify(items, size) {
     attributes: { 
       width: size || '16px', 
       height: size || '16px' 
-    }
+    },
   }
 
   return flatten(items.map((item) => {
@@ -53,12 +53,6 @@ function _autolink(items) {
 }
 
 class TextMessage extends React.Component {
-  static propTypes = {
-    text: PropTypes.string,
-    useEmojis: PropTypes.bool,
-    highlightWords: PropTypes.array
-  };
-
   constructor(props) {
     super(props)
 
@@ -91,11 +85,13 @@ class TextMessage extends React.Component {
         <TransitionGroup
           transitionName='textAnimation'
           transitionAppear={true}
-          transitionAppearTimeout={500}
+          transitionEnter={false}
+          transitionLeave={false}
+          transitionAppearTimeout={200}
           transitionEnterTimeout={0}
           transitionLeaveTimeout={0}
           className='content2'>
-          <span className='content2'>{this.state.content}</span>
+          <span className='content2' key={Math.random() * 1000}>{this.state.content}</span>
         </TransitionGroup>
       </div>
     )

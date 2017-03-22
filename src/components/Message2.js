@@ -17,53 +17,19 @@ class Message extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      post: null,
-      user: null,
+      post: props.post,
+      user: props.post.meta.from,
       hasHighlights: false,
-      isCommand: false,
-      formattedTime: getFormattedTime(props.message.meta.ts),
+      isCommand: props.post.content && props.post.content.startsWith('/me'),
+      formattedTime: getFormattedTime(props.post.meta.ts),
       showSignature: false,
       showProfile: null
     }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return this.state.post !== nextState.post
+    return (this.state.post !== nextState.post && this.state.post.hash !== nextState.post.hash)
       || this.state.user !== nextState.user
-  }
-
-  componentDidMount() {
-    ChannelActions.loadPost(this.props.message.value, (err, post) => {
-      if (post) {
-        UserActions.getUser(post.meta.from, (err, user) => {
-          this.setState({ post: post, user: user })
-
-          if (post.content) {
-            if (post.content.startsWith('/me')) {
-              this.state.isCommand = true
-            }
-            post.content.split(' ').forEach((word) => {
-              const highlight = MentionHighlighter.highlight(word, this.props.highlightWords)
-              if(typeof highlight[0] !== 'string' && this.props.highlightWords !== post.meta.from) {
-                this.state.hasHighlights = true
-                NotificationActions.mention(this.state.channelName, post.content) // TODO: where does channelName come from?
-              }
-            })
-          }
-        })
-      }
-    })
-  }
-
-  onReplyTo(event) {
-    const { post, user } = this.state
-    const hash = this.props.message.value
-    this.setState({ replyto: hash })
-    this.props.onReplyTo({
-      hash: hash,
-      content: post.meta.type === 'text' ? post.content : post.name,
-      user: user,
-    })
   }
 
   renderContent() {
@@ -72,26 +38,27 @@ class Message extends React.Component {
     const contentClass = isCommand ? "Content2 command" : "Content2"
     let content = (<div></div>)
     if (post) {
+      const key = post.hash + post.meta.ts
       switch (post.meta.type) {
         case 'text':
           content = (
             <TextMessage
               text={post.content}
-              replyto={post.replyToContent}
+              replyto={null}
               useEmojis={useEmojis}
-              highlightWords={post.meta.from !== highlightWords ? highlightWords : ''}
-              key={post.hash} />
+              highlightWords={highlightWords}
+              key={key} />
           )
           break
         case 'file':
-          content = <File hash={post.hash} name={post.name} size={post.size} meta={post.meta} onPreviewOpened={this.props.onScrollToPreview}/>
+          content = <File hash={post.hash} name={post.name} size={post.size} meta={post.meta} onPreviewOpened={this.props.onScrollToPreview} key={key}/>
           break
         case 'directory':
-          content = <Directory hash={post.hash} name={post.name} size={post.size} root={true} onPreviewOpened={this.props.onScrollToPreview}/>
+          content = <Directory hash={post.hash} name={post.name} size={post.size} root={true} onPreviewOpened={this.props.onScrollToPreview} key={key}/>
           break
       }
     }
-    return <div className={contentClass} onClick={this.onReplyTo.bind(this)}>{content}</div>
+    return <div className={contentClass}>{content}</div>
   }
 
   render() {
@@ -101,7 +68,7 @@ class Message extends React.Component {
 
     return (
       <div className={className} style={style} onDragEnter={onDragEnter}>
-        <div className="Avatar"></div>
+        <div className="Avatar">{user.name.split('')[0].toUpperCase()}</div>
         <div className="Text">
           <div className="rowrow2">
             <User

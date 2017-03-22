@@ -39,7 +39,10 @@ class File extends React.Component {
   }
 
   get isImage() {
-    return this.ext === 'png' || this.ext === 'jpg' || this.ext === 'gif' || this.ext === 'svg' || this.ext === 'bmp';
+    const supportedImageTypes = [
+      'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'
+    ]
+    return supportedImageTypes.includes(this.ext.toLowerCase())
   }
 
   get isHighlightable() {
@@ -177,10 +180,10 @@ class File extends React.Component {
           component="div"
           className="content">
             <span className="text" onClick={this.handleClick.bind(this)}>{this.props.name}</span>
+            <span className="size">{size}</span>
             <a className="download" href={openLink} target="_blank">Open</a>
             <a className="download" href={openLink} download={this.props.name}>Download</a>
-            <span className={className}>Hash</span>
-            <span className="size">{size}</span>
+            <span className={className}>Copy Hash</span>
             {this.state.showPreview && preview}
         </TransitionGroup>
       </div>

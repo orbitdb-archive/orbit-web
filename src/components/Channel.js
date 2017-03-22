@@ -1,13 +1,13 @@
 'use strict'
 
 import React from 'react'
-import last from 'lodash.last'
 import Message from 'components/Message'
 import Message2 from 'components/Message2'
 import ChannelControls from 'components/ChannelControls'
 import NewMessageNotification from 'components/NewMessageNotification'
 import Dropzone from 'react-dropzone'
 import MessageStore from 'stores/MessageStore'
+import ChannelStore from 'stores/ChannelStore'
 import UIActions from 'actions/UIActions'
 import ChannelActions from 'actions/ChannelActions'
 import Profile from "components/Profile"
@@ -15,12 +15,24 @@ import 'styles/Channel.scss'
 import Logger from 'logplease'
 const logger = Logger.create('Channel', { color: Logger.Colors.Cyan })
 
+window.LOG = 'none'
+
+// debug command
+window.send = (channel, amount = 1, interval = 100, text = "ping") => {
+  let i = 0
+  let timer = setInterval(() => {
+    ChannelActions.sendMessage(channel, text + " (" + i + ")")
+    i ++
+    if(i === amount) clearInterval(timer)
+  }, interval)
+}
+
 class Channel extends React.Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      peers: 0,
+      peers: [],
       channelChanged: true,
       channelName: null,
       messages: [],
@@ -41,9 +53,9 @@ class Channel extends React.Component {
 
     this.peersPollTimer = null
     this.scrollTimer = null
-    this.topMargin = 120
+    this.topMargin = 0//window.innerHeight * (15 / 100)
     this.bottomMargin = 20
-
+    this.prevScrollPosition = 0
     this.onShowProfile = this.onShowProfile.bind(this)
     this.onDragEnter = this.onDragEnter.bind(this)
     this.onScrollToPreview = this.onScrollToPreview.bind(this)
@@ -55,7 +67,7 @@ class Channel extends React.Component {
       || this.state.channelName != nextState.channelName
       || this.state.dragEnter != nextState.dragEnter
       || this.state.loading != nextState.loading
-      || this.state.peers != nextState.peers
+      || this.state.peers.length != nextState.peers.length
       || this.state.showUserProfile != nextState.showUserProfile
   }
 
@@ -71,6 +83,7 @@ class Channel extends React.Component {
       })
       UIActions.focusOnSendMessage()
       ChannelActions.loadMessages(nextProps.channel)
+      if (this.peersPollTimer) clearInterval(this.peersPollTimer)
     }
 
     this.setState({
@@ -82,27 +95,20 @@ class Channel extends React.Component {
   }
 
   componentDidMount() {
-    if (this.state.channelName) {
-      this.peersPollTimer = setInterval(() => {
-        if (MessageStore.orbit) {
-          MessageStore.orbit._ipfs.pubsub.peers(this.state.channelName)
-            .then((peers) => this.setState({ peers: peers.length }))
-            .catch((e) => {})
-        }
-      }, 1000)
-    }
-
+    this.unsubscribeFromChannelStore = ChannelStore.listen(this.onPeers.bind(this))
     this.unsubscribeFromMessageStore = MessageStore.listen(this.onNewMessages.bind(this))
     this.unsubscribeFromErrors = UIActions.raiseError.listen(this._onError.bind(this))
     this.stopListeningChannelState = ChannelActions.reachedChannelStart.listen(this._onReachedChannelStart.bind(this))
     this.node = this.refs.MessagesView
     this.unsubscribeFromLoadingStart = UIActions.startLoading.listen((channel) => {
-      if (channel === this.state.channelName)
+      if (channel === this.state.channelName) {
         this.setState({ loading: true })
+      }
     })
     this.unsubscribeFromLoadingStop = UIActions.stopLoading.listen((channel) => {
-      if (channel === this.state.channelName)
+      if (channel === this.state.channelName) {
         this.setState({ loading: false })
+      }
     })
   }
 
@@ -117,6 +123,7 @@ class Channel extends React.Component {
   componentWillUnmount() {
     clearTimeout(this.timer)
     clearTimeout(this.scrollTimer)
+    this.unsubscribeFromChannelStore()
     this.unsubscribeFromMessageStore()
     this.unsubscribeFromErrors()
     this.stopListeningChannelState()
@@ -125,27 +132,48 @@ class Channel extends React.Component {
     this.setState({ messages: [] })
   }
 
+  onPeers(channels, peers) {
+    const p = peers[this.state.channelName]
+    if (p !== undefined && p.length !== this.state.peers.length)
+      this.setState({ peers: p || [] })
+  }
+
   onNewMessages(channel: string, messages) {
     if(channel !== this.state.channelName)
       return
 
-    this.node = this.refs.MessagesView
-    if(this.node && this.node.scrollHeight - this.node.scrollTop + this.bottomMargin > this.node.clientHeight
-      && this.node.scrollHeight > this.node.clientHeight + 1
-      && this.state.messages.length > 0 && last(messages).meta.ts > last(this.state.messages).meta.ts
-      && this.node.scrollHeight > 0) {
-      this.setState({
-        unreadMessages: this.state.unreadMessages + 1
-      })
-    }
+    // THIS IS ADDING A LOT OF CYCLES TO EACH FRAME!!
 
-    this.setState({ messages: messages })
+    // this.node = this.refs.MessagesView
+    // if(this.node && this.node.scrollHeight - this.node.scrollTop + this.bottomMargin > this.node.clientHeight
+    //   && this.node.scrollHeight > this.node.clientHeight + 1
+    //   && this.state.messages.length > 0 && last(messages).meta.ts > last(this.state.messages).meta.ts
+    //   && this.node.scrollHeight > 0) {
+    //   this.setState({
+    //     unreadMessages: this.state.unreadMessages + 1
+    //   })
+    // }
+
+    const prevLength = this.state.messages.length
+    setImmediate(() => {
+      this.setState({ messages: messages }, () => {
+        if (messages.length > prevLength) {
+          // Load more history to the "buffer"
+          if(this.loadMoreTimeout) clearTimeout(this.loadMoreTimeout)
+          this.loadMoreTimeout = setTimeout(() => {
+            if(this._shouldLoadMoreMessages())
+              // this.loadOlderMessages(this.node.scrollHeight === this.node.clientHeight)
+              this.loadOlderMessages(true, true)
+          }, 10)
+        }
+      })
+    })
   }
 
-  sendMessage(text: string, replyto: string) {
+  sendMessage(text: string, replyto: string, cb) {
     if(text !== '') {
-      ChannelActions.sendMessage(this.state.channelName, text, replyto)
-      this.setState({ replyto: null })
+      ChannelActions.sendMessage(this.state.channelName, text, replyto, cb)
+      // this.setState({ replyto: null })
     }
   }
 
@@ -154,10 +182,8 @@ class Channel extends React.Component {
       ChannelActions.addFile(this.state.channelName, source)
   }
 
-  loadOlderMessages() {
-    if(!this.state.loading) {
-      ChannelActions.loadMoreMessages(this.state.channelName)
-    }
+  loadOlderMessages(force, refresh) {
+    ChannelActions.loadMoreMessages(this.state.channelName, force, refresh)
   }
 
   componentWillUpdate() {
@@ -172,11 +198,12 @@ class Channel extends React.Component {
 
     this.node = this.refs.MessagesView
     this.scrollAmount = scrollHeight - this.scrollHeight
-    this.keepScrollPosition = (this.scrollAmount > 0 && this.scrollTop > (0 + this.topMargin)) || this.state.reachedChannelStart
+    // this.keepScrollPosition = (this.scrollAmount > 0 && this.scrollTop > (0 + this.topMargin))
     this.shouldScrollToBottom = (this.node.scrollTop + clientHeight + this.bottomMargin) >= this.scrollHeight
 
-    if(!this.keepScrollPosition)
+    if(this.scrollAmount > 0) {
       this.node.scrollTop += this.scrollAmount
+    }
 
     if(this.shouldScrollToBottom)
       this.node.scrollTop = scrollHeight + clientHeight
@@ -190,15 +217,17 @@ class Channel extends React.Component {
 
     // Wait for the render (paint) cycle to finish before checking.
     // The DOM element sizes (ie. scrollHeight and clientHeight) are not updated until the paint cycle finishes.
-    if(this.loadMoreTimeout) clearTimeout(this.loadMoreTimeout)
-    this.loadMoreTimeout = setTimeout(() => {
-      if(this._shouldLoadMoreMessages())
-        this.loadOlderMessages()
-    }, 20)
+    // if(this.loadMoreTimeout) clearTimeout(this.loadMoreTimeout)
+    // this.loadMoreTimeout = setTimeout(() => {
+    //   if(this._shouldLoadMoreMessages())
+    //     this.loadOlderMessages()
+    // }, 30)
   }
 
   _shouldLoadMoreMessages() {
-    return this.node && (this.node.scrollTop - this.topMargin <= 0 || this.node.scrollHeight === this.node.clientHeight)
+    return this.node 
+      && (this.node.scrollTop - this.topMargin <= 0 
+       || this.node.scrollHeight === this.node.clientHeight)
   }
 
   onDrop(files) {
@@ -232,26 +261,35 @@ class Channel extends React.Component {
     this.setState({ dragEnter: false })
   }
 
-  onScroll() {
+  onScroll(e) {
     if(this.scrollTimer)
-      clearTimeout(this.scrollTimer)
+      return
 
     // After scroll has finished, check if we should load more messages
     // Using timeout here because of OS-applied scroll inertia
-    // this.setState({ loadingText: 'Loading more messages...' })
-    this.scrollTimer = setTimeout(() => {
-      if(this._shouldLoadMoreMessages())
-        this.loadOlderMessages()
-    }, 800)
-
+    // UPDATE: it seems only OSX and the (new) trackpad applies inertia
+    if(this._shouldLoadMoreMessages()) {
+      const loadDelay = 100
+      this.scrollTimer = setTimeout(() => {
+        // this.setState({ loadingText: 'Loading more messages...' })
+        this.loadOlderMessages(true, false)
+        clearTimeout(this.scrollTimer)
+        this.scrollTimer = null
+      }, loadDelay)
+    }
 
     // If we scrolled to the bottom, hide the "new messages" label
-    this.node = this.refs.MessagesView
-    if(this.node.scrollHeight - this.node.scrollTop - 10 <= this.node.clientHeight) {
-      this.setState({
-        unreadMessages: 0
-      })
-    }
+    const hideDelay = 100
+    setTimeout(() => {
+      this.node = this.refs.MessagesView
+      if(this.node.scrollHeight - this.node.scrollTop - 10 <= this.node.clientHeight) {
+        this.setState({ unreadMessages: 0 })
+      }
+    }, hideDelay)
+
+    // Stop inertia if we're at the top of the element
+    // if (this.node.scrollTop === 0)
+    //   e.preventDefault()
   }
 
   onScrollToBottom() {
@@ -319,25 +357,33 @@ class Channel extends React.Component {
       fontSize: useMonospaceFont ? '0.9em' : '1.0em',
       fontWeight: useMonospaceFont ? 'normal' : 'bold'
     }
+    const style2 = {
+      fontFamily: useMonospaceFont ? monospaceFont : font,
+      fontSize: appSettings.useLargeMessage ? '0.8em' : '0.7em',
+      fontWeight: useMonospaceFont ? 'normal' : 'bold',
+      paddingBottom: useMonospaceFont ? '0.2em' : '0em',
+      paddingLeft: appSettings.useLargeMessage ? '0.75em' : '0.3em'
+    }
 
-    const elements = messages.map((message) => {
+    let prevDate
+    const elements = messages.reduce((result, message) => {
+      const date = new Date(message.Post.meta.ts)
+      if (date.getDate() !== prevDate) {
+        prevDate = date.getDate()
+        result.push(
+          <div 
+            className="dateSeparator" 
+            key={message.Hash + date}
+            style={style2}>
+            {date.toDateString()}
+          </div>
+        )
+      }
+
       if (appSettings.useLargeMessage) {
-        return <Message2
-          message={message}
-          key={message.hash + message.meta.ts}
-          onReplyTo={this.onReplyTo.bind(this)}
-          onShowProfile={this.onShowProfile.bind(this)}
-          onDragEnter={this.onDragEnter.bind(this)}
-          onScrollToPreview={this.onScrollToPreview.bind(this)}
-          highlightWords={[username]}
-          colorifyUsername={colorifyUsernames}
-          useEmojis={useEmojis}
-          style={style}
-        />
-      } else {
-        return <Message
-          message={message}
-          key={message.hash + message.meta.ts}
+        result.push(<Message2
+          post={message.Post}
+          key={message.Hash}
           onShowProfile={this.onShowProfile}
           onDragEnter={this.onDragEnter}
           onScrollToPreview={this.onScrollToPreview}
@@ -345,13 +391,29 @@ class Channel extends React.Component {
           colorifyUsername={colorifyUsernames}
           useEmojis={useEmojis}
           style={style}
-        />
+        />)
+      } else {
+        result.push(<Message
+          post={message.Post}
+          entry={message.Entry}
+          key={message.Hash}
+          onShowProfile={this.onShowProfile}
+          onDragEnter={this.onDragEnter}
+          onScrollToPreview={this.onScrollToPreview}
+          highlightWords={[username]}
+          colorifyUsername={colorifyUsernames}
+          useEmojis={useEmojis}
+          style={style}
+        />)
       }
-    })
-        // {reachedChannelStart && !loading ? `Joined #${channelName}` : loadingText }
+
+      return result
+    }, [])
+    
+    // {reachedChannelStart && !loading ? `Joined #${channelName}` : loadingText }
     elements.unshift(
-      <div className="firstMessage" key="firstMessage" onClick={this.loadOlderMessages.bind(this)}>
-        {`Joined #${channelName}`}
+      <div className="firstMessage" key="firstMessage" onClick={this.loadOlderMessages.bind(this, false, false)}>
+        {this.state.loading ? `Loading history...` : `Beginning of #${channelName}`}
       </div>
     )
     return elements
@@ -388,10 +450,14 @@ class Channel extends React.Component {
         onClose={this.onShowProfile.bind(this)}/>
       : null
 
+        // <div className="Messages" ref="MessagesView" onScroll={this.onScroll.bind(this)}>
     return (
       <div className="Channel flipped" onDragEnter={this.onDragEnter.bind(this)}>
         <div>{profile}</div>
-        <div className="Messages" ref="MessagesView" onScroll={this.onScroll.bind(this)}>
+        <div 
+          className="Messages" 
+          ref="MessagesView" 
+          onScroll={this.onScroll.bind(this)}>
           {this.renderMessages()}
         </div>
         <NewMessageNotification
@@ -401,7 +467,7 @@ class Channel extends React.Component {
           onSendMessage={this.sendMessage.bind(this)}
           onSendFiles={this.onDrop.bind(this)}
           isLoading={loading}
-          channelMode={this.state.peers + " peers"}
+          channelMode={this.state.peers.length + " peers"}
           appSettings={appSettings}
           theme={theme}
           replyto={replyto}

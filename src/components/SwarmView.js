@@ -26,6 +26,7 @@ class SwarmView extends React.Component {
   }
 
   render() {
+    const peerId = SwarmStore.orbit ? SwarmStore.orbit._ipfs.PeerId : null
     var peers = this.state.peers.map((p) => {
       return (
         <TransitionGroup
@@ -46,6 +47,7 @@ class SwarmView extends React.Component {
 
     return (
       <div className="SwarmView">
+        <div className="summary">Your Peer ID is <span className="green">{peerId}</span></div>
         <div className="summary">Peers connected <span className="green">{this.state.peers.length}</span></div>
         <div className="peers">
           {peers}
