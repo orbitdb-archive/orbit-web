@@ -4,6 +4,11 @@ const webpack = require('webpack')
 const path = require('path')
 const common = require('./common.config.js')
 
+const extractCommons = new webpack.optimize.CommonsChunkPlugin({
+  name: 'commons',
+  filename: 'commons.js'
+})
+
 let config = {
   output: {
     path: 'dist/assets/',
@@ -15,6 +20,7 @@ let config = {
   },
   target: 'web',
   plugins: [
+    extractCommons,
     new webpack.DefinePlugin({
       'process.env': {
         'NODE_ENV': JSON.stringify('production')

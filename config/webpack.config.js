@@ -4,6 +4,11 @@ const webpack = require('webpack')
 const path = require('path')
 const common = require('./common.config.js')
 
+const extractCommons = new webpack.optimize.CommonsChunkPlugin({
+  name: 'commons',
+  filename: 'commons.js'
+})
+
 let config = {
   output: {
     path: path.resolve(process.cwd(), 'dist/assets/'),
@@ -14,7 +19,16 @@ let config = {
     app: [
       'webpack/hot/only-dev-server',
       './src/components/App.js'
-    ]
+    ],
+    commons: [
+      './node_modules/bignumber.js/bignumber.js',
+      './node_modules/bn.js/lib/bn.js',
+      './node_modules/dexie/dist/dexie.js',
+      './node_modules/ipfs-daemon/src/ipfs-browser-daemon.js',
+      './node_modules/orbit_/src/Orbit.js',
+      './src/utils/emojilist.js', 
+      './node_modules/highlight.js/lib/index.js'
+    ],
   },
   target: 'web',
   devtool: 'sourcemap',
@@ -24,7 +38,8 @@ let config = {
     headers: { "Access-Control-Allow-Origin": "*" }
   },
   plugins: [
-    new webpack.HotModuleReplacementPlugin()
+    extractCommons,
+    new webpack.HotModuleReplacementPlugin(),
   ]
 }
 
