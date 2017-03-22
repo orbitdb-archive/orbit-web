@@ -16,7 +16,7 @@ dist: build
 	npm run dist
 
 publish: build
-	@echo "You will need to have a $NODE_GITHUB_ISSUE_BOT GitHub access token set in your environment"
+	@echo "You will need to have a NODE_GITHUB_ISSUE_BOT GitHub access token set in your environment"
 	npm run publish
 
 clean:
