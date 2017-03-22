@@ -1,7 +1,6 @@
 'use strict'
 
 import React from 'react'
-import last from 'lodash.last'
 import Message from 'components/Message'
 import Message2 from 'components/Message2'
 import ChannelControls from 'components/ChannelControls'

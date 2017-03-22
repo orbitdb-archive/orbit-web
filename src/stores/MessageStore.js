@@ -1,7 +1,6 @@
 'use strict'
 
 import sortBy from 'lodash.sortby'
-import take from 'lodash.take'
 import differenceWith from 'lodash.differencewith'
 import Reflux from 'reflux'
 import AppActions from 'actions/AppActions'

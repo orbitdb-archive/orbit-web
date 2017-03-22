@@ -3,7 +3,6 @@
 import React from 'react'
 import { render } from 'react-dom'
 import { Router, Route, hashHistory } from 'react-router'
-import some from 'lodash.some'
 import Logger from 'logplease'
 
 import AppActions from 'actions/AppActions'
@@ -182,13 +181,12 @@ var App = React.createClass({
   },
   onJoinedChannel: function(channel) {
     logger.debug("Joined channel #" + channel)
-    // this.showChannel(channel)
     this.closePanel()
     document.title = `#${channel}`
     logger.debug("Set title: " + document.title)
     AppActions.setCurrentChannel(channel)
     let channels = this._getSavedChannels(this.state.networkName, this.state.user.name)
-    if (!some(channels, { name: channel })) {
+    if (!channels.find(e => e.name === channel)) {
       channels.push({ name: channel })
       this._saveChannels(this.state.networkName, this.state.user.name, channels)
     }

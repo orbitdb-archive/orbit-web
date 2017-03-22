@@ -3,7 +3,6 @@
 import React, { PropTypes } from 'react';
 import TransitionGroup from "react-addons-css-transition-group";
 import Dropzone from 'react-dropzone';
-import Halogen from 'halogen';
 import Spinner from 'components/Spinner';
 import SendMessage from 'components/SendMessage';
 import { getFormattedTime } from '../utils/utils.js';
