@@ -6,7 +6,7 @@
 
 > A distributed, peer-to-peer chat application built on [IPFS](http://ipfs.io)
 
-Browser application for [Orbit](https://github.com/orbitdb/orbit).
+Browser application for [Orbit](https://github.com/orbitdb/orbit). Try it at https://orbit.chat.
 
 **NOTE!** Orbit is still more or less experimental. It means Orbit is currently **not secure**, APIs will change and builds can break over the coming months. If you come across problems, it would help greatly to open issues so that we can fix them as quickly as possible.
 
@@ -25,10 +25,6 @@ See also:
 - [orbit-db](https://github.com/orbitdb/orbit-db) - Serverless, p2p database that orbit-core uses to store its data.
 - [orbit-textui](https://github.com/orbitdb/orbit-textui) - Terminal client prototype for Orbit.
 - [IPFS](https://ipfs.io) - IPFS
-
-## Live Version
-
-https://ipfs.io/ipfs/QmRBmZDB1ssGCchXx1aKM7smiAghRDLKwYR5dWGrozxXCJ
 
 ## From Source Code
 
