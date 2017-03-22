@@ -96,7 +96,7 @@ class BackgroundAnimation extends React.Component {
 
     return (
       <div className="BackgroundAnimation" ref="container" style={this.props.style}>
-        <svg width={this.state.width} height={this.state.width} key="circles" style={this.state.theme}>
+        <svg className="Rings" width={this.state.width} height={this.state.width} key="circles" style={this.state.theme}>
           <g className="transparent">
             {circles}
           </g>

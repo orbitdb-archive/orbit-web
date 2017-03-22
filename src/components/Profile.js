@@ -98,7 +98,7 @@ class Profile extends React.Component {
           ? <div className="more" onClick={this.onShowRawData.bind(this)}>Show profile...</div>
           : <div className="more" onClick={this.onShowRawData.bind(this)}>Show profile data...</div>
         }
-        <BackgroundAnimation style={{ top: "-80px", left: "-128px", zIndex: "-1" }} size={256} delay={0.0} theme={this.state.theme}/>
+        <BackgroundAnimation style={{ top: "-144px", left: "-128px", zIndex: "-1" }} size={256} delay={0.0} theme={this.state.theme}/>
       </div>
     )
   }
