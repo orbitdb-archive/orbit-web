@@ -63,6 +63,7 @@
     "load-grunt-tasks": "~3.5.0",
     "node-sass": "^4.5.0",
     "normalize.css": "~5.0.0",
+    "ping-ops-requests": "github:haadcode/ping-ops-requests",
     "react-hot-loader": "^1.3.0",
     "sass-loader": "^6.0.3",
     "style-loader": "~0.15.0",
@@ -79,6 +80,7 @@
     "build:dist": "grunt build && webpack --config config/webpack.config.dist.js --hide-modules --progress --env production && uglifyjs dist/assets/app.js -o dist/assets/app.js",
     "build:debug": "grunt build && webpack --config config/webpack.config.js --display-modules --sort-modules-by size --progress --hot",
     "dist": "ipfs add -r dist/",
+    "publish": "npm run dist | tail -1 | grep -o Qm[a-zA-Z0-9]* | xargs ping-ops-requests -d orbit.chat -t 'Deploy new version of orbit-web' -h",
     "start": "cd dist && ../node_modules/.bin/http-server -c-1 -p 8081 & open http://localhost:8081/index.html & wait"
   }
 }
