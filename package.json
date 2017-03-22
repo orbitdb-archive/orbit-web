@@ -63,7 +63,7 @@
     "load-grunt-tasks": "~3.5.0",
     "node-sass": "^4.5.0",
     "normalize.css": "~5.0.0",
-    "ping-ops-requests": "github:haadcode/ping-ops-requests",
+    "ping-ops-requests": "~1.0.4",
     "react-hot-loader": "^1.3.0",
     "sass-loader": "^6.0.3",
     "style-loader": "~0.15.0",
