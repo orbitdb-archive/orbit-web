@@ -8,7 +8,10 @@ import UserActions from 'actions/UserActions';
 import AppActions from 'actions/AppActions';
 import BackgroundAnimation from 'components/BackgroundAnimation';
 import Themes from 'app/Themes';
+import Package from '../../package.json'
 import 'styles/LoginView.scss';
+
+const version = Package.version
 
 var maxNicknameLength = 32;
 var maxLogoSize = 480;
@@ -144,6 +147,9 @@ class LoginView extends React.Component{
         <form onSubmit={this.register.bind(this)}>
           {form}
         </form>
+        <div className='Version'>
+          Version: {version}
+        </div>
         <button type='button' className='ConfigurationButton submitButton' onClick={this.configureIpfs.bind(this)}>
           Configuration
         </button>

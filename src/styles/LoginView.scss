@@ -14,12 +14,21 @@ $text-color: rgba(228, 228, 228, 0.9);
   // border-top: 1px solid rgba(30, 30, 30, 1);
   box-sizing: border-box;
 
+  .Version {
+    z-index: 1;
+    position: absolute;
+    bottom: 1.2em;
+    left: 1em;
+    font-size: 0.9em;
+    color: rgba(220, 220, 220, 0.4);
+  }
 
   .ConfigurationButton {
     z-index: 1;
     position: absolute;
     bottom: 1em;
     right: 1em;
+    font-size: 0.9em;
   }
 
   // TODO: rename to header
