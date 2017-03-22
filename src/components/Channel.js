@@ -101,13 +101,14 @@ class Channel extends React.Component {
     this.stopListeningChannelState = ChannelActions.reachedChannelStart.listen(this._onReachedChannelStart.bind(this))
     this.node = this.refs.MessagesView
     this.unsubscribeFromLoadingStart = UIActions.startLoading.listen((channel) => {
-      if (channel === this.state.channelName && !this.state.loading) {
+      if (channel === this.state.channelName) {
         this.setState({ loading: true })
       }
     })
     this.unsubscribeFromLoadingStop = UIActions.stopLoading.listen((channel) => {
-      if (channel === this.state.channelName && this.state.loading)
+      if (channel === this.state.channelName) {
         this.setState({ loading: false })
+      }
     })
   }
 

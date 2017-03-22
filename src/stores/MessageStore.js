@@ -30,7 +30,7 @@ const MessageStore = Reflux.createStore({
   _reset: function() {
     this.orbit = null
     this.channels = {}
-    this.syncCount = 0
+    this.syncCount = {}
     this.sendQueue = []
     this.sending = false
     this.loadingHistory = false
@@ -78,13 +78,13 @@ const MessageStore = Reflux.createStore({
   },
   onInitialize: function(orbit) {
     this.orbit = orbit
-    this.syncCount = 0
+    this.syncCount = {}
 
     const processMessages = (channel, messages, newMessages = true) => {
       setImmediate(() => {
         this._updateStore(channel, messages, newMessages)
-        if (this.syncCount <= 0)
-          UIActions.stopLoading(channel, "load")
+        if (this.syncCount[channel] <= 0)
+          setImmediate(() => UIActions.stopLoading(channel, "load"))
       })
     }
 
@@ -101,33 +101,37 @@ const MessageStore = Reflux.createStore({
       getMessages(channel, this.channels[channel].messages.length + 1)
     })
 
-    // When we receive new messages from peers,
-    // get the messages and update the store state
-    this.orbit.events.on('synced', (channel) => {
-      // logger.info("synced -->", channel)
-      this.syncCount --
-      getMessages(channel, this.channels[channel].messages.length + messagesBatchSize)
-    })
-
     this.orbit.events.on('joined', (channel) => {
       logger.info(`Joined #${channel}`)
 
       const feed = this.orbit.channels[channel].feed
 
+      this.syncCount[channel] = this.syncCount[channel] ? this.syncCount[channel] : 0
+
       // When the database has loaded its history,
       // get the messages and update the state
       feed.events.on('ready', () => {
         // logger.info("ready -->", channel)
-        this.syncCount --
+        this.syncCount[channel]--
+        this.syncCount[channel] = Math.max(0, this.syncCount[channel])
         getMessages(channel, messagesBatchSize, false)
       })
 
       // When the database starts syncing new messages,
       // send a message that we're loading
-      feed.events.on('sync', (name) => {
+      feed.events.on('sync', (channel) => {
         // logger.info("sync -->", channel, name)
-        this.syncCount ++
-        UIActions.startLoading(channel, "load")
+        this.syncCount[channel] ++
+        setImmediate(() => UIActions.startLoading(channel, "load"))
+      })
+
+      // When we receive new messages from peers,
+      // get the messages and update the store state
+      feed.events.on('synced', (channel) => {
+        // logger.info("synced -->", channel)
+        this.syncCount[channel] --
+        this.syncCount[channel] = Math.max(0, this.syncCount[channel])
+        getMessages(channel, this.channels[channel].messages.length + messagesBatchSize)
       })
     })
   },
@@ -135,10 +139,13 @@ const MessageStore = Reflux.createStore({
     this._reset()
   },
   onJoinChannel: function(channel, password) {
-    if(!this.channels[channel])
+    if(!this.channels[channel]) {
+      this.syncCount[channel] = 0
       this.channels[channel] = { messages: [] }
+    }
   },
   onLeaveChannel: function(channel: string) {
+    delete this.syncCount[channel]
     delete this.channels[channel]
   },
   onLoadMessages: function(channel: string) {
