@@ -108,6 +108,11 @@ const MessageStore = Reflux.createStore({
 
       this.syncCount[channel] = this.syncCount[channel] ? this.syncCount[channel] : 0
 
+      // Catch and display db errors
+      feed.events.on('error', (err) => {
+        console.error(channel, err)
+      })
+
       // When the database has loaded its history,
       // get the messages and update the state
       feed.events.on('ready', () => {
