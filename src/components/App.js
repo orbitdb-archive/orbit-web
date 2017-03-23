@@ -141,7 +141,16 @@ var App = React.createClass({
   },
   _getSavedChannels: function(networkName, username) {
     const channelsKey = this._makeChannelsKey(username, networkName)
-    return JSON.parse(localStorage.getItem(channelsKey)) || []
+    let channels = JSON.parse(localStorage.getItem(channelsKey))
+
+    // If we have a first time user (nothing saved in local storage),
+    // add #ipfs to their saved channel list in order to join it
+    // automatically on first login
+    if (!channels) {
+      channels = [{ name: 'ipfs' }]
+    }
+
+    return channels
   },
   _saveChannels: function(networkName, username, channels) {
     const channelsKey = this._makeChannelsKey(username, networkName)
