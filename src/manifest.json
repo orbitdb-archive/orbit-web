@@ -1,0 +1,25 @@
+{
+  "short_name": "Orbit",
+  "name": "Orbit",
+  "icons": [
+    {
+      "src": "orbit-logo.png",
+      "type": "image/png",
+      "sizes": "48x48"
+    },
+    {
+      "src": "orbit-logo.png",
+      "type": "image/png",
+      "sizes": "96x96"
+    },
+    {
+      "src": "orbit-logo.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#222222",
+  "background_color": "#222222"
+}

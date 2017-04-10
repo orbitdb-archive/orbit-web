@@ -109,9 +109,15 @@ module.exports = function (grunt) {
           {
             flatten: true,
             expand: true,
-            src: ['<%= pkg.build.src %>/lib/**/*.js'],
-            dest: '<%= pkg.build.target %>/lib/'
-          }
+            src: ['<%= pkg.build.src %>/sw.js'],
+            dest: '<%= pkg.build.target %>/'
+          },
+          {
+            flatten: true,
+            expand: true,
+            src: ['assets/orbit-logo.png'],
+            dest: '<%= pkg.build.target %>/'
+          },
         ]
       }
     },

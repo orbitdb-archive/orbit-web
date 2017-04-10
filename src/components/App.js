@@ -57,6 +57,15 @@ const views = {
 
 const ipcRenderer = window.ipcRenderer
 
+// server worker for add-to-homescreen functionality
+if (navigator.serviceWorker) {
+  navigator.serviceWorker.register('sw.js').then(function(registration) {
+    console.log('ServiceWorker registration successful with scope:',  registration.scope);
+  }).catch(function(error) {
+    console.log('ServiceWorker registration failed:', error);
+  });
+}
+
 var App = React.createClass({
   getInitialState: function() {
     return {
