@@ -245,7 +245,7 @@ var App = React.createClass({
       <Header
         onClick={this.openPanel}
         title={location}
-        channels={ChannelStore.channels}
+        channels={ChannelStore.all()}
         theme={this.state.theme}>
       </Header>
     ) : null

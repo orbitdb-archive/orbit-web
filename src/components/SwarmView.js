@@ -26,7 +26,7 @@ class SwarmView extends React.Component {
   }
 
   render() {
-    const peerId = SwarmStore.orbit ? SwarmStore.orbit._ipfs.PeerId : null
+    const peerId = SwarmStore.orbit ? SwarmStore.orbit._orbitdb.id : null
     var peers = this.state.peers.map((p) => {
       return (
         <TransitionGroup

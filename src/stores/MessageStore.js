@@ -21,6 +21,7 @@ const messagesBatchSize = 4
 const MessageStore = Reflux.createStore({
   listenables: [AppActions, UIActions, NetworkActions, ChannelActions],
   init: function() {
+    this._messages = {}
     // Set our internal state to its initial values
     this._reset()
 
@@ -29,7 +30,7 @@ const MessageStore = Reflux.createStore({
   },
   _reset: function() {
     this.orbit = null
-    this.channels = {}
+    this._messages = {}
     this.syncCount = {}
     this.sendQueue = []
     this.sending = false
@@ -38,7 +39,7 @@ const MessageStore = Reflux.createStore({
   _updateStore(channel, messages, isNewMessage = false) {
     // Messages are { Hash: <multihash base58 string>, Post: Post{} }
     messages = messages || []
-    let uniqueNew = differenceWith(messages, this.channels[channel].messages, (a, b) => a.Hash === b.Hash && a.Post.meta.ts === b.Post.meta.ts)
+    let uniqueNew = differenceWith(messages, this._messages[channel], (a, b) => a.Hash === b.Hash && a.Post.meta.ts === b.Post.meta.ts)
 
     if (uniqueNew.length > 0) {
       // Process all new messages
@@ -53,17 +54,18 @@ const MessageStore = Reflux.createStore({
       }
 
       // this.channels[channel].messages = messages
-      this.channels[channel].messages = this.channels[channel].messages.concat(uniqueNew)
-      this.channels[channel].messages = sortBy(this.channels[channel].messages, (e) => e.Post.meta.ts)
+      this._messages[channel] = this._messages[channel] || []
+      this._messages[channel] = this._messages[channel].concat(uniqueNew)
+      this._messages[channel] = sortBy(this._messages[channel], (e) => e.Post.meta.ts)
       // console.log("Messages in UI:", this.channels[channel].messages.length)
 
       setImmediate(() => {
-        this.trigger(channel, this.channels[channel].messages)
+        this.trigger(channel, this._messages[channel])
       })
     }
   },
   _processQueue: function() {
-    const canProcessNext = this.sendQueue && this.sendQueue.length > 0 && !this.sending    
+    const canProcessNext = this.sendQueue && this.sendQueue.length > 0 && !this.sending
     if (canProcessNext) {
       const task = this.sendQueue.shift()
       this.sending = true
@@ -98,13 +100,13 @@ const MessageStore = Reflux.createStore({
     // NOTE: currently only messages sent by the user, not from other users
     this.orbit.events.on('message', (channel, message) => {
       // logger.info("message -->", channel, message)
-      getMessages(channel, this.channels[channel].messages.length + 1)
+      getMessages(channel, this._messages[channel] ? this._messages[channel].length + 1 : 1)
     })
 
     this.orbit.events.on('joined', (channel) => {
       logger.info(`Joined #${channel}`)
 
-      const feed = this.orbit.channels[channel].feed
+      const feed = this.orbit.getChannel(channel).feed
 
       this.syncCount[channel] = this.syncCount[channel] ? this.syncCount[channel] : 0
 
@@ -132,49 +134,39 @@ const MessageStore = Reflux.createStore({
 
       // When we receive new messages from peers,
       // get the messages and update the store state
-      feed.events.on('synced', (channel) => {
+      feed.events.on('synced', () => {
         // logger.info("synced -->", channel)
         this.syncCount[channel] --
         this.syncCount[channel] = Math.max(0, this.syncCount[channel])
-        getMessages(channel, this.channels[channel].messages.length + messagesBatchSize)
+        getMessages(channel, this._messages[channel] ? this._messages[channel].length + messagesBatchSize : messagesBatchSize)
       })
     })
   },
   onDisconnect: function() {
     this._reset()
   },
-  onJoinChannel: function(channel, password) {
-    if(!this.channels[channel]) {
-      this.syncCount[channel] = 0
-      this.channels[channel] = { messages: [] }
-    }
-  },
-  onLeaveChannel: function(channel: string) {
-    delete this.syncCount[channel]
-    delete this.channels[channel]
-  },
   onLoadMessages: function(channel: string) {
-    if (this.channels[channel]) {
-      this.trigger(channel, this.channels[channel].messages)
+    if (this.orbit && this.orbit.getChannel(channel) !== undefined) {
+      this.trigger(channel, this._messages[channel] || [])
     }
   },
   onLoadMoreMessages: function(channel: string, force: boolean, refresh: boolean) {
     this.loadMessages(channel, messagesBatchSize, force, refresh)
   },
   loadMessages: function(channel: string, amount: number, force: boolean, refresh) {
-    if (this.channels[channel].messages.length > 0) {
+    if (this._messages[channel].length > 0) {
       if (refresh) {
         this.loadingHistory = true
         const viewSize = 64 // How many we consider to fit in our view in the UI. TODO: make dynamic based on screen height
         // Get the first <viewSize> entries
-        const entriesInView = this.channels[channel].messages.slice(-viewSize).map(e => e.Entry)
+        const entriesInView = this._messages[channel].slice(-viewSize).map(e => e.Entry)
         // console.log("Refresh from:", entriesInView)
         this.orbit.loadMoreHistory(channel, messagesBatchSize, entriesInView)
           .then(() => this.loadingHistory = false)
           .catch((e) => console.error(e))
       } else {
-        const len = this.channels[channel].messages.length
-        const first = this.channels[channel].messages[0]
+        const len = this._messages[channel].length
+        const first = this._messages[channel][0]
         this.orbit.get(channel, null, first, len + messagesBatchSize)
           .then((messages) => {
             setImmediate(() => {
@@ -183,7 +175,7 @@ const MessageStore = Reflux.createStore({
                 this.loadingHistory = true
                 const viewSize = 64 // How many we consider to fit in our view in the UI. TODO: make dynamic based on screen height
                 // Get the last <viewSize> entries
-                const entriesInView = this.channels[channel].messages.slice(0, viewSize).map(e => e.Entry)
+                const entriesInView = this._messages[channel].slice(0, viewSize).map(e => e.Entry)
                 // console.log("Load more history")
                 this.orbit.loadMoreHistory(channel, messagesBatchSize, entriesInView)
                   .then(() => this.loadingHistory = false)
@@ -191,7 +183,7 @@ const MessageStore = Reflux.createStore({
               }
             })
           })
-          .catch((e) => console.error(e))        
+          .catch((e) => console.error(e))
       }
     }
   },

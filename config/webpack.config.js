@@ -24,7 +24,7 @@ let config = {
       './node_modules/bignumber.js/bignumber.js',
       './node_modules/bn.js/lib/bn.js',
       './node_modules/dexie/dist/dexie.js',
-      './node_modules/ipfs-daemon/src/ipfs-browser-daemon.js',
+      // './node_modules/ipfs-daemon/src/ipfs-browser-daemon.js',
       './node_modules/orbit_/src/Orbit.js',
       './src/utils/emojilist.js', 
       './node_modules/highlight.js/lib/index.js'

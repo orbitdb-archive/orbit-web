@@ -2,33 +2,32 @@
 export function defaultIpfsDaemonSettings(ipfsDataDir) {
   return {
     IpfsDataDir: ipfsDataDir,
-    Addresses: {
-      API: '/ip4/127.0.0.1/tcp/0',
-      Swarm: [
-        '/ip4/0.0.0.0/tcp/0'
-      ],
-      Gateway: '/ip4/0.0.0.0/tcp/0'
-    },
-    // How to use a local webrtc-star server: 
-    // https://github.com/libp2p/js-libp2p-webrtc-star
-    // SignalServer: '0.0.0.0:9090', // localhost
-    // SignalServer: '178.62.241.75', // old dev server
-    SignalServer: 'star-signal.cloud.ipfs.team', // IPFS dev server
-    API: {
-      HTTPHeaders: {
-        "Access-Control-Allow-Origin": ['*'],
-        "Access-Control-Allow-Methods": ["PUT", "GET", "POST"],
-        "Access-Control-Allow-Credentials": ["true"]
-      }
-    },
-    Discovery: {
-      MDNS: {
-        Enabled: false,
-        Interval: 10
+    config : {
+      Addresses: {
+        API: '/ip4/127.0.0.1/tcp/0',
+        Swarm: [
+          // '/ip4/0.0.0.0/tcp/0',
+        '/libp2p-webrtc-star/dns4/star-signal.cloud.ipfs.team/wss',
+        ],
+        Gateway: '/ip4/0.0.0.0/tcp/0'
       },
-      webRTCStar: {
-        Enabled: true
-      }
-    },    
+      API: {
+        HTTPHeaders: {
+          "Access-Control-Allow-Origin": ['*'],
+          "Access-Control-Allow-Methods": ["PUT", "GET", "POST"],
+          "Access-Control-Allow-Credentials": ["true"]
+        }
+      },
+      Bootstrap: [],
+      Discovery: {
+        MDNS: {
+          Enabled: false,
+          Interval: 10
+        },
+        webRTCStar: {
+          Enabled: false
+        }
+      },
+    }
   }
 }
