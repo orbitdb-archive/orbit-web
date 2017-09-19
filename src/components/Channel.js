@@ -467,7 +467,7 @@ class Channel extends React.Component {
           onSendMessage={this.sendMessage.bind(this)}
           onSendFiles={this.onDrop.bind(this)}
           isLoading={loading}
-          channelMode={this.state.peers.length + " peers"}
+          channelMode={this.state.peers.length + " users"}
           appSettings={appSettings}
           theme={theme}
           replyto={replyto}
