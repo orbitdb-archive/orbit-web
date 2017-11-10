@@ -20,25 +20,25 @@ let config = {
       'webpack/hot/only-dev-server',
       './src/components/App.js'
     ],
-    commons: [
-      './node_modules/bignumber.js/bignumber.js',
-      './node_modules/bn.js/lib/bn.js',
-      './node_modules/dexie/dist/dexie.js',
-      // './node_modules/ipfs-daemon/src/ipfs-browser-daemon.js',
-      './node_modules/orbit_/src/Orbit.js',
-      './src/utils/emojilist.js', 
-      './node_modules/highlight.js/lib/index.js'
-    ],
+    // commons: [
+    //   './node_modules/bignumber.js/bignumber.js',
+    //   './node_modules/bn.js/lib/bn.js',
+    //   // './node_modules/dexie/dist/dexie.js',
+    //   './node_modules/orbit_/src/Orbit.js',
+    //   './src/utils/emojilist.js', 
+    //   './node_modules/highlight.js/lib/index.js'
+    // ],
   },
   target: 'web',
   devtool: 'sourcemap',
   cache: false,
   // TODO: check if still needed with the new webpack-dev-server
   devServer: {
+    contentBase: './dist',
     headers: { "Access-Control-Allow-Origin": "*" }
   },
   plugins: [
-    extractCommons,
+    // extractCommons,
     new webpack.HotModuleReplacementPlugin(),
   ]
 }

@@ -39,13 +39,13 @@ const ChannelStore = Reflux.createStore({
 
     logger.debug(`Join channel #${channel}`)
     this.orbit.join(channel)
-      .then(() => {
+      .then(c => {
         logger.debug(`Joined channel #${channel}`)
         NetworkActions.joinedChannel(channel)
         setImmediate(() => this.trigger(this.orbit.channels, this.peers))
 
         this.timers[channel] = setInterval(() => {
-          this.orbit._ipfs.pubsub.peers(channel)
+          this.orbit._ipfs.pubsub.peers(this.orbit.channels[channel].feed.address.toString())
             .then((peers) => {
               this.peers[channel] = peers
               setImmediate(() => {

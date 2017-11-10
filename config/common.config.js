@@ -12,14 +12,12 @@ module.exports = {
   },
   resolve: {
     modules: [
-      "node_modules"
+      'node_modules',
+      path.resolve(__dirname, '../node_modules')
     ],
+    extensions: [".jsx", ".js", ".json"],
     alias: {
       'node_modules': path.join(__dirname + '/node_modules'),
-      'zlib': 'browserify-zlib-next',
-      'http': 'stream-http',
-      'https': 'https-browserify',
-      'Buffer': 'buffer',
       'app': path.join(__dirname, '../src/app/'),
       'styles': path.join(__dirname, '../src/styles'),
       'components': path.join(__dirname, '../src/components/'),
@@ -30,13 +28,37 @@ module.exports = {
       'fonts': path.join(__dirname, '../src/fonts')
     }
   },
+  resolveLoader: {
+    modules: [
+      'node_modules',
+      path.resolve(__dirname, '../node_modules')
+    ],
+    moduleExtensions: ['-loader']
+  },
   module: {
     rules: [
+      // {
+      //   test: /\.(js|jsx)$/,
+      //   exclude: /node_modules/,
+      //   loader: 'babel-loader',
+      //   query: babelPlugins
+      // }, 
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
-        query: babelPlugins
+        options: {
+          presets: [
+            require.resolve('babel-preset-es2015'),
+            require.resolve('babel-preset-react'),
+            require.resolve('babel-preset-stage-0'),
+          ],
+          plugins: [
+            require.resolve('babel-plugin-transform-runtime'),
+            // require.resolve('syntax-flow'),
+            // require.resolve('transform-flow-strip-types'),
+          ]
+        }
       }, 
       {
         test: /\.css$/,
@@ -70,11 +92,5 @@ module.exports = {
   },
   externals: {
     fs: '{}',
-    du: '{}',
-    net: '{}',
-    tls: '{}',
-    console: '{}',
-    'require-dir': '{}',
-    mkdirp: '{}'
   }
 }

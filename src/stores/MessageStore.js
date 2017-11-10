@@ -16,7 +16,7 @@ const logger = Logger.create('MessageStore', { color: Logger.Colors.Magenta })
 
 window.LOG = 'none' // turn off logging
 
-const messagesBatchSize = 4
+const messagesBatchSize = 64
 
 const MessageStore = Reflux.createStore({
   listenables: [AppActions, UIActions, NetworkActions, ChannelActions],
@@ -26,7 +26,7 @@ const MessageStore = Reflux.createStore({
     this._reset()
 
     // Start processing the send queue at an interval
-    setInterval(() => this._processQueue(), 16)
+    setInterval(() => this._processQueue(), 10)
   },
   _reset: function() {
     this.orbit = null
@@ -70,12 +70,14 @@ const MessageStore = Reflux.createStore({
       const task = this.sendQueue.shift()
       this.sending = true
 
-      this.orbit.send(task.channel, task.message)
+      return this.orbit.send(task.channel, task.message)
         .then((post) => {
           this.sending = false
           if (task.callback) task.callback()
         })
         .catch((e) => console.error(e))
+    } else {
+      return Promise.resolve()
     }
   },
   onInitialize: function(orbit) {
@@ -107,8 +109,18 @@ const MessageStore = Reflux.createStore({
       logger.info(`Joined #${channel}`)
 
       const feed = this.orbit.getChannel(channel).feed
+      const name = channel.split('/').pop()
 
       this.syncCount[channel] = this.syncCount[channel] ? this.syncCount[channel] : 0
+
+      // Get the messages we have already loaded locally
+      this.syncCount[channel] ++
+      setImmediate(() => UIActions.startLoading(name, "load"))
+      getMessages(channel, messagesBatchSize, false)
+
+      feed.events.on('load.progress', (channel) => {
+        setImmediate(() => UIActions.startLoading(name, "load"))
+      })
 
       // Catch and display db errors
       feed.events.on('error', (err) => {
@@ -121,20 +133,26 @@ const MessageStore = Reflux.createStore({
         // logger.info("ready -->", channel)
         this.syncCount[channel]--
         this.syncCount[channel] = Math.max(0, this.syncCount[channel])
+        console.log("GET MESSAGES", messagesBatchSize)
         getMessages(channel, messagesBatchSize, false)
+        setImmediate(() => UIActions.stopLoading(name, "load"))
       })
 
       // When the database starts syncing new messages,
       // send a message that we're loading
-      feed.events.on('sync', (channel) => {
+      feed.events.on('replicate', (channel) => {
         // logger.info("sync -->", channel, name)
         this.syncCount[channel] ++
-        setImmediate(() => UIActions.startLoading(channel, "load"))
+        setImmediate(() => UIActions.startLoading(name, "load"))
+      })
+
+      feed.events.on('replicate.progress', (channel) => {
+        setImmediate(() => UIActions.startLoading(name, "load"))
       })
 
       // When we receive new messages from peers,
       // get the messages and update the store state
-      feed.events.on('synced', () => {
+      feed.events.on('replicated', () => {
         // logger.info("synced -->", channel)
         this.syncCount[channel] --
         this.syncCount[channel] = Math.max(0, this.syncCount[channel])
@@ -151,7 +169,23 @@ const MessageStore = Reflux.createStore({
     }
   },
   onLoadMoreMessages: function(channel: string, force: boolean, refresh: boolean) {
-    this.loadMessages(channel, messagesBatchSize, force, refresh)
+    // this.loadMessages(channel, messagesBatchSize, force, refresh)
+
+    const processMessages = (channel, messages, newMessages = true) => {
+      setImmediate(() => {
+        this._updateStore(channel, messages, newMessages)
+        if (this.syncCount[channel] <= 0)
+          setImmediate(() => UIActions.stopLoading(channel, "load"))
+      })
+    }
+
+    const getMessages = (channel, amount, newMessages = true) => {
+      this.orbit.get(channel, null, null, amount)
+        .then((messages) => processMessages(channel, messages, newMessages))
+        .catch((e) => console.error(e))
+    }
+
+    getMessages(channel, this._messages[channel].length + messagesBatchSize, false)
   },
   loadMessages: function(channel: string, amount: number, force: boolean, refresh) {
     if (this._messages[channel].length > 0) {
