@@ -100,3 +100,7 @@ or
 ### Clean
 
 `make clean`
+
+## License
+
+[MIT](LICENSE) © 2017-2018 Protocol Labs Inc., Haja Networks Oy
