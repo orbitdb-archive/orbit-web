@@ -1,19 +1,20 @@
-'use strict'
+"use strict";
 
-var mountFolder = function (connect, dir) {
-  return connect.static(require('path').resolve(dir))
+function mountFolder(connect, dir) {
+  return connect.static(require("path").resolve(dir));
 }
 
-var webpackDistConfig = require('./config/webpack.config.dist.js'),
-    webpackDevConfig = require('./config/webpack.config.js')
+const webpackDistConfig = require("./config/webpack.config.dist.js");
+const webpackDevConfig = require("./config/webpack.config.js");
 
-module.exports = function (grunt) {
+module.exports = function(grunt) {
   // Let *load-grunt-tasks* require everything
-  require('load-grunt-tasks')(grunt)
+  require("load-grunt-tasks")(grunt);
 
   // Read configuration from package.json
-  var pkgConfig = grunt.file.readJSON('package.json')
+  const pkgConfig = grunt.file.readJSON("package.json");
 
+  // Init
   grunt.initConfig({
     pkg: pkgConfig,
 
@@ -22,18 +23,14 @@ module.exports = function (grunt) {
       dist: {}
     },
 
-    'webpack-dev-server': {
+    "webpack-dev-server": {
       options: {
         hot: true,
         inline: true,
         port: 8000,
         webpack: webpackDevConfig,
-        publicPath: '/assets/',
-        contentBase: './<%= pkg.build.src %>/',
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Credentials": "true"
-        },
+        publicPath: "/assets/",
+        contentBase: "./<%= pkg.build.src %>/"
       },
 
       start: {
@@ -49,10 +46,8 @@ module.exports = function (grunt) {
       dist: {
         options: {
           keepalive: true,
-          middleware: function (connect) {
-            return [
-              mountFolder(connect, pkg.build.target)
-            ]
+          middleware: function(connect) {
+            return [mountFolder(connect, pkg.build.target)];
           }
         }
       }
@@ -63,17 +58,16 @@ module.exports = function (grunt) {
         delay: 500
       },
       dev: {
-        // path: 'http://localhost:<%= connect.options.port %>/webpack-dev-server/'
-        path: 'http://localhost:<%= connect.options.port %>/'
+        path: "http://localhost:<%= connect.options.port %>/"
       },
       dist: {
-        path: 'http://localhost:<%= connect.options.port %>/'
+        path: "http://localhost:<%= connect.options.port %>/"
       }
     },
 
     karma: {
       unit: {
-        configFile: 'karma.conf.js'
+        configFile: "karma.conf.js"
       }
     },
 
@@ -84,33 +78,33 @@ module.exports = function (grunt) {
           {
             flatten: true,
             expand: true,
-            src: ['<%= pkg.build.src %>/*'],
-            dest: '<%= pkg.build.target %>/',
-            filter: 'isFile'
+            src: ["<%= pkg.build.src %>/*"],
+            dest: "<%= pkg.build.target %>/",
+            filter: "isFile"
           },
           {
             flatten: true,
             expand: true,
-            src: ['<%= pkg.build.src %>/images/*'],
-            dest: '<%= pkg.build.target %>/images/'
+            src: ["<%= pkg.build.src %>/images/*"],
+            dest: "<%= pkg.build.target %>/images/"
           },
           {
             flatten: true,
             expand: true,
-            src: ['<%= pkg.build.src %>/icons/**/*'],
-            dest: '<%= pkg.build.target %>/icons/'
+            src: ["<%= pkg.build.src %>/icons/**/*"],
+            dest: "<%= pkg.build.target %>/icons/"
           },
           {
             expand: true,
-            cwd: '<%= pkg.build.src %>/fonts/',
-            src: ['**/*.woff2', '**/*.txt}'],
-            dest: '<%= pkg.build.target %>/fonts/'
+            cwd: "<%= pkg.build.src %>/fonts/",
+            src: ["**/*.woff2", "**/*.txt}"],
+            dest: "<%= pkg.build.target %>/fonts/"
           },
           {
             flatten: true,
             expand: true,
-            src: ['<%= pkg.build.src %>/lib/**/*.js'],
-            dest: '<%= pkg.build.target %>/lib/'
+            src: ["<%= pkg.build.src %>/lib/**/*.js"],
+            dest: "<%= pkg.build.target %>/lib/"
           }
         ]
       }
@@ -118,19 +112,16 @@ module.exports = function (grunt) {
 
     clean: {
       dist: {
-        files: [{
-          dot: true,
-          src: [
-            '<%= pkg.build.target %>'
-          ]
-        }]
+        files: [
+          {
+            dot: true,
+            src: ["<%= pkg.build.target %>"]
+          }
+        ]
       },
-      npm: [
-        'node_modules/ipfs-api',
-        'node_modules/ipfs/node_modules/ipfs-api'
-      ]
+      npm: ["node_modules/ipfs-api", "node_modules/ipfs/node_modules/ipfs-api"]
     }
-  })
+  });
 
   // Tasks
   grunt.registerTask("serve", function(target) {
@@ -143,10 +134,9 @@ module.exports = function (grunt) {
     grunt.task.run(["open:dev", "force:webpack-dev-server"]);
   });
 
-  grunt.registerTask('test', ['karma'])
+  grunt.registerTask("test", ["karma"]);
 
-  // grunt.registerTask('build', ['clean:dist', 'copy', 'webpack'])
-  grunt.registerTask('build', ['clean:dist', 'copy'])
+  grunt.registerTask("build", ["clean:dist", "copy"]);
 
-  grunt.registerTask('default', [])
-}
+  grunt.registerTask("default", []);
+};
