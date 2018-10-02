@@ -132,16 +132,16 @@ module.exports = function (grunt) {
     }
   })
 
-  grunt.registerTask('serve', function (target) {
-    if (target === 'dist') {
-      return grunt.task.run(['build', 'open:dist', 'connect:dist'])
+  // Tasks
+  grunt.registerTask("serve", function(target) {
+    if (target === "dist") {
+      // Use "force" here since all environments can not "open" a browser
+      return grunt.task.run(["build", "open:dist", "force:connect:dist"]);
     }
 
-    grunt.task.run([
-      'open:dev',
-      'webpack-dev-server'
-    ])
-  })
+    // Use "force" here since all environments can not "open" a browser
+    grunt.task.run(["open:dev", "force:webpack-dev-server"]);
+  });
 
   grunt.registerTask('test', ['karma'])
 
