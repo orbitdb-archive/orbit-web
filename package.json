@@ -68,8 +68,6 @@
     "react-hot-loader": "^4.3.11",
     "sass-loader": "^7.1.0",
     "style-loader": "^0.23.0",
-    "transform-loader": "^0.2.3",
-    "uglify-js": "github:mishoo/UglifyJS2#harmony",
     "url-loader": "^1.1.1",
     "webpack": "^4.20.2",
     "webpack-cli": "^3.1.2",
