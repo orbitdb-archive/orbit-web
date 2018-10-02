@@ -122,4 +122,4 @@ var Loader = React.createClass({
     }
 })
 
-module.exports = Loader
+export default Loader;

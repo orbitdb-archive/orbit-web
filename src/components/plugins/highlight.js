@@ -37,4 +37,4 @@ class Highlight extends Component {
   }
 }
 
-module.exports = Highlight;
+export default Highlight;
