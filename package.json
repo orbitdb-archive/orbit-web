@@ -79,7 +79,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "grunt serve",
     "build": "npm run build:dist",
-    "build:dist": "grunt build && webpack --config config/webpack.config.dist.js --hide-modules --progress --env production && uglifyjs dist/assets/app.js -o dist/assets/app.js",
+    "build:dist": "grunt build && webpack --config config/webpack.config.dist.js --hide-modules --progress",
     "build:debug": "grunt build && webpack --config config/webpack.config.js --display-modules --sort-modules-by size --progress --hot",
     "dist": "ipfs add -r dist/",
     "publish": "npm run dist | tail -1 | grep -o Qm[a-zA-Z0-9]* | xargs ping-ops-requests -d orbit.chat -t 'Deploy new version of orbit-web' -h",
