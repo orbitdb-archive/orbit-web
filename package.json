@@ -20,6 +20,7 @@
   ],
   "dependencies": {
     "clipboard": "^1.5.16",
+    "create-react-class": "^15.6.3",
     "domkit": "0.0.1",
     "emoji-annotation-to-unicode": "^0.2.4",
     "highlight.js": "^9.9.0",
@@ -37,6 +38,7 @@
     "orbit_": "~0.1.0",
     "p-each-series": "^1.0.0",
     "pleasejs": "^0.4.2",
+    "prop-types": "^15.6.2",
     "react": "^15.4.2",
     "react-addons-css-transition-group": "^15.4.2",
     "react-dom": "^15.4.2",
