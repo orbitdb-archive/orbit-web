@@ -1,0 +1,27 @@
+- Update _React_ to v16.x
+  - First make sure code is v15.5 compatible ([react-v15.5.0 migration](https://reactjs.org/blog/2017/04/07/react-v15.5.0.html))
+  - Start switching _react-addons-transition-group_ to _react-transition-group_
+- Update _React router_ to v4
+- Clean up _package.json_
+  - move some "devDependencies" to "dependencies" (like _normalize.css_)
+  - remove obsolote packages (like _object-assign_)
+- Check _npm_ deprecation warnings
+  - npm WARN deprecated lodash.isarray@4.0.0: This package is deprecated. Use Array.isArray.
+  - npm WARN deprecated ipld-resolver@0.9.0: WARNING: This project has been renamed to "ipld". Install using "ipld" instead.
+  - npm WARN deprecated ipld-resolver@0.8.1: WARNING: This project has been renamed to "ipld". Install using "ipld" instead.
+  - npm WARN deprecated ipld-eth-block@2.3.0: deprecated in favor of js-ipld-ethereum https://github.com/ipld/js-ipld-ethereum
+  - npm WARN deprecated ipld-eth-block-list@1.0.4: deprecated in favor of js-ipld-ethereum https://github.com/ipld/js-ipld-ethereum
+  - npm WARN deprecated ipld-eth-state-trie@1.2.0: deprecated in favor of js-ipld-ethereum https://github.com/ipld/js-ipld-ethereum
+  - npm WARN deprecated ipld-eth-tx-trie@1.0.1: deprecated in favor of js-ipld-ethereum https://github.com/ipld/js-ipld-ethereum
+  - npm WARN deprecated ipld-eth-block@2.2.2: deprecated in favor of js-ipld-ethereum https://github.com/ipld/js-ipld-ethereum
+  - npm WARN deprecated ipld-eth-trie@2.1.0: deprecated in favor of js-ipld-ethereum https://github.com/ipld/js-ipld-ethereum
+  - npm WARN deprecated ipld-eth-account-snapshot@1.0.1: deprecated in favor of js-ipld-ethereum https://github.com/ipld/js-ipld-ethereum
+  - npm WARN deprecated ipld-eth-tx@1.0.1: deprecated in favor of js-ipld-ethereum https://github.com/ipld/js-ipld-ethereum
+  - npm WARN deprecated bignumber.js@6.0.0: Custom ALPHABET bug fixed in v7.0.2
+  - npm WARN deprecated gulp-util@3.0.8: gulp-util is deprecated - replace it, following the guidelines at https://medium.com/gulpjs/gulp-util-ca3b1f9f9ac5
+  - npm WARN deprecated github@0.2.4: 'github' has been renamed to '@octokit/rest' (https://git.io/vNB11)
+  - npm WARN deprecated graceful-fs@3.0.11: please upgrade to graceful-fs 4 for compatibility with current and future versions of Node.js
+  - npm WARN deprecated babel-preset-es2015@6.24.1: 🙌 Thanks for using Babel: we recommend using babel-preset-env now: please read babeljs.io/env to update!
+  - npm WARN deprecated minimatch@2.0.10: Please update to minimatch 3.0.2 or higher to avoid a RegExp DoS issue
+  - npm WARN deprecated graceful-fs@1.2.3: please upgrade to graceful-fs 4 for compatibility with current and future versions of Node.js
+  - npm WARN deprecated minimatch@0.2.14: Please update to minimatch 3.0.2 or higher to avoid a RegExp DoS issue
