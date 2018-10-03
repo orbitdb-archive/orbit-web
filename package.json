@@ -47,8 +47,10 @@
     "@babel/plugin-transform-flow-strip-types": "^7.0.0",
     "@babel/preset-env": "^7.1.0",
     "@babel/preset-react": "^7.0.0",
+    "@orbitdb/eslint-config-orbitdb": "0.0.2",
     "babel-loader": "^8.0.0",
     "css-loader": "^1.0.0",
+    "eslint": "^5.6.1",
     "exports-loader": "^0.7.0",
     "file-loader": "^2.0.0",
     "grunt": "^1.0.3",
@@ -81,6 +83,7 @@
     "build:debug": "grunt build && webpack --config config/webpack.config.js --display-modules --sort-modules-by size --progress --hot",
     "dist": "ipfs add -r dist/",
     "publish": "npm run dist | tail -1 | grep -o Qm[a-zA-Z0-9]* | xargs ping-ops-requests -d orbit.chat -t 'Deploy new version of orbit-web' -h",
-    "start": "cd dist && ../node_modules/.bin/http-server -c-1 -p 8081 & open http://localhost:8081/index.html & wait"
+    "start": "cd dist && ../node_modules/.bin/http-server -c-1 -p 8081 & open http://localhost:8081/index.html & wait",
+    "lint": "./node_modules/eslint/bin/eslint.js src/"
   }
 }
