@@ -1,8 +1,7 @@
 - ~~Update _React_ to v16.x~~
-
   - ~~First make sure code is v15.5 compatible ([react-v15.5.0 migration](https://reactjs.org/blog/2017/04/07/react-v15.5.0.html))~~
-
 - Update _React router_ to v4
+- Remove _create-react-class_ package and convert calls to it into proper React Component classes
 - Clean up _package.json_
   - move some "devDependencies" to "dependencies" (like _normalize.css_)
   - remove obsolote packages (like _object-assign_)
