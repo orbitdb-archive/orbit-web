@@ -1,10 +1,12 @@
-- Update _React_ to v16.x
-  - First make sure code is v15.5 compatible ([react-v15.5.0 migration](https://reactjs.org/blog/2017/04/07/react-v15.5.0.html))
-  - Start switching _react-addons-transition-group_ to _react-transition-group_
+- ~~Update _React_ to v16.x~~
+
+  - ~~First make sure code is v15.5 compatible ([react-v15.5.0 migration](https://reactjs.org/blog/2017/04/07/react-v15.5.0.html))~~
+
 - Update _React router_ to v4
 - Clean up _package.json_
   - move some "devDependencies" to "dependencies" (like _normalize.css_)
   - remove obsolote packages (like _object-assign_)
+- Start switching _react-addons-transition-group_ to _react-transition-group_
 - Check _npm_ deprecation warnings
   - npm WARN deprecated lodash.isarray@4.0.0: This package is deprecated. Use Array.isArray.
   - npm WARN deprecated ipld-resolver@0.9.0: WARNING: This project has been renamed to "ipld". Install using "ipld" instead.
