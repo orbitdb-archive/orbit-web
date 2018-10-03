@@ -1,19 +1,20 @@
 'use strict'
 
-var mountFolder = function (connect, dir) {
+function mountFolder (connect, dir) {
   return connect.static(require('path').resolve(dir))
 }
 
-var webpackDistConfig = require('./config/webpack.config.dist.js'),
-    webpackDevConfig = require('./config/webpack.config.js')
+const webpackDistConfig = require('./config/webpack.config.dist.js')
+const webpackDevConfig = require('./config/webpack.config.js')
 
 module.exports = function (grunt) {
   // Let *load-grunt-tasks* require everything
   require('load-grunt-tasks')(grunt)
 
   // Read configuration from package.json
-  var pkgConfig = grunt.file.readJSON('package.json')
+  const pkgConfig = grunt.file.readJSON('package.json')
 
+  // Init
   grunt.initConfig({
     pkg: pkgConfig,
 
@@ -29,11 +30,7 @@ module.exports = function (grunt) {
         port: 8000,
         webpack: webpackDevConfig,
         publicPath: '/assets/',
-        contentBase: './<%= pkg.build.src %>/',
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Credentials": "true"
-        },
+        contentBase: './<%= pkg.build.src %>/'
       },
 
       start: {
@@ -50,9 +47,7 @@ module.exports = function (grunt) {
         options: {
           keepalive: true,
           middleware: function (connect) {
-            return [
-              mountFolder(connect, pkg.build.target)
-            ]
+            return [mountFolder(connect, pkgConfig.build.target)]
           }
         }
       }
@@ -63,7 +58,6 @@ module.exports = function (grunt) {
         delay: 500
       },
       dev: {
-        // path: 'http://localhost:<%= connect.options.port %>/webpack-dev-server/'
         path: 'http://localhost:<%= connect.options.port %>/'
       },
       dist: {
@@ -118,34 +112,30 @@ module.exports = function (grunt) {
 
     clean: {
       dist: {
-        files: [{
-          dot: true,
-          src: [
-            '<%= pkg.build.target %>'
-          ]
-        }]
+        files: [
+          {
+            dot: true,
+            src: ['<%= pkg.build.target %>']
+          }
+        ]
       },
-      npm: [
-        'node_modules/ipfs-api',
-        'node_modules/ipfs/node_modules/ipfs-api'
-      ]
+      npm: ['node_modules/ipfs-api', 'node_modules/ipfs/node_modules/ipfs-api']
     }
   })
 
+  // Tasks
   grunt.registerTask('serve', function (target) {
     if (target === 'dist') {
-      return grunt.task.run(['build', 'open:dist', 'connect:dist'])
+      // Use "force" here since all environments can not "open" a browser
+      return grunt.task.run(['build', 'open:dist', 'force:connect:dist'])
     }
 
-    grunt.task.run([
-      'open:dev',
-      'webpack-dev-server'
-    ])
+    // Use "force" here since all environments can not "open" a browser
+    grunt.task.run(['open:dev', 'force:webpack-dev-server'])
   })
 
   grunt.registerTask('test', ['karma'])
 
-  // grunt.registerTask('build', ['clean:dist', 'copy', 'webpack'])
   grunt.registerTask('build', ['clean:dist', 'copy'])
 
   grunt.registerTask('default', [])
