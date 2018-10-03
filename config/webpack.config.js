@@ -1,14 +1,14 @@
-"use strict";
+'use strict'
 
-const common = require("./webpack.common.js");
+const common = require('./webpack.common.js')
 
 const config = {
-  mode: "development",
+  mode: 'development',
   entry: {
-    app: ["webpack/hot/only-dev-server", "./src/components/App.js"]
+    app: ['webpack/hot/only-dev-server', './src/components/App.js']
   },
-  devtool: "sourcemap",
+  devtool: 'sourcemap',
   cache: false
-};
+}
 
-module.exports = Object.assign(config, common);
+module.exports = Object.assign(config, common)

@@ -1,12 +1,12 @@
-"use strict";
+'use strict'
 
-const common = require("./webpack.common.js");
+const common = require('./webpack.common.js')
 
 const config = {
-  mode: "production",
+  mode: 'production',
   entry: {
-    app: "./src/components/App.js"
+    app: './src/components/App.js'
   }
-};
+}
 
-module.exports = Object.assign(config, common);
+module.exports = Object.assign(config, common)
