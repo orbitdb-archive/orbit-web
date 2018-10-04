@@ -4,7 +4,7 @@ import React from 'react'
 import createReactClass from 'create-react-class'
 import PropTypes from 'prop-types'
 import { render } from 'react-dom'
-import { Router, Route, hashHistory } from 'react-router'
+import { HashRouter, Route, Switch } from 'react-router-dom'
 import Logger from 'logplease'
 
 import AppActions from 'actions/AppActions'
@@ -55,6 +55,9 @@ const ipcRenderer = window.ipcRenderer
 const App = createReactClass({
   propTypes: {
     children: PropTypes.element
+  },
+  contextTypes: {
+    router: PropTypes.object
   },
   getInitialState: function () {
     return {
@@ -285,7 +288,7 @@ const App = createReactClass({
     AppActions.setLocation('Connect')
   },
   goToLocation: function (name, url) {
-    hashHistory.replace(url || '/')
+    this.context.router.history.push(url || '/')
   },
   render: function () {
     const {
@@ -329,7 +332,14 @@ const App = createReactClass({
       <div className="App view">
         {panel}
         {header}
-        {this.props.children}
+        <Switch>
+          <Route path="/channel/:channel" component={ChannelView} />
+          <Route path="/settings" component={SettingsView} />
+          <Route path="/ipfs-settings" component={IpfsSettingsView} />
+          <Route path="/swarm" component={SwarmView} />
+          <Route path="/connect" component={LoginView} />
+          <Route path="/loading" component={LoadingView} />
+        </Switch>
       </div>
     )
   }
@@ -337,16 +347,9 @@ const App = createReactClass({
 
 /* MAIN */
 render(
-  <Router history={hashHistory}>
-    <Route path="/" component={App}>
-      <Route path="channel/:channel" component={ChannelView} />
-      <Route path="settings" component={SettingsView} />
-      <Route path="ipfs-settings" component={IpfsSettingsView} />
-      <Route path="swarm" component={SwarmView} />
-      <Route path="connect" component={LoginView} />
-      <Route path="loading" component={LoadingView} />
-    </Route>
-  </Router>,
+  <HashRouter>
+    <App />
+  </HashRouter>,
   document.getElementById('content')
 )
 
