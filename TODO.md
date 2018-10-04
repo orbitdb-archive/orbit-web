@@ -1,10 +1,12 @@
 - ~~Update _React_ to v16.x~~
   - ~~First make sure code is v15.5 compatible ([react-v15.5.0 migration](https://reactjs.org/blog/2017/04/07/react-v15.5.0.html))~~
-- Update _React router_ to v4
+- ~~Update _React router_ to v4~~
+- Update _Reflux_ to v6
 - Remove _create-react-class_ package and convert calls to it into proper React Component classes
 - Clean up _package.json_
   - move some "devDependencies" to "dependencies" (like _normalize.css_)
   - remove obsolote packages (like _object-assign_)
+- Fix: "Warning: Received `true` for a non-boolean attribute `autoComplete`." caused SendMessage.js line 111
 - Start switching _react-addons-transition-group_ to _react-transition-group_
 - Check _npm_ deprecation warnings
   - npm WARN deprecated lodash.isarray@4.0.0: This package is deprecated. Use Array.isArray.
