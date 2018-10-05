@@ -99,42 +99,50 @@ const App = createReactClass({
     // window.onblur = () => AppActions.windowLostFocus()
     // window.onfocus = () => AppActions.windowOnFocus()
   },
-  _handleAppStateChange: function (state) {
-    let prefix = ''
+  _handleAppStateChange: function (newState) {
+    const {
+      hasFocus,
+      unreadMessages,
+      currentChannel,
+      location: currentLocation
+    } = AppStateStore.state
 
+    const {
+      unreadMessages: newUnreadMessages,
+      currentChannel: newChannel,
+      location: newLocation
+    } = newState
+
+    let prefix = ''
     let suffix = ''
 
-    if (
-      !AppStateStore.state.hasFocus &&
-      AppStateStore.state.unreadMessages[AppStateStore.state.currentChannel] > 0
-    ) {
-      suffix = `(${
-        AppStateStore.state.unreadMessages[AppStateStore.state.currentChannel]
-      })`
+    if (!hasFocus && unreadMessages[currentChannel] > 0) {
+      suffix = `(${unreadMessages[currentChannel]})`
     }
 
+    const channelsWithNewMessages = Object.keys(newUnreadMessages)
+
     if (
-      Object.keys(state.unreadMessages).length > 1 ||
-      (Object.keys(state.unreadMessages).length === 1 &&
-        !Object.keys(state.unreadMessages).includes(
-          AppStateStore.state.currentChannel
-        ))
+      channelsWithNewMessages.length > 1 ||
+      (channelsWithNewMessages.length === 1 &&
+        !channelsWithNewMessages.includes(currentChannel))
     ) {
       prefix = '*'
     }
 
-    if (Object.keys(state.mentions).length > 0) prefix = '!'
+    if (Object.keys(newState.mentions).length > 0) {
+      prefix = '!'
+    }
 
-    if (state.currentChannel) {
-      document.title =
-        prefix + ' ' + AppStateStore.state.location + ' ' + suffix
+    if (newChannel) {
+      document.title = `${prefix} ${currentLocation} ${suffix}`
       this.goToLocation(
-        state.currentChannel,
-        views.Channel + encodeURIComponent(state.currentChannel)
+        newChannel,
+        views.Channel + encodeURIComponent(newChannel)
       )
     } else {
-      document.title = prefix + ' Orbit'
-      this.goToLocation(state.location, views[state.location])
+      document.title = `${prefix} Orbit`
+      this.goToLocation(newLocation, views[newLocation])
     }
   },
   _reset: function () {
@@ -155,6 +163,8 @@ const App = createReactClass({
       AppActions.setLocation('Connect')
     } else {
       this.setState({ networkName: network.name })
+      // TODO: on the next lines 'this.state' refers to the _old_ 'state'
+      // with the _old_ 'networkName'. Is this the desired behaviour?
       const channels = this._getSavedChannels(
         this.state.networkName,
         this.state.user.name
@@ -196,7 +206,7 @@ const App = createReactClass({
 
     if (user === this.state.user) return
 
-    this.setState({ user: user })
+    this.setState({ user })
 
     if (!this.state.panelOpen) this.openPanel()
     AppActions.setLocation(null)
@@ -210,33 +220,42 @@ const App = createReactClass({
     NetworkActions.joinChannel(channelName, password)
   },
   onJoinChannelError: function (channel, err) {
-    if (!this.state.panelOpen) this.setState({ panelOpen: true })
-    this.setState({ joiningToChannel: channel, requirePassword: true })
+    this.setState({
+      joiningToChannel: channel,
+      requirePassword: true,
+      panelOpen: true
+    })
   },
   onJoinedChannel: function (channel) {
+    const { networkName, user } = this.state
+
     logger.debug('Joined channel #' + channel)
+
     this.closePanel()
+
     document.title = `#${channel}`
     logger.debug('Set title: ' + document.title)
+
     AppActions.setCurrentChannel(channel)
-    let channels = this._getSavedChannels(
-      this.state.networkName,
-      this.state.user.name
-    )
+
+    const channels = this._getSavedChannels(networkName, user.name)
+
     if (!channels.find(e => e.name === channel)) {
       channels.push({ name: channel })
-      this._saveChannels(this.state.networkName, this.state.user.name, channels)
+      this._saveChannels(networkName, user.name, channels)
     }
   },
   onLeaveChannel: function (channel) {
     const { user, networkName } = this.state
+
     const channelsKey = this._makeChannelsKey(user.name, networkName)
-    const channels = this._getSavedChannels(networkName, user.name).filter(
-      c => c.name !== channel
-    )
-    if (channels.length === 0) localStorage.removeItem(channelsKey)
-    else {
-      this._saveChannels(this.state.networkName, this.state.user.name, channels)
+    const savedChannels = this._getSavedChannels(networkName, user.name)
+    const remainingChannels = savedChannels.filter(c => c.name !== channel)
+
+    if (remainingChannels.length === 0) {
+      localStorage.removeItem(channelsKey)
+    } else {
+      this._saveChannels(networkName, user.name, remainingChannels)
     }
   },
   openSettings: function () {
@@ -269,8 +288,17 @@ const App = createReactClass({
     hashHistory.replace(url || '/')
   },
   render: function () {
-    const location = AppStateStore.state.location
+    const {
+      user,
+      requirePassword,
+      theme,
+      leftSidePanel,
+      networkName,
+      joiningToChannel
+    } = this.state
+    const { location } = AppStateStore.state
     const noHeader = ['Connect', 'IpfsSettings', 'Loading']
+
     const header =
       location && noHeader.indexOf(location) < 0 ? (
         <Header
@@ -288,16 +316,14 @@ const App = createReactClass({
         onOpenSettings={this.openSettings}
         onDisconnect={this.disconnect}
         currentChannel={location}
-        username={this.state.user ? this.state.user.name : ''}
-        requirePassword={this.state.requirePassword}
-        theme={this.state.theme}
-        left={this.state.leftSidePanel}
-        networkName={this.state.networkName}
-        joiningToChannel={this.state.joiningToChannel}
+        username={user ? user.name : ''}
+        requirePassword={requirePassword}
+        theme={theme}
+        left={leftSidePanel}
+        networkName={networkName}
+        joiningToChannel={joiningToChannel}
       />
-    ) : (
-      ''
-    )
+    ) : null
 
     return (
       <div className="App view">

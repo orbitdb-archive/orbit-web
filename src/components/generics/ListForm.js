@@ -45,12 +45,7 @@ class ListForm extends React.Component {
   render () {
     const list = this.props.list.map((element, i) => {
       return (
-        <li
-          key={element + i}
-          onClick={() => {
-            this.remove(element)
-          }}
-        >
+        <li key={element + i} onClick={() => this.remove(element)}>
           {element}
         </li>
       )
