@@ -1,3 +1,14 @@
 {
-  "extends": ["@orbitdb/eslint-config-orbitdb"]
+  "extends": [
+    "@orbitdb/eslint-config-orbitdb",
+    "plugin:react/recommended",
+    "plugin:compat/recommended"
+  ],
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "rules": {
+    "no-var": "warn"
+  }
 }

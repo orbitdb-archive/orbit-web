@@ -13,8 +13,14 @@
   "browser": {
     "fs-pull-blob-store": "idb-pull-blob-store"
   },
+  "browserslist": [
+    "last 2 versions",
+    "> 1%",
+    "not dead"
+  ],
   "dependencies": {
     "clipboard": "^1.5.16",
+    "create-react-class": "^15.6.3",
     "domkit": "0.0.1",
     "emoji-annotation-to-unicode": "^0.2.4",
     "highlight.js": "^9.9.0",
@@ -32,11 +38,12 @@
     "orbit_": "~0.1.0",
     "p-each-series": "^1.0.0",
     "pleasejs": "^0.4.2",
-    "react": "^15.4.2",
+    "prop-types": "^15.6.2",
+    "react": "^16.5.2",
     "react-addons-css-transition-group": "^15.4.2",
-    "react-dom": "^15.4.2",
+    "react-dom": "^16.5.2",
     "react-dropzone": "^3.9.2",
-    "react-emoji": "haadcode/react-emoji#a0a3c5dd069bfcd068fe3f51391917ec7facba13",
+    "react-emoji": "github:haadcode/react-emoji#a0a3c5dd069bfcd068fe3f51391917ec7facba13",
     "react-router": "^3.0.2",
     "reflux": "^0.4.1"
   },
@@ -51,6 +58,12 @@
     "babel-loader": "^8.0.0",
     "css-loader": "^1.0.0",
     "eslint": "^5.6.1",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-compat": "^2.5.1",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-react": "^7.11.1",
+    "eslint-plugin-standard": "^3.0.0",
     "exports-loader": "^0.7.0",
     "file-loader": "^2.0.0",
     "grunt": "^1.0.3",
