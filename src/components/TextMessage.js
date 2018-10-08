@@ -48,9 +48,7 @@ function _emojify (items, size) {
 function _ipfsfy (items) {
   return flatten(
     items.map(item => {
-      return typeof item === 'string'
-        ? ReactIpfsLink.linkify(item, linkProps)
-        : item
+      return typeof item === 'string' ? ReactIpfsLink.linkify(item, linkProps) : item
     })
   )
 }
@@ -66,9 +64,7 @@ class TextMessage extends React.Component {
     let content = props.text
 
     // Remove the command prefix from the rendered text
-    content = content.startsWith('/me')
-      ? content.substring(3, content.length)
-      : content
+    content = content.startsWith('/me') ? content.substring(3, content.length) : content
 
     // Create links from urls
     content = _autolink(content)

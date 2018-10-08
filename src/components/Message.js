@@ -1,20 +1,20 @@
 'use strict'
 
-import React from "react"
+import React from 'react'
 import MentionHighlighter from 'components/plugins/mention-highlighter'
-import User from "components/User"
-import File from "components/File"
-import TextMessage from "components/TextMessage"
-import Directory from "components/Directory"
+import User from 'components/User'
+import File from 'components/File'
+import TextMessage from 'components/TextMessage'
+import Directory from 'components/Directory'
 import ChannelActions from 'actions/ChannelActions'
 import UserActions from 'actions/UserActions'
 import NotificationActions from 'actions/NotificationActions'
-import TransitionGroup from "react-addons-css-transition-group"
+import TransitionGroup from 'react-addons-css-transition-group'
 import { getFormattedTime } from '../utils/utils.js'
-import "styles/Message.scss"
+import 'styles/Message.scss'
 
 class Message extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       post: props.post,
@@ -27,16 +27,18 @@ class Message extends React.Component {
     }
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return (this.state.post !== nextState.post && this.state.post.hash !== nextState.post.hash)
-      || this.state.user !== nextState.user
+  shouldComponentUpdate (nextProps, nextState) {
+    return (
+      (this.state.post !== nextState.post && this.state.post.hash !== nextState.post.hash) ||
+      this.state.user !== nextState.user
+    )
   }
 
-  renderContent() {
+  renderContent () {
     const { highlightWords, useEmojis, entry } = this.props
     const { isCommand, post } = this.state
-    const contentClass = isCommand ? "Content command" : "Content"
-    let content = (<div></div>)
+    const contentClass = isCommand ? 'Content command' : 'Content'
+    let content = <div />
     if (post) {
       const key = post.hash + post.meta.ts
       switch (post.meta.type) {
@@ -47,24 +49,43 @@ class Message extends React.Component {
               replyto={null}
               useEmojis={useEmojis}
               highlightWords={highlightWords}
-              key={key} />
+              key={key}
+            />
           )
           break
         case 'file':
-          content = <File hash={post.hash} name={post.name} size={post.size} meta={post.meta} onPreviewOpened={this.props.onScrollToPreview} key={key}/>
+          content = (
+            <File
+              hash={post.hash}
+              name={post.name}
+              size={post.size}
+              meta={post.meta}
+              onPreviewOpened={this.props.onScrollToPreview}
+              key={key}
+            />
+          )
           break
         case 'directory':
-          content = <Directory hash={post.hash} name={post.name} size={post.size} root={true} onPreviewOpened={this.props.onScrollToPreview} key={key}/>
+          content = (
+            <Directory
+              hash={post.hash}
+              name={post.name}
+              size={post.size}
+              root={true}
+              onPreviewOpened={this.props.onScrollToPreview}
+              key={key}
+            />
+          )
           break
       }
     }
     return <div className={contentClass}>{content}</div>
   }
 
-  render() {
+  render () {
     const { message, colorifyUsername, style, onDragEnter } = this.props
     const { user, post, isCommand, hasHighlights, formattedTime } = this.state
-    const className = hasHighlights ? "Message highlighted" : "Message"
+    const className = hasHighlights ? 'Message highlighted' : 'Message'
 
     return (
       <div className={className} style={style} onDragEnter={onDragEnter}>
@@ -74,12 +95,11 @@ class Message extends React.Component {
           colorify={colorifyUsername}
           highlight={isCommand}
           onShowProfile={this.props.onShowProfile.bind(this, user)}
-          />
+        />
         {this.renderContent()}
       </div>
     )
   }
-
 }
 
 export default Message

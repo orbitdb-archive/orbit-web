@@ -1,15 +1,15 @@
 'use strict'
 
 import React from 'react'
-import ChannelActions from 'actions/ChannelActions';
-import BackgroundAnimation from 'components/BackgroundAnimation';
-import TransitionGroup from "react-addons-css-transition-group";
-import Please from "pleasejs"
+import ChannelActions from 'actions/ChannelActions'
+import BackgroundAnimation from 'components/BackgroundAnimation'
+import TransitionGroup from 'react-addons-css-transition-group'
+import Please from 'pleasejs'
 import Countries from '../lib/countries.json'
 import 'styles/Profile.scss'
 
 class Profile extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       user: props.user,
@@ -18,27 +18,30 @@ class Profile extends React.Component {
       y: props.y || 0,
       showRawData: false,
       theme: props.theme,
-      userColor: this._makeColor(props.user.name),
+      userColor: this._makeColor(props.user.name)
     }
   }
 
-  componentDidMount() {
+  componentDidMount () {
     this.loadProfilePicture()
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      user: nextProps.user,
-      picture: null,
-      x: nextProps.x,
-      y: nextProps.y,
-      showRawData: false,
-      theme: nextProps.theme,
-      userColor: this._makeColor(nextProps.user.name),
-    }, () => this.loadProfilePicture())
+  componentWillReceiveProps (nextProps) {
+    this.setState(
+      {
+        user: nextProps.user,
+        picture: null,
+        x: nextProps.x,
+        y: nextProps.y,
+        showRawData: false,
+        theme: nextProps.theme,
+        userColor: this._makeColor(nextProps.user.name)
+      },
+      () => this.loadProfilePicture()
+    )
   }
 
-  _makeColor(username) {
+  _makeColor (username) {
     return Please.make_color({
       seed: username,
       saturation: 0.4,
@@ -47,8 +50,8 @@ class Profile extends React.Component {
     })
   }
 
-  loadProfilePicture() {
-    if(this.state.user && this.state.user.image) {
+  loadProfilePicture () {
+    if (this.state.user && this.state.user.image) {
       ChannelActions.loadFile(this.state.user.image, true, false, (err, buffer, url, stream) => {
         this.setState({ picture: url })
       })
@@ -57,48 +60,69 @@ class Profile extends React.Component {
     }
   }
 
-  onShowRawData(evt) {
+  onShowRawData (evt) {
     evt.stopPropagation()
     this.setState({ showRawData: !this.state.showRawData })
   }
 
-  render() {
+  render () {
     const { user, picture, x, y, showRawData, userColor } = this.state
     const country = Countries[user.location]
-    const location = country ? country + ", Earth" : "Earth"
+    const location = country ? country + ', Earth' : 'Earth'
 
     const rawData = showRawData ? <pre>{JSON.stringify(user, null, 2)}</pre> : null
-    const profileData = showRawData ? null :
-      (<div className="profileDataContainer">
+    const profileData = showRawData ? null : (
+      <div className="profileDataContainer">
         <div className="country">{location}</div>
-        <br/><br/><br/><br/>
+        <br />
+        <br />
+        <br />
+        <br />
         <div className="title">Identity Provider:</div>
         <div className="identityProvider">{user.identityProvider.provider}</div>
         <div className="title">Signing Key:</div>
         <div className="signKey">{user.signKey}</div>
-      </div>)
+      </div>
+    )
 
     return (
       <div className="Profile" style={{ left: x, top: y }}>
-        <span className="close" onClick={this.props.onClose.bind(this, user)}>X</span>
+        <span className="close" onClick={this.props.onClose.bind(this, user)}>
+          X
+        </span>
         <TransitionGroup
           transitionName="profilePictureAnimation"
-          transitionAppear={true} component="div"
+          transitionAppear={true}
+          component="div"
           transitionAppearTimeout={1500}
           transitionEnterTimeout={0}
           transitionLeaveTimeout={0}
         >
           <img className="picture" src={picture} />
         </TransitionGroup>
-        <div className="name">{user.name}<span style={{ color: userColor, fontSize: '0.5em', marginLeft: '0.2em' }}>{user.name}</span></div>
+        <div className="name">
+          {user.name}
+          <span style={{ color: userColor, fontSize: '0.5em', marginLeft: '0.2em' }}>
+            {user.name}
+          </span>
+        </div>
         {profileData}
         {rawData}
-        {
-          showRawData
-          ? <div className="more" onClick={this.onShowRawData.bind(this)}>Show profile...</div>
-          : <div className="more" onClick={this.onShowRawData.bind(this)}>Show profile data...</div>
-        }
-        <BackgroundAnimation style={{ top: "-144px", left: "-128px", zIndex: "-1" }} size={256} delay={0.0} theme={this.state.theme}/>
+        {showRawData ? (
+          <div className="more" onClick={this.onShowRawData.bind(this)}>
+            Show profile...
+          </div>
+        ) : (
+          <div className="more" onClick={this.onShowRawData.bind(this)}>
+            Show profile data...
+          </div>
+        )}
+        <BackgroundAnimation
+          style={{ top: '-144px', left: '-128px', zIndex: '-1' }}
+          size={256}
+          delay={0.0}
+          theme={this.state.theme}
+        />
       </div>
     )
   }

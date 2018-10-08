@@ -65,9 +65,7 @@ const Loader = createReactClass({
    * @return {Object}
    */
   getAnimationStyle: function getAnimationStyle (i) {
-    const animation = [animationName, '0.8s', '0s', 'infinite', 'linear'].join(
-      ' '
-    )
+    const animation = [animationName, '0.8s', '0s', 'infinite', 'linear'].join(' ')
     const animationFillMode = 'forwards'
 
     return {

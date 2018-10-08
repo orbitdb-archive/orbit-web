@@ -6,26 +6,26 @@ import BackgroundAnimation from 'components/BackgroundAnimation'
 import Themes from 'app/Themes'
 import 'styles/LoadingView.scss'
 
-class LoadingView extends React.Component{
-  constructor(props) {
+class LoadingView extends React.Component {
+  constructor (props) {
     super(props)
     this.state = this._getInitialState(props)
   }
 
-  _getInitialState(props) {
+  _getInitialState (props) {
     return {
       text: [],
       theme: Themes.Default,
-      loading: true,
+      loading: true
     }
   }
 
-  componentDidMount() {
+  componentDidMount () {
     if (window.ipcRenderer) {
       window.ipcRenderer.on('log', (e, source, level, text) => {
         const event = { source: source, level: level, text: text }
-        this.setState({ text: this.state.text.concat([event])})
-      })      
+        this.setState({ text: this.state.text.concat([event]) })
+      })
       window.ipcRenderer.on('ipfs-daemon-instance', () => {
         // fired when daemon has started
         this.setState({ loading: false })
@@ -33,35 +33,47 @@ class LoadingView extends React.Component{
     }
   }
 
-  componentWillUnmount() {
-  }
+  componentWillUnmount () {}
 
-  render() {
-    if (!this.state.loading)
-      return null
+  render () {
+    if (!this.state.loading) return null
 
-    const logs = this.state.text.map((e) => {
-      const className = e.level.toLowerCase() === 'error' ? "text error" : "text"
-      return <div className={className}>{e.level} {e.text}</div>
+    const logs = this.state.text.map(e => {
+      const className = e.level.toLowerCase() === 'error' ? 'text error' : 'text'
+      return (
+        <div className={className}>
+          {e.level} {e.text}
+        </div>
+      )
     })
 
-    const transitionProps =  {
+    const transitionProps = {
       transitionAppear: true,
       transitionAppearTimeout: 5000,
       transitionEnterTimeout: 5000,
-      transitionLeaveTimeout: 5000,
+      transitionLeaveTimeout: 5000
     }
 
     return (
       <div className="LoadingView">
-        <TransitionGroup className="header" component="div" transitionName="loadingHeaderAnimation" {...transitionProps}>
+        <TransitionGroup
+          className="header"
+          component="div"
+          transitionName="loadingHeaderAnimation"
+          {...transitionProps}
+        >
           <h1>Loading</h1>
         </TransitionGroup>
-        <TransitionGroup className="logs" component="div" transitionName="loadingTextAnimation" {...transitionProps}>
+        <TransitionGroup
+          className="logs"
+          component="div"
+          transitionName="loadingTextAnimation"
+          {...transitionProps}
+        >
           {logs}
         </TransitionGroup>
         <div className="logo">
-          <BackgroundAnimation size={480} circleSize={2} theme={this.state.theme}/>
+          <BackgroundAnimation size={480} circleSize={2} theme={this.state.theme} />
         </div>
       </div>
     )

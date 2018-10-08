@@ -5,14 +5,12 @@ import Profile from 'components/Profile'
 import createColor from 'utils/create-color'
 import 'styles/User.scss'
 
-const getUserColor = (props) => {
-  return props.colorify && props.user
-    ? createColor(props.user.name) 
-    : 'rgb(250, 250, 250)'
+const getUserColor = props => {
+  return props.colorify && props.user ? createColor(props.user.name) : 'rgb(250, 250, 250)'
 }
 
 class User extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       user: props.user,
@@ -21,7 +19,7 @@ class User extends React.Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps (nextProps) {
     this.setState({
       user: nextProps.user,
       highlight: nextProps.highlight,
@@ -29,22 +27,16 @@ class User extends React.Component {
     })
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return this.state.user 
-      && this.state.user.id !== nextState.user 
-      && nextState.user.id
+  shouldComponentUpdate (nextProps, nextState) {
+    return this.state.user && this.state.user.id !== nextState.user && nextState.user.id
   }
 
-  render() {
+  render () {
     const { user, color, highlight } = this.state
     const className = highlight ? 'User command' : 'User'
 
     return (
-      <div
-        className={className}
-        style={{ color: color }}
-        onClick={this.props.onShowProfile}
-      >
+      <div className={className} style={{ color: color }} onClick={this.props.onShowProfile}>
         {user ? user.name : ''}
       </div>
     )

@@ -13,12 +13,7 @@ class Spinner extends React.Component {
     const { className, isLoading, color, size } = this.props
     return (
       <div className={className}>
-        <MoonLoader
-          className="spinnerIcon"
-          loading={isLoading}
-          color={color}
-          size={size}
-        />
+        <MoonLoader className="spinnerIcon" loading={isLoading} color={color} size={size} />
       </div>
     )
   }
