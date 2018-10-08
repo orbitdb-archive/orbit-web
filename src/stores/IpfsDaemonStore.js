@@ -27,9 +27,9 @@ const IpfsDaemonStore = Reflux.createStore({
     this.ipfsDaemonSettings = {}
     this.settings = {}
 
-    let orbitDataDir = window.orbitDataDir || '/orbit'
-    let ipfsDataDir = window.ipfsDataDir || '/orbit/ipfs'
-    let settings = [defaultIpfsDaemonSettings(ipfsDataDir), defaultOrbitSettings(orbitDataDir)]
+    const orbitDataDir = window.orbitDataDir || '/orbit'
+    const ipfsDataDir = window.ipfsDataDir || '/orbit/ipfs'
+    const settings = [defaultIpfsDaemonSettings(ipfsDataDir), defaultOrbitSettings(orbitDataDir)]
     // const persistedSettings = this.getIpfsSettings()
     // if (persistedSettings) {
     //   settings.unshift(persistedSettings)
@@ -54,7 +54,7 @@ const IpfsDaemonStore = Reflux.createStore({
     this.trigger(this.ipfsDaemonSettings)
   },
   onStart: function (user) {
-    let settings = Object.assign({}, this.ipfsDaemonSettings)
+    const settings = Object.assign({}, this.ipfsDaemonSettings)
 
     if (settings.IpfsDataDir.includes(settings.OrbitDataDir + '/ipfs')) {
       settings.IpfsDataDir = settings.IpfsDataDir.replace(

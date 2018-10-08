@@ -1,11 +1,11 @@
-'use strict';
+'use strict'
 
-const webpack = require('webpack');
-const path = require('path');
+const webpack = require('webpack')
+const path = require('path')
 
-const webpackConf = require('./webpack.dist.config.js');
+const webpackConf = require('./webpack.dist.config.js')
 
-module.exports = function(config) {
+module.exports = function (config) {
   config.set({
     singleRun: false,
 
@@ -17,9 +17,7 @@ module.exports = function(config) {
 
     browserNoActivityTimeout: 100000,
 
-    files: [
-      'test/orbit.test.js',
-    ],
+    files: ['test/orbit.test.js'],
 
     preprocessors: {
       './test/orbit.test.js': ['webpack']
@@ -30,5 +28,5 @@ module.exports = function(config) {
     webpackMiddleware: {
       // noInfo: true
     }
-  });
-};
+  })
+}

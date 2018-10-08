@@ -236,7 +236,7 @@ const MessageStore = Reflux.createStore({
       // console.log(window.gatewayAddress, this.orbit._ipfs.GatewayAddress)
       callback(null, null, 'http://' + window.gatewayAddress + hash)
     } else if (isElectron) {
-      let xhr = new XMLHttpRequest()
+      const xhr = new XMLHttpRequest()
       xhr.open('GET', 'http://' + window.gatewayAddress + hash, true)
       xhr.responseType = 'blob'
       xhr.onload = function (e) {
