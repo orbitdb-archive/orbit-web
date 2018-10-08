@@ -40,8 +40,7 @@ const SettingsStore = Reflux.createStore({
   loadSettings: function () {
     // Load from local storage
     this.settings = Object.assign({}, defaultSettings)
-    const settings =
-      JSON.parse(localStorage.getItem(this._getSettingsKey())) || {}
+    const settings = JSON.parse(localStorage.getItem(this._getSettingsKey())) || {}
     this.settings = Object.assign(this.settings, settings)
     this._save() // Save the defaults for a new user
     this.trigger(this.settings, settingsDescriptions)

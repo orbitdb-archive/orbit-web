@@ -57,13 +57,8 @@ const MessageStore = Reflux.createStore({
       }
 
       // this.channels[channel].messages = messages
-      this.channels[channel].messages = this.channels[channel].messages.concat(
-        uniqueNew
-      )
-      this.channels[channel].messages = sortBy(
-        this.channels[channel].messages,
-        e => e.Post.meta.ts
-      )
+      this.channels[channel].messages = this.channels[channel].messages.concat(uniqueNew)
+      this.channels[channel].messages = sortBy(this.channels[channel].messages, e => e.Post.meta.ts)
       // console.log("Messages in UI:", this.channels[channel].messages.length)
 
       setImmediate(() => {
@@ -72,8 +67,7 @@ const MessageStore = Reflux.createStore({
     }
   },
   _processQueue: function () {
-    const canProcessNext =
-      this.sendQueue && this.sendQueue.length > 0 && !this.sending
+    const canProcessNext = this.sendQueue && this.sendQueue.length > 0 && !this.sending
     if (canProcessNext) {
       const task = this.sendQueue.shift()
       this.sending = true
@@ -119,9 +113,7 @@ const MessageStore = Reflux.createStore({
 
       const feed = this.orbit.channels[channel].feed
 
-      this.syncCount[channel] = this.syncCount[channel]
-        ? this.syncCount[channel]
-        : 0
+      this.syncCount[channel] = this.syncCount[channel] ? this.syncCount[channel] : 0
 
       // Catch and display db errors
       feed.events.on('error', err => {
@@ -151,10 +143,7 @@ const MessageStore = Reflux.createStore({
         // logger.info("synced -->", channel)
         this.syncCount[channel]--
         this.syncCount[channel] = Math.max(0, this.syncCount[channel])
-        getMessages(
-          channel,
-          this.channels[channel].messages.length + messagesBatchSize
-        )
+        getMessages(channel, this.channels[channel].messages.length + messagesBatchSize)
       })
     })
   },
@@ -185,9 +174,7 @@ const MessageStore = Reflux.createStore({
         this.loadingHistory = true
         const viewSize = 64 // How many we consider to fit in our view in the UI. TODO: make dynamic based on screen height
         // Get the first <viewSize> entries
-        const entriesInView = this.channels[channel].messages
-          .slice(-viewSize)
-          .map(e => e.Entry)
+        const entriesInView = this.channels[channel].messages.slice(-viewSize).map(e => e.Entry)
         // console.log("Refresh from:", entriesInView)
         this.orbit
           .loadMoreHistory(channel, messagesBatchSize, entriesInView)
@@ -201,12 +188,7 @@ const MessageStore = Reflux.createStore({
           .then(messages => {
             setImmediate(() => {
               this._updateStore(channel, messages)
-              if (
-                (messages.length > 0 &&
-                  !this.loadingHistory &&
-                  messages.length > len) ||
-                force
-              ) {
+              if ((messages.length > 0 && !this.loadingHistory && messages.length > len) || force) {
                 this.loadingHistory = true
                 const viewSize = 64 // How many we consider to fit in our view in the UI. TODO: make dynamic based on screen height
                 // Get the last <viewSize> entries
@@ -243,9 +225,7 @@ const MessageStore = Reflux.createStore({
       .then(post => UIActions.stopLoading(channel, 'file'))
       .catch(e => {
         const error = e.toString()
-        logger.error(
-          `Couldn't add file: ${JSON.stringify(filePath)} -  ${error}`
-        )
+        logger.error(`Couldn't add file: ${JSON.stringify(filePath)} -  ${error}`)
         UIActions.raiseError(error)
       })
   },

@@ -52,10 +52,7 @@ const AppStateStore = Reflux.createStore({
 
       if (
         post.content &&
-        hasMentions(
-          post.content.toLowerCase(),
-          UserStore.user.name.toLowerCase()
-        )
+        hasMentions(post.content.toLowerCase(), UserStore.user.name.toLowerCase())
       ) {
         this.onMention(channel, post)
       }
@@ -79,12 +76,7 @@ const AppStateStore = Reflux.createStore({
           post.meta.from.name + ' mentioned you in #' + channel,
           {
             icon: 'images/OrbitLogo_32x32.png',
-            body:
-              getFormattedTime(post.meta.ts) +
-              '\n<' +
-              post.meta.from.name +
-              '> ' +
-              post.content
+            body: getFormattedTime(post.meta.ts) + '\n<' + post.meta.from.name + '> ' + post.content
           }
         )
 

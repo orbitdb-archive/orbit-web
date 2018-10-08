@@ -26,15 +26,9 @@ const OrbitStore = Reflux.createStore({
   onDaemonStarted: function (ipfs) {
     const options = {
       // path where to keep generates keys
-      keystorePath: path.join(
-        IpfsDaemonStore.getIpfsSettings().OrbitDataDir,
-        '/data/keys'
-      ),
+      keystorePath: path.join(IpfsDaemonStore.getIpfsSettings().OrbitDataDir, '/data/keys'),
       // path to orbit-db cache file
-      cachePath: path.join(
-        IpfsDaemonStore.getIpfsSettings().OrbitDataDir,
-        '/data/orbit-db'
-      ),
+      cachePath: path.join(IpfsDaemonStore.getIpfsSettings().OrbitDataDir, '/data/orbit-db'),
       // how many messages to retrieve from history on joining a channel
       maxHistory: isElectron ? 2 : 2
     }
