@@ -2,11 +2,13 @@
 
 import React from 'react'
 import TransitionGroup from 'react-addons-css-transition-group'
-import SwarmStore from 'stores/SwarmStore'
-import 'styles/SwarmView.scss'
-import Logger from 'logplease'
+// import Logger from 'logplease'
 
-const logger = Logger.create('Swarm', { color: Logger.Colors.Green })
+import SwarmStore from 'stores/SwarmStore'
+
+import 'styles/SwarmView.scss'
+
+// const logger = Logger.create('Swarm', { color: Logger.Colors.Green })
 
 class SwarmView extends React.Component {
   constructor (props) {
@@ -26,7 +28,7 @@ class SwarmView extends React.Component {
   }
 
   render () {
-    const peerId = SwarmStore.orbit ? SwarmStore.orbit._ipfs.PeerId : null
+    const peerId = SwarmStore.orbit ? SwarmStore.orbit._orbitdb.id : null
     const peers = this.state.peers.map(p => {
       return (
         <TransitionGroup

@@ -63,7 +63,7 @@ class ChannelsPanel extends React.Component {
       this.setState({ appState: appState })
     })
 
-    this.setState({ openChannels: ChannelStore.channels })
+    this.setState({ openChannels: ChannelStore.all() })
   }
 
   componentWillUnmount () {

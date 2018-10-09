@@ -100,12 +100,7 @@ class Profile extends React.Component {
         >
           <img className="picture" src={picture} />
         </TransitionGroup>
-        <div className="name">
-          {user.name}
-          <span style={{ color: userColor, fontSize: '0.5em', marginLeft: '0.2em' }}>
-            {user.name}
-          </span>
-        </div>
+        <div className="name">{user.name}</div>
         {profileData}
         {rawData}
         {showRawData ? (
