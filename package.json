@@ -5,7 +5,7 @@
   "author": "Haad",
   "license": "MIT",
   "repository": "https://github.com/orbitdb/orbit-web.git",
-  "main": "src/index.js",
+  "main": "src/components/index.js",
   "build": {
     "src": "src",
     "target": "dist"

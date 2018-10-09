@@ -4,7 +4,7 @@ const path = require('path')
 
 module.exports = {
   entry: {
-    app: ['@babel/polyfill', './src/index.js']
+    app: ['@babel/polyfill', './src/components/index.js']
   },
   output: {
     path: path.resolve(process.cwd(), 'dist/assets/'),
