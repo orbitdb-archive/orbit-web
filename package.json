@@ -10,9 +10,6 @@
     "src": "src",
     "target": "dist"
   },
-  "browser": {
-    "fs-pull-blob-store": "idb-pull-blob-store"
-  },
   "browserslist": [
     "last 2 versions",
     "> 1%",
@@ -24,7 +21,7 @@
     "domkit": "0.0.1",
     "emoji-annotation-to-unicode": "^0.2.4",
     "highlight.js": "^9.9.0",
-    "idb-pull-blob-store": "^0.5.1",
+    "ipfs": "^0.32.3",
     "lodash.differencewith": "^4.5.0",
     "lodash.flatten": "^4.4.0",
     "lodash.isarray": "^4.0.0",
