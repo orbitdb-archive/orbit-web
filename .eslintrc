@@ -8,7 +8,27 @@
     "browser": true,
     "node": true
   },
+  "globals": {
+    "ipcRenderer": true
+  },
   "rules": {
-    "no-var": "warn"
+    "max-len": [
+      "error",
+      {
+        "code": 100,
+        "tabWidth": 2,
+        "ignoreComments": true,
+        "ignoreStrings": true,
+        "ignoreTemplateLiterals": true,
+        "ignoreRegExpLiterals": true
+      }
+    ],
+    "no-var": "warn",
+    "prefer-const": "error"
+  },
+  "settings": {
+    "react": {
+      "version": "16.5"
+    }
   }
 }

@@ -34,11 +34,7 @@ module.exports = {
       },
       {
         test: /\.scss$/,
-        use: [
-          'style-loader',
-          { loader: 'css-loader', options: { url: false } },
-          'sass-loader'
-        ]
+        use: ['style-loader', { loader: 'css-loader', options: { url: false } }, 'sass-loader']
       },
       {
         test: /\.(png|jpg)$/,

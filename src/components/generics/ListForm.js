@@ -30,7 +30,7 @@ class ListForm extends React.Component {
     if (e.key !== 'Enter') return
     e.preventDefault()
     e.stopPropagation()
-    let list = [].concat(this.props.list)
+    const list = [].concat(this.props.list)
     list.push(this.state.inputValue)
     this.setState(this.initialState())
     this.props.onListChange(list, this.props.name)

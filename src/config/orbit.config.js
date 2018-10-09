@@ -1,6 +1,6 @@
 // Orbit's default settings
-export function defaultOrbitSettings(orbitDataDir) {
+export function defaultOrbitSettings (orbitDataDir) {
   return {
-    OrbitDataDir: orbitDataDir,
+    OrbitDataDir: orbitDataDir
   }
 }

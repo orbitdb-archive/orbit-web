@@ -3,13 +3,13 @@
 import React from 'react'
 import Channel from 'components/Channel'
 import UserStore from 'stores/UserStore'
-import SettingsStore from "stores/SettingsStore"
-import Profile from "components/Profile"
+import SettingsStore from 'stores/SettingsStore'
+import Profile from 'components/Profile'
 import Themes from 'app/Themes'
 import 'styles/ChannelView.scss'
 
 class ChannelView extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       channelName: '',
@@ -19,35 +19,32 @@ class ChannelView extends React.Component {
     }
   }
 
-  componentDidMount() {
+  componentDidMount () {
     this.setState({
       user: UserStore.user,
       appSettings: SettingsStore.settings
     })
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps (nextProps) {
     this.setState({
       channelName: decodeURIComponent(nextProps.match.params.channel),
       appSettings: SettingsStore.settings
     })
   }
 
-  onShowProfile(user, evt) {
+  onShowProfile (user, evt) {
     const { showProfile } = this.state
-    if(!showProfile || (showProfile && user.id !== showProfile.id))
+    if (!showProfile || (showProfile && user.id !== showProfile.id)) {
       this.setState({ showProfile: user })
-    else
-      this.setState({ showProfile: null })
+    } else this.setState({ showProfile: null })
   }
 
-  renderProfile() {
-    return this.state.showProfile 
-      ? <Profile user={this.state.showProfile} /> 
-      : null
+  renderProfile () {
+    return this.state.showProfile ? <Profile user={this.state.showProfile} /> : null
   }
 
-  render() {
+  render () {
     const { user, showProfile, appSettings } = this.state
     const theme = appSettings ? Themes[appSettings.theme] : null
 

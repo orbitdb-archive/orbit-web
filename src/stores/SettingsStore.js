@@ -1,8 +1,11 @@
 'use strict'
 
 import Reflux from 'reflux'
-import UserStore from 'stores/UserStore'
+
 import SettingsActions from 'actions/SettingsActions'
+
+import UserStore from 'stores/UserStore'
+
 import Themes from 'app/Themes'
 
 const appName = 'anonet.app'
@@ -15,7 +18,7 @@ const defaultSettings = {
   monospaceFont: 'Roboto Mono',
   useMonospaceFont: false,
   leftSidePanel: false,
-  useLargeMessage: false,
+  useLargeMessage: false
 }
 
 const settingsDescriptions = {
@@ -24,17 +27,17 @@ const settingsDescriptions = {
 
 const SettingsStore = Reflux.createStore({
   listenables: [SettingsActions],
-  init: function() {
+  init: function () {
     this.settings = {}
     this.username = 'default'
-    UserStore.listen((user) => {
-      if(user) {
+    UserStore.listen(user => {
+      if (user) {
         this.username = user.name
         this.loadSettings()
       }
     })
   },
-  loadSettings: function() {
+  loadSettings: function () {
     // Load from local storage
     this.settings = Object.assign({}, defaultSettings)
     const settings = JSON.parse(localStorage.getItem(this._getSettingsKey())) || {}
@@ -42,18 +45,18 @@ const SettingsStore = Reflux.createStore({
     this._save() // Save the defaults for a new user
     this.trigger(this.settings, settingsDescriptions)
   },
-  onGet: function(callback) {
+  onGet: function (callback) {
     callback(this.settings, settingsDescriptions)
   },
-  onSet: function(key, value) {
+  onSet: function (key, value) {
     this.settings[key] = value
     this._save()
     this.trigger(this.settings, settingsDescriptions)
   },
-  _getSettingsKey: function() {
+  _getSettingsKey: function () {
     return `${appName}.${this.username}.settings`
   },
-  _save: function() {
+  _save: function () {
     localStorage.setItem(this._getSettingsKey(), JSON.stringify(this.settings))
   }
 })

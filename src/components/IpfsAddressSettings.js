@@ -18,7 +18,7 @@ class IpfsAddressSettings extends React.Component {
 
   onAddressChange (value, name) {
     logger.info('change', name, value)
-    let newAddress = Object.assign({}, this.props.Addresses)
+    const newAddress = Object.assign({}, this.props.Addresses)
     newAddress[name] = value
     this.props.onChange(newAddress, 'Addresses')
   }

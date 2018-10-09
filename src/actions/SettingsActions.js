@@ -1,10 +1,7 @@
-'use strict';
+'use strict'
 
-import Reflux from 'reflux';
+import Reflux from 'reflux'
 
-var SettingsActions = Reflux.createActions([
-  "get",
-  "set"
-]);
+const SettingsActions = Reflux.createActions(['get', 'set'])
 
-export default SettingsActions;
+export default SettingsActions

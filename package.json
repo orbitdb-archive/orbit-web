@@ -97,6 +97,7 @@
     "dist": "ipfs add -r dist/",
     "publish": "npm run dist | tail -1 | grep -o Qm[a-zA-Z0-9]* | xargs ping-ops-requests -d orbit.chat -t 'Deploy new version of orbit-web' -h",
     "start": "cd dist && ../node_modules/.bin/http-server -c-1 -p 8081 & open http://localhost:8081/index.html & wait",
-    "lint": "./node_modules/eslint/bin/eslint.js src/"
+    "lint": "./node_modules/eslint/bin/eslint.js src/",
+    "lint:fix": "./node_modules/eslint/bin/eslint.js src/ --fix"
   }
 }

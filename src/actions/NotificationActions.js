@@ -1,10 +1,7 @@
-'use strict';
+'use strict'
 
-import Reflux from 'reflux';
+import Reflux from 'reflux'
 
-var NotificationActions = Reflux.createActions([
-  "mention",
-  "newMessage"
-]);
+const NotificationActions = Reflux.createActions(['mention', 'newMessage'])
 
-export default NotificationActions;
+export default NotificationActions

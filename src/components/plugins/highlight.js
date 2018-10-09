@@ -17,8 +17,7 @@ class Highlight extends React.Component {
     if (this.refs.root.scrollHeight > this.refs.root.clientHeight) {
       if (
         evt.deltaY > 0 &&
-        this.refs.root.clientHeight + this.refs.root.scrollTop >=
-          this.refs.root.scrollHeight
+        this.refs.root.clientHeight + this.refs.root.scrollTop >= this.refs.root.scrollHeight
       ) {
         evt.stopPropagation()
         evt.preventDefault()

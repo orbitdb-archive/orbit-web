@@ -1,15 +1,15 @@
-'use strict';
+'use strict'
 
-import Reflux from 'reflux';
+import Reflux from 'reflux'
 
-var AppActions = Reflux.createActions([
-  "initialize",
-  "login",
-  "disconnect",
-  "setLocation",
-  "setCurrentChannel",
-  "windowLostFocus",
-  "windowOnFocus"
-]);
+const AppActions = Reflux.createActions([
+  'initialize',
+  'login',
+  'disconnect',
+  'setLocation',
+  'setCurrentChannel',
+  'windowLostFocus',
+  'windowOnFocus'
+])
 
-export default AppActions;
+export default AppActions

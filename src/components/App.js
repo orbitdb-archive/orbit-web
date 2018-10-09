@@ -85,13 +85,9 @@ const App = createReactClass({
     NetworkActions.leaveChannel.listen(this.onLeaveChannel)
     AppActions.login.listen(this.onLogin)
 
-    this.unsubscribeFromNetworkStore = NetworkStore.listen(
-      this.onNetworkUpdated
-    )
+    this.unsubscribeFromNetworkStore = NetworkStore.listen(this.onNetworkUpdated)
     this.unsubscribeFromUserStore = UserStore.listen(this.onUserUpdated)
-    this.stopListeningAppState = AppStateStore.listen(
-      this._handleAppStateChange
-    )
+    this.stopListeningAppState = AppStateStore.listen(this._handleAppStateChange)
     this.unsubscribeFromSettingsStore = SettingsStore.listen(settings => {
       this.setState({
         theme: Themes[settings.theme] || null,
@@ -127,8 +123,7 @@ const App = createReactClass({
 
     if (
       channelsWithNewMessages.length > 1 ||
-      (channelsWithNewMessages.length === 1 &&
-        !channelsWithNewMessages.includes(currentChannel))
+      (channelsWithNewMessages.length === 1 && !channelsWithNewMessages.includes(currentChannel))
     ) {
       prefix = '*'
     }
@@ -139,10 +134,7 @@ const App = createReactClass({
 
     if (newChannel) {
       document.title = `${prefix} ${currentLocation} ${suffix}`
-      this.goToLocation(
-        newChannel,
-        views.Channel + encodeURIComponent(newChannel)
-      )
+      this.goToLocation(newChannel, views.Channel + encodeURIComponent(newChannel))
     } else {
       document.title = `${prefix} Orbit`
       this.goToLocation(newLocation, views[newLocation])
@@ -168,10 +160,7 @@ const App = createReactClass({
       this.setState({ networkName: network.name })
       // TODO: on the next lines 'this.state' refers to the _old_ 'state'
       // with the _old_ 'networkName'. Is this the desired behaviour?
-      const channels = this._getSavedChannels(
-        this.state.networkName,
-        this.state.user.name
-      )
+      const channels = this._getSavedChannels(this.state.networkName, this.state.user.name)
       channels.forEach(channel => NetworkActions.joinChannel(channel.name, ''))
     }
   },
