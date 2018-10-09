@@ -1,14 +1,21 @@
 'use strict'
 
+const path = require('path')
+const webpack = require('webpack')
+
 const common = require('./webpack.common.js')
 
 const config = {
   mode: 'development',
-  entry: {
-    app: ['webpack/hot/only-dev-server', './src/components/App.js']
+  devtool: 'inline-source-map',
+  devServer: {
+    contentBase: path.resolve(process.cwd(), 'dist'),
+    compress: true,
+    hot: true,
+    port: 8000,
+    publicPath: '/assets/'
   },
-  devtool: 'sourcemap',
-  cache: false
+  plugins: [new webpack.HotModuleReplacementPlugin()]
 }
 
 module.exports = Object.assign(config, common)

@@ -3,6 +3,9 @@
 const path = require('path')
 
 module.exports = {
+  entry: {
+    app: './src/index.js'
+  },
   output: {
     path: path.resolve(process.cwd(), 'dist/assets/'),
     publicPath: '/assets/',

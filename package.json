@@ -5,7 +5,7 @@
   "author": "Haad",
   "license": "MIT",
   "repository": "https://github.com/orbitdb/orbit-web.git",
-  "main": "src/components/App.js",
+  "main": "src/index.js",
   "build": {
     "src": "src",
     "target": "dist"
@@ -63,6 +63,7 @@
     "eslint-plugin-compat": "^2.5.1",
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-react": "^7.11.1",
     "eslint-plugin-standard": "^3.0.0",
     "exports-loader": "^0.7.0",
@@ -87,7 +88,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "grunt serve",
+    "dev": "./node_modules/.bin/webpack-dev-server --config config/webpack.config.js",
     "build": "npm run build:dist",
     "build:dist": "grunt build && webpack --config config/webpack.config.dist.js --hide-modules --progress",
     "build:debug": "grunt build && webpack --config config/webpack.config.js --display-modules --sort-modules-by size --progress --hot",

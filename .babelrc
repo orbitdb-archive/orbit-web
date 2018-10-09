@@ -3,6 +3,7 @@
   "plugins": [
     "@babel/plugin-transform-flow-strip-types",
     "@babel/plugin-syntax-flow",
-    "@babel/plugin-proposal-class-properties"
+    "@babel/plugin-proposal-class-properties",
+    "react-hot-loader/babel"
   ]
 }
