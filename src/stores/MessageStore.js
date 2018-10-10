@@ -3,7 +3,6 @@
 import sortBy from 'lodash.sortby'
 import differenceWith from 'lodash.differencewith'
 import Reflux from 'reflux'
-import Logger from 'logplease'
 
 import AppActions from 'actions/AppActions'
 import UIActions from 'actions/UIActions'
@@ -12,9 +11,9 @@ import ChannelActions from 'actions/ChannelActions'
 import NotificationActions from 'actions/NotificationActions'
 import UserActions from 'actions/UserActions'
 
-const logger = Logger.create('MessageStore', { color: Logger.Colors.Magenta })
+import Logger from 'utils/logger'
 
-window.LOG = 'none' // turn off logging
+const logger = new Logger()
 
 const messagesBatchSize = 64
 
@@ -77,7 +76,7 @@ const MessageStore = Reflux.createStore({
       this.sending = false
       if (task.callback) task.callback()
     } catch (err) {
-      console.error(err)
+      logger.error(err)
     }
   },
   _processMessages: function (channel, messages, newMessages = true) {
@@ -93,14 +92,14 @@ const MessageStore = Reflux.createStore({
       const messages = await this.orbit.get(channel, null, null, amount)
       this._processMessages(channel, messages, newMessages)
     } catch (err) {
-      console.error(err)
+      logger.error(err)
     }
   },
   _orbitOnMessage: function (channel, message) {
     this._getMessages(channel, this._messages[channel] ? this._messages[channel].length + 1 : 1)
   },
   _orbitOnChannelJoin: function (channel) {
-    logger.info(`Joined #${channel}`)
+    logger.debug(`Joined #${channel}`)
 
     const feed = this.orbit.getChannel(channel).feed
     const name = channel.split('/').pop()
@@ -118,13 +117,13 @@ const MessageStore = Reflux.createStore({
 
     // Catch and display db errors
     feed.events.on('error', err => {
-      console.error(channel, err)
+      logger.error(channel, err)
     })
 
     // When the database has loaded its history,
     // get the messages and update the state
     feed.events.on('ready', () => {
-      // logger.info("ready -->", channel)
+      // logger.debug("ready -->", channel)
       this.syncCount[channel]--
       this.syncCount[channel] = Math.max(0, this.syncCount[channel])
       this._getMessages(channel, messagesBatchSize, false)
@@ -134,7 +133,7 @@ const MessageStore = Reflux.createStore({
     // When the database starts syncing new messages,
     // send a message that we're loading
     feed.events.on('replicate', channel => {
-      // logger.info("sync -->", channel, name)
+      // logger.debug("sync -->", channel, name)
       this.syncCount[channel]++
       setImmediate(() => UIActions.startLoading(name, 'load'))
     })
@@ -146,7 +145,7 @@ const MessageStore = Reflux.createStore({
     // When we receive new messages from peers,
     // get the messages and update the store state
     feed.events.on('replicated', () => {
-      // logger.info("synced -->", channel)
+      // logger.debug("synced -->", channel)
       this.syncCount[channel]--
       this.syncCount[channel] = Math.max(0, this.syncCount[channel])
       this._getMessages(
@@ -205,7 +204,7 @@ const MessageStore = Reflux.createStore({
         await this.orbit.loadMoreHistory(channel, messagesBatchSize, entriesInView)
         this.loadingHistory = false
       } catch (err) {
-        console.error(err)
+        logger.error(err)
       }
     } else {
       const len = this._messages[channel].length
@@ -229,7 +228,7 @@ const MessageStore = Reflux.createStore({
           await this.orbit.loadMoreHistory(channel, messagesBatchSize, entriesInView)
           this.loadingHistory = false
         } catch (err) {
-          console.error(err)
+          logger.error(err)
         }
       })
     }
@@ -291,7 +290,7 @@ const MessageStore = Reflux.createStore({
             })
           }
         })
-        .catch(e => console.error(e))
+        .catch(e => logger.error(e))
     }
   },
   onLoadDirectoryInfo: function (hash, callback) {
@@ -309,7 +308,7 @@ const MessageStore = Reflux.createStore({
         })
         callback(null, result)
       })
-      .catch(e => console.error(e))
+      .catch(e => logger.error(e))
   }
 })
 

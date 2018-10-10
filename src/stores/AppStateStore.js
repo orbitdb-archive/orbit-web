@@ -9,8 +9,8 @@ import NotificationActions from 'actions/NotificationActions'
 
 import UserStore from 'stores/UserStore'
 
-import { getFormattedTime } from '../utils/utils.js'
-import hasMentions from '../utils/has-mentions'
+import { getFormattedTime } from 'utils/utils.js'
+import hasMentions from 'utils/has-mentions'
 
 const AppStateStore = Reflux.createStore({
   listenables: [AppActions, NetworkActions, NotificationActions],

@@ -1,7 +1,6 @@
 'use strict'
 
 import Reflux from 'reflux'
-import Logger from 'logplease'
 
 import AppActions from 'actions/AppActions'
 import NetworkActions from 'actions/NetworkActions'
@@ -9,7 +8,9 @@ import ChannelActions from 'actions/ChannelActions'
 
 import AppStateStore from 'stores/AppStateStore'
 
-const logger = Logger.create('ChannelStore', { color: Logger.Colors.Blue })
+import Logger from 'utils/logger'
+
+const logger = new Logger()
 
 const ChannelStore = Reflux.createStore({
   listenables: [AppActions, NetworkActions, ChannelActions],
@@ -58,7 +59,7 @@ const ChannelStore = Reflux.createStore({
           this.trigger(this.orbit.channels, this.peers)
         })
       } catch (err) {
-        console.error(err)
+        logger.error(err)
       }
     }, 1000)
   },

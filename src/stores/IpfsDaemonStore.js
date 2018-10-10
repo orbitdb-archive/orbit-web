@@ -2,7 +2,6 @@
 
 import IPFS from 'ipfs'
 import Reflux from 'reflux'
-import Logger from 'logplease'
 import path from 'path'
 
 import AppActions from 'actions/AppActions'
@@ -12,13 +11,16 @@ import IpfsDaemonActions from 'actions/IpfsDaemonActions'
 import { defaultIpfsDaemonSettings } from '../config/ipfs-daemon.config'
 import { defaultOrbitSettings } from '../config/orbit.config'
 
-const logger = Logger.create('IpfsDaemonStore', { color: Logger.Colors.Green })
+import Logger from 'utils/logger'
+
+const logger = new Logger()
+
 // const LOCAL_STORAGE_KEY = 'ipfs-daemon-settings'
 
 const IpfsDaemonStore = Reflux.createStore({
   listenables: [AppActions, IpfsDaemonActions, NetworkActions],
   init: function () {
-    logger.info('IpfsDaemonStore Init sequence')
+    logger.debug('IpfsDaemonStore Init sequence')
 
     this.isElectron = window.isElectron
     this.ipfs = null
@@ -34,7 +36,7 @@ const IpfsDaemonStore = Reflux.createStore({
 
     if (this.isElectron) {
       ipcRenderer.on('ipfs-daemon-instance', () => {
-        logger.info('daemon callback')
+        logger.debug('daemon callback')
         window.ipfsInstance = window.remote.getGlobal('ipfsInstance')
         this.ipfs = window.ipfsInstance
         window.gatewayAddress = this.ipfs.GatewayAddress

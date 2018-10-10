@@ -3,14 +3,12 @@
 import Orbit from 'orbit_'
 import Reflux from 'reflux'
 import path from 'path'
-// import Logger from 'logplease'
 
 import AppActions from 'actions/AppActions'
 import IpfsDaemonActions from 'actions/IpfsDaemonActions'
 
 import IpfsDaemonStore from 'stores/IpfsDaemonStore'
 
-// const logger = Logger.create('OrbitStore', { color: Logger.Colors.Blue })
 const isElectron = window.remote
 const ipcRenderer = window.ipcRenderer
 

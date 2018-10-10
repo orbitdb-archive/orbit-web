@@ -1,13 +1,14 @@
 'use strict'
 
 import Reflux from 'reflux'
-import Logger from 'logplease'
 
 import NetworkActions from 'actions/NetworkActions'
 
 import OrbitStore from 'stores/OrbitStore'
 
-const logger = Logger.create('UserStore', { color: Logger.Colors.Green })
+import Logger from 'utils/logger'
+
+const logger = new Logger()
 
 const UserStore = Reflux.createStore({
   listenables: [NetworkActions],
@@ -15,7 +16,7 @@ const UserStore = Reflux.createStore({
     this.user = null
     OrbitStore.listen(orbit => {
       orbit.events.on('connected', (network, user) => {
-        logger.info(`Connected as ${user}`)
+        logger.debug(`Connected as ${user}`)
         this._update(user)
       })
     })

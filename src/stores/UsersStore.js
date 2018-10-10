@@ -1,13 +1,10 @@
 'use strict'
 
 import Reflux from 'reflux'
-// import Logger from 'logplease'
 
 import AppActions from 'actions/AppActions'
 import NetworkActions from 'actions/NetworkActions'
 import UserActions from 'actions/UserActions'
-
-// const logger = Logger.create('UsersStore', { color: Logger.Colors.Cyan })
 
 const UsersStore = Reflux.createStore({
   listenables: [AppActions, NetworkActions, UserActions],

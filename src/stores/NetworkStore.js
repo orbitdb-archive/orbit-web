@@ -1,22 +1,23 @@
 'use strict'
 
 import Reflux from 'reflux'
-import Logger from 'logplease'
 
 import OrbitStore from 'stores/OrbitStore'
 
-const logger = Logger.create('NetworkStore', { color: Logger.Colors.Yellow })
+import Logger from 'utils/logger'
+
+const logger = new Logger()
 
 const NetworkStore = Reflux.createStore({
   init: function () {
     this.network = null
     OrbitStore.listen(orbit => {
       orbit.events.on('connected', (network, user) => {
-        logger.info('orbit.events.connected', network, user)
+        logger.debug('orbit.events.connected', network, user)
         this._update(network, user)
       })
       orbit.events.on('diconnected', (network, user) => {
-        logger.info('orbit.events.disconnected', network, user)
+        logger.debug('orbit.events.disconnected', network, user)
         this._update(null, null)
       })
     })
