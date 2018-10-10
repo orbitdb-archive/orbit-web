@@ -40,10 +40,16 @@ const ChannelStore = Reflux.createStore({
 
     logger.debug(`Join channel #${channel}`)
 
-    await this.orbit.join(channel)
-
+    try {
+      const firstJoin = await this.orbit.join(channel)
+      NetworkActions.joinedChannel(channel, firstJoin)
+    } catch (err) {
+      logger.error(err)
+      NetworkActions.joinChannelError(channel, err)
+    }
+  },
+  onJoinedChannel: function (channel) {
     logger.debug(`Joined channel #${channel}`)
-    NetworkActions.joinedChannel(channel)
 
     setImmediate(() => this.trigger(this.orbit.channels, this.peers))
 

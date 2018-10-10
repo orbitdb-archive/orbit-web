@@ -95,11 +95,20 @@ const MessageStore = Reflux.createStore({
       logger.error(err)
     }
   },
-  _orbitOnMessage: function (channel, message) {
-    this._getMessages(channel, this._messages[channel] ? this._messages[channel].length + 1 : 1)
+  onInitialize: function (orbit) {
+    this.orbit = orbit
+    this.syncCount = {}
+
+    if (this._processQueueInterval) clearInterval(this._processQueueInterval)
+
+    // Start processing the send queue at an interval
+    this._processQueueInterval = setInterval(this._processQueue, 10)
   },
-  _orbitOnChannelJoin: function (channel) {
-    logger.debug(`Joined #${channel}`)
+  onDisconnect: function () {
+    this._reset()
+  },
+  onJoinedChannel: function (channel, firstJoin) {
+    if (!firstJoin) return
 
     const feed = this.orbit.getChannel(channel).feed
     const name = channel.split('/').pop()
@@ -155,24 +164,6 @@ const MessageStore = Reflux.createStore({
           : messagesBatchSize
       )
     })
-  },
-  onInitialize: function (orbit) {
-    this.orbit = orbit
-    this.syncCount = {}
-
-    if (this._processQueueInterval) clearInterval(this._processQueueInterval)
-
-    // Start processing the send queue at an interval
-    this._processQueueInterval = setInterval(this._processQueue, 10)
-
-    // New message
-    // NOTE: currently only messages sent by the user, not from other users
-    this.orbit.events.on('message', this._orbitOnMessage)
-
-    this.orbit.events.on('joined', this._orbitOnChannelJoin)
-  },
-  onDisconnect: function () {
-    this._reset()
   },
   onLoadMessages: function (channel) {
     if (this.orbit && this.orbit.getChannel(channel) !== undefined) {
@@ -242,6 +233,10 @@ const MessageStore = Reflux.createStore({
       message: text,
       callback: cb
     })
+  },
+  onUserMessage: function (channel, message) {
+    // React to users own message
+    this._getMessages(channel, this._messages[channel] ? this._messages[channel].length + 1 : 1)
   },
   onAddFile: function (channel, filePath, buffer, meta) {
     logger.debug('--> Add file: ' + filePath + buffer !== null)
