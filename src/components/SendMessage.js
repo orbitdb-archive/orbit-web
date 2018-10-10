@@ -111,7 +111,7 @@ class SendMessage extends React.Component {
             type="text"
             ref="message"
             placeholder="Type a message..."
-            autoComplete={true}
+            autoComplete="true"
             style={this.state.theme}
             onKeyDown={this.onKeyDown.bind(this)}
             onInput={this.onInput.bind(this)}
