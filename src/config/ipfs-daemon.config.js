@@ -5,7 +5,7 @@ export function defaultIpfsDaemonSettings (ipfsDataDir) {
     Addresses: {
       Swarm: ['/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'],
       API: '/ip4/127.0.0.1/tcp/0',
-      Gateway: '/ip4/0.0.0.0/tcp/0'
+      Gateway: ''
     },
     API: {
       HTTPHeaders: {
