@@ -1,10 +1,8 @@
 'use strict'
 
 import React from 'react'
-import createReactClass from 'create-react-class'
 import PropTypes from 'prop-types'
 import { Route, Switch } from 'react-router-dom'
-import Logger from 'logplease'
 import { hot } from 'react-hot-loader'
 
 import AppActions from 'actions/AppActions'
@@ -29,6 +27,8 @@ import LoadingView from 'components/LoadingView'
 import Header from 'components/Header'
 import Themes from 'app/Themes'
 
+import Logger from 'utils/logger'
+
 import 'normalize.css'
 import 'styles/Main.scss'
 import 'styles/App.scss'
@@ -36,9 +36,7 @@ import 'styles/Scrollbars.scss'
 import 'highlight.js/styles/atom-one-dark.css'
 // Agate, Atom One Dark, Github, Monokai, Monokai Sublime, Vs, Xcode
 
-Logger.setLogLevel(window.DEV ? 'DEBUG' : 'ERROR')
-
-const logger = Logger.create('App', { color: Logger.Colors.Red })
+const logger = new Logger()
 
 const views = {
   Index: '/',
@@ -52,14 +50,14 @@ const views = {
 
 const ipcRenderer = window.ipcRenderer
 
-const App = createReactClass({
-  propTypes: {
-    children: PropTypes.element
-  },
-  contextTypes: {
-    router: PropTypes.object
-  },
-  getInitialState: function () {
+class App extends React.Component {
+  constructor (props) {
+    super(props)
+
+    this.state = this.getInitialState()
+  }
+
+  getInitialState () {
     return {
       panelOpen: false,
       leftSidePanel: false,
@@ -70,8 +68,9 @@ const App = createReactClass({
       theme: null,
       networkName: 'Unknown Network'
     }
-  },
-  componentDidMount: function () {
+  }
+
+  componentDidMount () {
     if (!this.state.user) {
       this._reset()
       AppActions.setLocation('Connect')
@@ -79,26 +78,52 @@ const App = createReactClass({
 
     document.title = 'Orbit'
 
-    UIActions.joinChannel.listen(this.joinChannel)
-    NetworkActions.joinedChannel.listen(this.onJoinedChannel)
-    NetworkActions.joinChannelError.listen(this.onJoinChannelError)
-    NetworkActions.leaveChannel.listen(this.onLeaveChannel)
-    AppActions.login.listen(this.onLogin)
+    UIActions.joinChannel.listen(this.onJoinChannel.bind(this))
+    NetworkActions.joinedChannel.listen(this.onJoinedChannel.bind(this))
+    NetworkActions.joinChannelError.listen(this.onJoinChannelError.bind(this))
+    NetworkActions.leaveChannel.listen(this.onLeaveChannel.bind(this))
+    AppActions.login.listen(this.onLogin.bind(this))
 
-    this.unsubscribeFromNetworkStore = NetworkStore.listen(this.onNetworkUpdated)
-    this.unsubscribeFromUserStore = UserStore.listen(this.onUserUpdated)
-    this.stopListeningAppState = AppStateStore.listen(this._handleAppStateChange)
-    this.unsubscribeFromSettingsStore = SettingsStore.listen(settings => {
-      this.setState({
-        theme: Themes[settings.theme] || null,
-        leftSidePanel: settings.leftSidePanel
-      })
-    })
+    NetworkStore.listen(this.onNetworkUpdated.bind(this))
+    UserStore.listen(this.onUserUpdated.bind(this))
+    AppStateStore.listen(this.onAppStateUpdated.bind(this))
+    SettingsStore.listen(this.onSettingsUpdated.bind(this))
+  }
 
-    // window.onblur = () => AppActions.windowLostFocus()
-    // window.onfocus = () => AppActions.windowOnFocus()
-  },
-  _handleAppStateChange: function (newState) {
+  _reset () {
+    if (ipcRenderer) ipcRenderer.send('disconnected')
+    this.setState(this.getInitialState())
+  }
+
+  _makeChannelsKey (username, networkName) {
+    return 'orbit.app.' + username + '.' + networkName + '.channels'
+  }
+
+  _getSavedChannels (networkName, username) {
+    const channelsKey = this._makeChannelsKey(username, networkName)
+    let channels = JSON.parse(localStorage.getItem(channelsKey))
+
+    // If we have a first time user (nothing saved in local storage),
+    // add #ipfs to their saved channel list in order to join it
+    // automatically on first login
+    if (!channels) {
+      channels = [{ name: 'ipfs' }]
+    }
+
+    return channels
+  }
+
+  _saveChannels (networkName, username, channels) {
+    const channelsKey = this._makeChannelsKey(username, networkName)
+    localStorage.setItem(channelsKey, JSON.stringify(channels))
+  }
+
+  _showConnectView () {
+    this.setState({ user: null })
+    AppActions.setLocation('Connect')
+  }
+
+  onAppStateUpdated (newState) {
     const {
       hasFocus,
       unreadMessages,
@@ -139,56 +164,29 @@ const App = createReactClass({
       document.title = `${prefix} Orbit`
       this.goToLocation(newLocation, views[newLocation])
     }
-  },
-  _reset: function () {
-    if (ipcRenderer) ipcRenderer.send('disconnected')
-    this.setState(this.getInitialState())
-  },
-  onLogin: function (username) {
-    IpfsDaemonActions.start(username)
-    OrbitStore.listen(orbit => {
-      logger.debug('Connect as ' + username)
-      orbit.connect(username)
+  }
+
+  onSettingsUpdated (settings) {
+    this.setState({
+      theme: Themes[settings.theme] || null,
+      leftSidePanel: settings.leftSidePanel
     })
-  },
-  onNetworkUpdated: function (network) {
+  }
+
+  onNetworkUpdated (network) {
     logger.debug('Network updated')
     if (!network) {
       this._reset()
       AppActions.setLocation('Connect')
     } else {
-      this.setState({ networkName: network.name })
-      // TODO: on the next lines 'this.state' refers to the _old_ 'state'
-      // with the _old_ 'networkName'. Is this the desired behaviour?
-      const channels = this._getSavedChannels(this.state.networkName, this.state.user.name)
-      channels.forEach(channel => NetworkActions.joinChannel(channel.name, ''))
+      this.setState({ networkName: network.name }, () => {
+        const channels = this._getSavedChannels(this.state.networkName, this.state.user.name)
+        channels.forEach(channel => NetworkActions.joinChannel(channel.name, ''))
+      })
     }
-  },
-  _makeChannelsKey: function (username, networkName) {
-    return 'orbit.app.' + username + '.' + networkName + '.channels'
-  },
-  _getSavedChannels: function (networkName, username) {
-    const channelsKey = this._makeChannelsKey(username, networkName)
-    let channels = JSON.parse(localStorage.getItem(channelsKey))
+  }
 
-    // If we have a first time user (nothing saved in local storage),
-    // add #ipfs to their saved channel list in order to join it
-    // automatically on first login
-    if (!channels) {
-      channels = [{ name: 'ipfs' }]
-    }
-
-    return channels
-  },
-  _saveChannels: function (networkName, username, channels) {
-    const channelsKey = this._makeChannelsKey(username, networkName)
-    localStorage.setItem(channelsKey, JSON.stringify(channels))
-  },
-  _showConnectView: function () {
-    this.setState({ user: null })
-    AppActions.setLocation('Connect')
-  },
-  onUserUpdated: function (user) {
+  onUserUpdated (user) {
     logger.debug('User updated', user)
 
     if (!user) {
@@ -202,23 +200,34 @@ const App = createReactClass({
 
     if (!this.state.panelOpen) this.openPanel()
     AppActions.setLocation(null)
-  },
-  joinChannel: function (channelName, password) {
+  }
+
+  onLogin (username) {
+    IpfsDaemonActions.start(username)
+    OrbitStore.listen(orbit => {
+      logger.debug('Connect as ' + username)
+      orbit.connect(username)
+    })
+  }
+
+  onJoinChannel (channelName, password) {
     if (channelName === AppStateStore.state.currentChannel) {
       this.closePanel()
       return
     }
     logger.debug('Join channel #' + channelName)
     NetworkActions.joinChannel(channelName, password)
-  },
-  onJoinChannelError: function (channel, err) {
+  }
+
+  onJoinChannelError (channel, err) {
     this.setState({
       joiningToChannel: channel,
       requirePassword: true,
       panelOpen: true
     })
-  },
-  onJoinedChannel: function (channel) {
+  }
+
+  onJoinedChannel (channel) {
     const { networkName, user } = this.state
 
     logger.debug('Joined channel #' + channel)
@@ -236,8 +245,9 @@ const App = createReactClass({
       channels.push({ name: channel })
       this._saveChannels(networkName, user.name, channels)
     }
-  },
-  onLeaveChannel: function (channel) {
+  }
+
+  onLeaveChannel (channel) {
     const { user, networkName } = this.state
 
     const channelsKey = this._makeChannelsKey(user.name, networkName)
@@ -249,37 +259,45 @@ const App = createReactClass({
     } else {
       this._saveChannels(networkName, user.name, remainingChannels)
     }
-  },
-  openSettings: function () {
+  }
+
+  onDaemonDisconnected () {
+    AppActions.setLocation('Connect')
+  }
+
+  openSettings () {
     this.closePanel()
     AppActions.setLocation('Settings')
-  },
-  openSwarmView: function () {
+  }
+
+  openSwarmView () {
     this.closePanel()
     AppActions.setLocation('Swarm')
-  },
-  closePanel: function () {
+  }
+
+  closePanel () {
     this.setState({ panelOpen: false })
     UIActions.onPanelClosed()
-  },
-  openPanel: function () {
+  }
+
+  openPanel () {
     this.setState({ panelOpen: true })
-  },
-  disconnect: function () {
+  }
+
+  disconnect () {
     logger.debug('app disconnect')
     this.closePanel()
     AppActions.disconnect()
     NetworkActions.disconnect()
     this.setState({ user: null })
     AppActions.setLocation('Connect')
-  },
-  onDaemonDisconnected: function () {
-    AppActions.setLocation('Connect')
-  },
-  goToLocation: function (name, url) {
+  }
+
+  goToLocation (name, url) {
     this.context.router.history.push(url || '/')
-  },
-  render: function () {
+  }
+
+  render () {
     const {
       user,
       requirePassword,
@@ -294,7 +312,7 @@ const App = createReactClass({
     const header =
       location && noHeader.indexOf(location) < 0 ? (
         <Header
-          onClick={this.openPanel}
+          onClick={this.openPanel.bind(this)}
           title={location}
           channels={ChannelStore.all()}
           theme={this.state.theme}
@@ -303,10 +321,10 @@ const App = createReactClass({
 
     const panel = this.state.panelOpen ? (
       <ChannelsPanel
-        onClose={this.closePanel}
-        onOpenSwarmView={this.openSwarmView}
-        onOpenSettings={this.openSettings}
-        onDisconnect={this.disconnect}
+        onClose={this.closePanel.bind(this)}
+        onOpenSwarmView={this.openSwarmView.bind(this)}
+        onOpenSettings={this.openSettings.bind(this)}
+        onDisconnect={this.disconnect.bind(this)}
         currentChannel={location}
         username={user ? user.name : ''}
         requirePassword={requirePassword}
@@ -332,6 +350,14 @@ const App = createReactClass({
       </div>
     )
   }
-})
+}
+
+App.propTypes = {
+  children: PropTypes.element
+}
+
+App.contextTypes = {
+  router: PropTypes.object
+}
 
 export default hot(module)(App)
