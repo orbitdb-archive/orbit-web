@@ -105,6 +105,7 @@ const MessageStore = Reflux.createStore({
     this._processQueueInterval = setInterval(this._processQueue, 10)
   },
   onDisconnect: function () {
+    logger.debug('onDisconnect')
     this._reset()
   },
   onJoinedChannel: function (channel, firstJoin) {

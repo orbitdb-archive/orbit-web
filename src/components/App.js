@@ -61,8 +61,6 @@ class App extends React.Component {
     return {
       panelOpen: false,
       leftSidePanel: false,
-      user: null,
-      location: null,
       joiningToChannel: null,
       requirePassword: false,
       theme: null,
@@ -71,14 +69,14 @@ class App extends React.Component {
   }
 
   componentDidMount () {
-    if (!this.state.user) {
+    if (!UserStore.user) {
       this._reset()
       AppActions.setLocation('Connect')
     }
 
     document.title = 'Orbit'
 
-    UIActions.joinChannel.listen(this.onJoinChannel.bind(this))
+    NetworkActions.joinChannel.listen(this.onJoinChannel.bind(this))
     NetworkActions.joinedChannel.listen(this.onJoinedChannel.bind(this))
     NetworkActions.joinChannelError.listen(this.onJoinChannelError.bind(this))
     NetworkActions.leaveChannel.listen(this.onLeaveChannel.bind(this))
@@ -119,50 +117,48 @@ class App extends React.Component {
   }
 
   _showConnectView () {
-    this.setState({ user: null })
     AppActions.setLocation('Connect')
   }
 
-  onAppStateUpdated (newState) {
-    const {
-      hasFocus,
-      unreadMessages,
-      currentChannel,
-      location: currentLocation
-    } = AppStateStore.state
-
-    const {
-      unreadMessages: newUnreadMessages,
-      currentChannel: newChannel,
-      location: newLocation
-    } = newState
+  _parseDocumentTitle (newState) {
+    const { hasFocus, unreadMessages, channel, location } = newState
 
     let prefix = ''
     let suffix = ''
 
-    if (!hasFocus && unreadMessages[currentChannel] > 0) {
-      suffix = `(${unreadMessages[currentChannel]})`
+    if (!hasFocus && unreadMessages[channel] > 0) {
+      suffix = ` (${unreadMessages[channel]})`
     }
 
-    const channelsWithNewMessages = Object.keys(newUnreadMessages)
+    const channelsWithNewMessages = Object.keys(unreadMessages)
 
     if (
       channelsWithNewMessages.length > 1 ||
-      (channelsWithNewMessages.length === 1 && !channelsWithNewMessages.includes(currentChannel))
+      (channelsWithNewMessages.length === 1 && !channelsWithNewMessages.includes(channel))
     ) {
-      prefix = '*'
+      prefix = '* '
     }
 
     if (Object.keys(newState.mentions).length > 0) {
-      prefix = '!'
+      prefix = '! '
     }
 
-    if (newChannel) {
-      document.title = `${prefix} ${currentLocation} ${suffix}`
-      this.goToLocation(newChannel, views.Channel + encodeURIComponent(newChannel))
+    if (channel) {
+      return `${prefix}${location}${suffix}`
+    }
+
+    return `${prefix}Orbit`
+  }
+
+  onAppStateUpdated (newState) {
+    document.title = this._parseDocumentTitle(newState)
+
+    const { channel, location } = newState
+
+    if (channel) {
+      this.goToLocation(channel, views.Channel + encodeURIComponent(channel))
     } else {
-      document.title = `${prefix} Orbit`
-      this.goToLocation(newLocation, views[newLocation])
+      this.goToLocation(location, views[location])
     }
   }
 
@@ -175,30 +171,30 @@ class App extends React.Component {
 
   onNetworkUpdated (network) {
     logger.debug('Network updated')
+
     if (!network) {
       this._reset()
       AppActions.setLocation('Connect')
     } else {
       this.setState({ networkName: network.name }, () => {
-        const channels = this._getSavedChannels(this.state.networkName, this.state.user.name)
+        const { networkName } = this.state
+        const { user } = UserStore
+        const channels = this._getSavedChannels(networkName, user.name)
         channels.forEach(channel => NetworkActions.joinChannel(channel.name, ''))
       })
     }
   }
 
-  onUserUpdated (user) {
-    logger.debug('User updated', user)
-
-    if (!user) {
+  onUserUpdated (newUser, oldUser) {
+    if (!newUser) {
       AppActions.setLocation('Connect')
       return
     }
 
-    if (user === this.state.user) return
-
-    this.setState({ user })
+    if (newUser === oldUser) return
 
     if (!this.state.panelOpen) this.openPanel()
+
     AppActions.setLocation(null)
   }
 
@@ -211,12 +207,9 @@ class App extends React.Component {
   }
 
   onJoinChannel (channelName, password) {
-    if (channelName === AppStateStore.state.currentChannel) {
+    if (channelName === AppStateStore.state.channel) {
       this.closePanel()
-      return
     }
-    logger.debug('Join channel #' + channelName)
-    NetworkActions.joinChannel(channelName, password)
   }
 
   onJoinChannelError (channel, err) {
@@ -228,16 +221,15 @@ class App extends React.Component {
   }
 
   onJoinedChannel (channel) {
-    const { networkName, user } = this.state
-
-    logger.debug('Joined channel #' + channel)
+    const { networkName } = this.state
+    const { user } = UserStore
 
     this.closePanel()
 
     document.title = `#${channel}`
     logger.debug('Set title: ' + document.title)
 
-    AppActions.setCurrentChannel(channel)
+    AppActions.setChannel(channel)
 
     const channels = this._getSavedChannels(networkName, user.name)
 
@@ -248,7 +240,8 @@ class App extends React.Component {
   }
 
   onLeaveChannel (channel) {
-    const { user, networkName } = this.state
+    const { networkName } = this.state
+    const { user } = UserStore
 
     const channelsKey = this._makeChannelsKey(user.name, networkName)
     const savedChannels = this._getSavedChannels(networkName, user.name)
@@ -287,9 +280,7 @@ class App extends React.Component {
   disconnect () {
     logger.debug('app disconnect')
     this.closePanel()
-    AppActions.disconnect()
     NetworkActions.disconnect()
-    this.setState({ user: null })
     AppActions.setLocation('Connect')
   }
 
@@ -298,15 +289,10 @@ class App extends React.Component {
   }
 
   render () {
-    const {
-      user,
-      requirePassword,
-      theme,
-      leftSidePanel,
-      networkName,
-      joiningToChannel
-    } = this.state
+    const { requirePassword, theme, leftSidePanel, networkName, joiningToChannel } = this.state
     const { location } = AppStateStore.state
+    const { user } = UserStore
+
     const noHeader = ['Connect', 'IpfsSettings', 'Loading']
 
     const header =
@@ -325,7 +311,7 @@ class App extends React.Component {
         onOpenSwarmView={this.openSwarmView.bind(this)}
         onOpenSettings={this.openSettings.bind(this)}
         onDisconnect={this.disconnect.bind(this)}
-        currentChannel={location}
+        channel={location}
         username={user ? user.name : ''}
         requirePassword={requirePassword}
         theme={theme}

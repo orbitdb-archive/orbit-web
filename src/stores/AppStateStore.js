@@ -3,7 +3,6 @@
 import Reflux from 'reflux'
 
 import AppActions from 'actions/AppActions'
-import UIActions from 'actions/UIActions'
 import NetworkActions from 'actions/NetworkActions'
 import NotificationActions from 'actions/NotificationActions'
 
@@ -17,7 +16,7 @@ const AppStateStore = Reflux.createStore({
   init: function () {
     this.state = {
       location: null,
-      currentChannel: null,
+      channel: null,
       unreadMessages: {},
       mentions: {},
       hasFocus: true
@@ -26,13 +25,13 @@ const AppStateStore = Reflux.createStore({
   onSetLocation: function (location) {
     if (location === this.state.location) return
 
-    this.state.currentChannel = null
+    this.state.channel = null
     this.state.location = location
     this.trigger(this.state)
   },
-  onSetCurrentChannel: function (channel) {
-    if (channel !== this.state.currentChannel) {
-      this.state.currentChannel = channel
+  onSetChannel: function (channel) {
+    if (channel !== this.state.channel) {
+      this.state.channel = channel
       this.state.location = channel ? `#${channel}` : null
       delete this.state.unreadMessages[channel]
       delete this.state.mentions[channel]
@@ -40,10 +39,10 @@ const AppStateStore = Reflux.createStore({
     }
   },
   onLeaveChannel: function (channel) {
-    if (channel === this.state.currentChannel) this.onSetCurrentChannel(null)
+    if (channel === this.state.channel) this.onSetChannel(null)
   },
   onNewMessage: function (channel, post) {
-    if (channel !== this.state.currentChannel || !this.state.hasFocus) {
+    if (channel !== this.state.channel || !this.state.hasFocus) {
       if (!this.state.unreadMessages[channel]) {
         this.state.unreadMessages[channel] = 0
       }
@@ -61,7 +60,7 @@ const AppStateStore = Reflux.createStore({
     }
   },
   onMention: function (channel, post) {
-    if (channel !== this.state.currentChannel || !this.state.hasFocus) {
+    if (channel !== this.state.channel || !this.state.hasFocus) {
       if (!this.state.mentions[channel]) this.state.mentions[channel] = 0
 
       this.state.mentions[channel] += 1
@@ -84,7 +83,7 @@ const AppStateStore = Reflux.createStore({
         notification.onclick = e => {
           e.preventDefault()
           notification.close()
-          UIActions.joinChannel(channel)
+          NetworkActions.joinChannel(channel)
         }
       }
 

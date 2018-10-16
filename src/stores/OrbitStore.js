@@ -7,14 +7,19 @@ import path from 'path'
 import AppActions from 'actions/AppActions'
 import IpfsDaemonActions from 'actions/IpfsDaemonActions'
 import ChannelActions from 'actions/ChannelActions'
+import NetworkActions from 'actions/NetworkActions'
 
 import IpfsDaemonStore from 'stores/IpfsDaemonStore'
+
+import Logger from 'utils/logger'
+
+const logger = new Logger()
 
 const isElectron = window.remote
 const ipcRenderer = window.ipcRenderer
 
 const OrbitStore = Reflux.createStore({
-  listenables: [AppActions, IpfsDaemonActions],
+  listenables: [AppActions, IpfsDaemonActions, NetworkActions],
   init: function () {
     this.orbit = null
     this.listeners = []
@@ -34,6 +39,8 @@ const OrbitStore = Reflux.createStore({
     this.orbit.disconnect()
   },
   onDaemonStarted: function (ipfs) {
+    logger.debug('IPFS daemon started')
+
     const options = {
       // path where to keep generates keys
       keystorePath: path.join(IpfsDaemonStore.getIpfsSettings().OrbitDataDir, '/data/keys'),

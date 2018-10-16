@@ -3,7 +3,7 @@
 import React from 'react'
 import TransitionGroup from 'react-addons-css-transition-group'
 import AppStateStore from 'stores/AppStateStore'
-import UIActions from 'actions/UIActions'
+import NetworkActions from 'actions/NetworkActions'
 import 'styles/Header.scss'
 
 class Header extends React.Component {
@@ -27,7 +27,7 @@ class Header extends React.Component {
 
   openChannel (channel, event) {
     event.stopPropagation()
-    UIActions.joinChannel(channel)
+    NetworkActions.joinChannel(channel)
   }
 
   onDragEnter (event) {

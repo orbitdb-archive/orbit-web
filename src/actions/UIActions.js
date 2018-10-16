@@ -4,7 +4,7 @@ import Reflux from 'reflux'
 
 const UIActions = Reflux.createActions([
   'raiseError',
-  'joinChannel',
+  // 'joinChannel',
   // "showChannel",
   'focusOnSendMessage',
   'startLoading',
