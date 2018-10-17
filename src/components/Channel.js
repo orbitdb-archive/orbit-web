@@ -15,8 +15,6 @@ import 'styles/Channel.scss'
 import Logger from 'logplease'
 const logger = Logger.create('Channel', { color: Logger.Colors.Cyan })
 
-window.LOG = 'none'
-
 // debug command
 window.send = (channel, amount = 1, interval = 100, text = 'ping') => {
   let i = 0
