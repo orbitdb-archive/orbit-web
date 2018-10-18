@@ -3,6 +3,9 @@
 const path = require('path')
 
 module.exports = {
+  entry: {
+    app: ['@babel/polyfill', './src/components/index.js']
+  },
   output: {
     path: path.resolve(process.cwd(), 'dist/assets/'),
     publicPath: '/assets/',
@@ -46,13 +49,9 @@ module.exports = {
       }
     ]
   },
-  externals: {
-    fs: '{}',
-    du: '{}',
-    net: '{}',
-    tls: '{}',
-    console: '{}',
-    'require-dir': '{}',
-    mkdirp: '{}'
+  node: {
+    fs: 'empty',
+    net: 'empty',
+    tls: 'empty'
   }
 }

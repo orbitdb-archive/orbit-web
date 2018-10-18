@@ -3,9 +3,9 @@
 import React from 'react'
 import createReactClass from 'create-react-class'
 import PropTypes from 'prop-types'
-import { render } from 'react-dom'
-import { HashRouter, Route, Switch } from 'react-router-dom'
+import { Route, Switch } from 'react-router-dom'
 import Logger from 'logplease'
+import { hot } from 'react-hot-loader'
 
 import AppActions from 'actions/AppActions'
 import UIActions from 'actions/UIActions'
@@ -296,7 +296,7 @@ const App = createReactClass({
         <Header
           onClick={this.openPanel}
           title={location}
-          channels={ChannelStore.channels}
+          channels={ChannelStore.all()}
           theme={this.state.theme}
         />
       ) : null
@@ -334,13 +334,4 @@ const App = createReactClass({
   }
 })
 
-/* MAIN */
-render(
-  <HashRouter>
-    <App />
-  </HashRouter>,
-  document.getElementById('content')
-)
-
-// TODO: Is the next line actually necessary or is just a typo?
-export default ChannelView
+export default hot(module)(App)

@@ -13,7 +13,8 @@ const ChannelActions = Reflux.createActions([
   'loadFile',
   'loadDirectoryInfo',
   'setChannelMode',
-  'channelModeUpdated'
+  'channelModeUpdated',
+  'userMessage'
 ])
 
 export default ChannelActions
