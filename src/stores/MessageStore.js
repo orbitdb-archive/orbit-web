@@ -240,8 +240,12 @@ const MessageStore = Reflux.createStore({
     this._getMessages(channel, this._messages[channel] ? this._messages[channel].length + 1 : 1)
   },
   onAddFile: function (channel, filePath, buffer, meta) {
-    logger.debug('--> Add file: ' + filePath + buffer !== null)
+    logger.debug('--> Add file: ', filePath)
+
     UIActions.startLoading(channel, 'file')
+
+    logger.debug(channel, filePath)
+
     this.orbit
       .addFile(channel, filePath, buffer, meta)
       .then(post => UIActions.stopLoading(channel, 'file'))
@@ -267,26 +271,22 @@ const MessageStore = Reflux.createStore({
       }
       xhr.send()
     } else {
-      this.orbit
-        .getFile(hash)
-        .then(stream => {
-          if (asStream) {
-            callback(null, null, null, stream)
-          } else {
-            let buf = new Uint8Array(0)
-            stream.on('error', err => callback(err, null))
-            stream.on('data', chunk => {
-              const tmp = new Uint8Array(buf.length + chunk.length)
-              tmp.set(buf)
-              tmp.set(chunk, buf.length)
-              buf = tmp
-            })
-            stream.on('end', () => {
-              callback(null, buf)
-            })
-          }
+      const stream = this.orbit.getFile(hash)
+      if (asStream) {
+        callback(null, null, null, stream)
+      } else {
+        let buf = new Uint8Array(0)
+        stream.on('error', err => callback(err, null))
+        stream.on('data', chunk => {
+          const tmp = new Uint8Array(buf.length + chunk.length)
+          tmp.set(buf)
+          tmp.set(chunk, buf.length)
+          buf = tmp
         })
-        .catch(e => logger.error(e))
+        stream.on('end', () => {
+          callback(null, buf)
+        })
+      }
     }
   },
   onLoadDirectoryInfo: function (hash, callback) {
