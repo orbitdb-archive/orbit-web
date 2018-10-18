@@ -32,8 +32,6 @@ class File extends React.Component {
         return props.hash
       }
     })
-
-    // this.loadFile = this.loadFile.bind(this)
   }
 
   get isVideo () {
@@ -84,13 +82,6 @@ class File extends React.Component {
         }
 
         if (buffer) url = window.URL.createObjectURL(blob)
-        // if (buffer && this.state.meta.mimeType && isMedia) {
-        //   const arrayBufferView = toArrayBuffer(buffer)
-        //   blob = new Blob([arrayBufferView], { type: this.state.meta.mimeType })
-        // } else if (isElectron) {
-        //   blob = buffer
-        //   url = window.URL.createObjectURL(blob)
-        // }
 
         if (this.isAudio) {
           previewContent = <audio src={url} controls autoPlay={true} />
@@ -121,7 +112,6 @@ class File extends React.Component {
               stream.on('end', () => {
                 setTimeout(() => {
                   if (source.readyState === 'open') source.endOfStream()
-                  // this.refs.videoPlayer.play();
                 }, 100)
               })
               stream.on('error', e => console.error(e))
