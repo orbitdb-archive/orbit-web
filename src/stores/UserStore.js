@@ -26,11 +26,12 @@ const UserStore = Reflux.createStore({
   },
   _update: function (user) {
     logger.debug(`User updated: ${user}`)
+    const oldUser = this.user
     this.user = user
 
     if (!this.user) logger.debug('Not logged in!')
 
-    this.trigger(this.user)
+    this.trigger(this.user, oldUser)
   }
 })
 

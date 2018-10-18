@@ -2,7 +2,6 @@
 
 import React from 'react'
 import TransitionGroup from 'react-addons-css-transition-group' //eslint-disable-line
-import UIActions from 'actions/UIActions'
 import JoinChannel from 'components/JoinChannel' //eslint-disable-line
 import ChannelStore from 'stores/ChannelStore'
 import AppStateStore from 'stores/AppStateStore'
@@ -12,15 +11,11 @@ import Spinner from 'components/Spinner'
 import 'styles/ChannelsPanel.scss'
 import 'styles/RecentChannels.scss'
 
-const channelsToArray = channels => {
-  return Object.keys(channels).map(f => channels[f])
-}
-
 class ChannelsPanel extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      currentChannel: props.currentChannel,
+      channel: props.channel,
       openChannels: {},
       leftSide: props.left,
       joiningToChannel: props.joiningToChannel,
@@ -36,15 +31,15 @@ class ChannelsPanel extends React.Component {
   shouldComponentUpdate (nextProps, nextState) {
     return (
       Object.keys(this.state.openChannels).length !== Object.keys(nextState.openChannels).length ||
-      nextProps.currentChannel !== this.props.currentChannel ||
-      nextState.appState.unreadMessages[this.props.currentChannel] !==
-        this.state.appState.unreadMessages[this.props.currentChannel]
+      nextProps.channel !== this.props.channel ||
+      nextState.appState.unreadMessages[this.props.channel] !==
+        this.state.appState.unreadMessages[this.props.channel]
     )
   }
 
   componentWillReceiveProps (nextProps) {
     this.setState({
-      currentChannel: nextProps.currentChannel,
+      channel: nextProps.channel,
       leftSide: nextProps.left,
       joiningToChannel: nextProps.joiningToChannel || this.state.joiningToChannel,
       requirePassword: nextProps.requirePassword,
@@ -72,7 +67,7 @@ class ChannelsPanel extends React.Component {
   }
 
   onClose () {
-    if (this.state.currentChannel !== null) this.props.onClose()
+    if (this.state.channel !== null) this.props.onClose()
   }
 
   handleJoinChannel (channelName, password) {
@@ -81,7 +76,7 @@ class ChannelsPanel extends React.Component {
       requirePassword: password !== '',
       loading: true
     })
-    UIActions.joinChannel(channelName)
+    NetworkActions.joinChannel(channelName)
   }
 
   clearRecentChannels () {
@@ -127,7 +122,7 @@ class ChannelsPanel extends React.Component {
   }
 
   render () {
-    const headerClass = this.state.currentChannel ? 'header' : 'header no-close'
+    const headerClass = this.state.channel ? 'header' : 'header no-close'
     const channelsHeaderClass =
       Object.keys(this.state.openChannels).length > 0 ? 'panelHeader' : 'hidden'
     const channelJoinInputClass = !this.state.loading

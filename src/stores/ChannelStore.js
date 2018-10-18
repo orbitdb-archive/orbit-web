@@ -36,7 +36,7 @@ const ChannelStore = Reflux.createStore({
   },
   onJoinChannel: async function (channel) {
     // TODO: check if still needed?
-    if (channel === AppStateStore.state.currentChannel) return
+    if (channel === AppStateStore.state.channel) return
 
     logger.debug(`Join channel #${channel}`)
 
