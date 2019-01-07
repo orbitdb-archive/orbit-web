@@ -17,6 +17,6 @@ FROM node:lts-alpine as app
 WORKDIR /usr/src/app
 COPY --from=builder node_modules ./node_modules
 COPY . .
-EXPOSE 9993
+EXPOSE 8081
 
 CMD ["npm", "start"]
