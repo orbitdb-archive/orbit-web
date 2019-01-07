@@ -9,7 +9,7 @@ RUN apk update
 RUN apk upgrade
 COPY package*.json ./
 RUN apk add --no-cache --virtual .gyp git python make g++ bash
-RUN npm install
+RUN yarn 
 
 # Stage 2: App Container
 FROM node:lts-alpine as app
@@ -19,4 +19,4 @@ COPY --from=builder node_modules ./node_modules
 COPY . .
 EXPOSE 8081
 
-CMD ["npm", "start"]
+CMD ["yarn", "start"]
