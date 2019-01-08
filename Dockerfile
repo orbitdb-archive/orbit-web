@@ -5,10 +5,8 @@ FROM node:lts-alpine as builder
 
 # Install dependencies
 # Git and python are currently necessary to install some packages
-RUN apk update
-RUN apk upgrade
+RUN apk update && apk upgrade  && apk add --no-cache --virtual .gyp git python make g++ bash
 COPY package*.json ./
-RUN apk add --no-cache --virtual .gyp git python make g++ bash
 RUN yarn 
 
 # Stage 2: App Container
