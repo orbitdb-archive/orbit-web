@@ -7,7 +7,7 @@ FROM node:lts-alpine as builder
 # Git and python are currently necessary to install some packages
 RUN apk update && apk upgrade  && apk add --no-cache --virtual .gyp git python make g++ bash
 COPY package*.json ./
-RUN npm 
+RUN npm install
 
 # Stage 2: App Container
 FROM node:lts-alpine as app
