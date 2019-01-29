@@ -15,6 +15,22 @@
     "> 1%",
     "not dead"
   ],
+  "bugs": "https://github.com/orbitdb/orbit-web/issues",
+  "homepage": "https://github.com/orbitdb/orbit-web#README",
+  "keywords": [
+    "orbitdb",
+    "orbit",
+  ],
+  "contributors": [
+    "Lauri Junkkari <latenssi@gmail.com>",
+    "Haadcode",
+    "Yuvraj <yuvraj.yad001@gmail.com>",
+    "latenssi",
+    "Richard Littauer <richard+github@burntfen.com>",
+    "adam-palazzo <palazzo.adam@gmail.com>",
+    "Prabodh Meshram <prabodh.meshram7@gmail.com>",
+    "Mark Robert Henderson <henderson.mark@gmail.com>"
+  ],
   "dependencies": {
     "clipboard": "^1.5.16",
     "create-react-class": "^15.6.3",
