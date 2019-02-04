@@ -1,7 +1,7 @@
 # orbit-web
 
 [![](https://img.shields.io/badge/made%20by-Protocol%20Labs-blue.svg?style=flat-square)](http://ipn.io)
-[![](https://img.shields.io/badge/freenode-%23ipfs-blue.svg?style=flat-square)](http://webchat.freenode.net/?channels=%23ipfs)
+[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/orbitdb/Lobby)
 [![Project Status](https://badge.waffle.io/haadcode/orbit.svg?label=In%20Progress&title=In%20Progress)](https://waffle.io/haadcode/orbit)
 
 > A distributed, peer-to-peer chat application built on [IPFS](http://ipfs.io)
@@ -25,6 +25,20 @@ See also:
 - [orbit-db](https://github.com/orbitdb/orbit-db) - Serverless, p2p database that orbit-core uses to store its data.
 - [orbit-textui](https://github.com/orbitdb/orbit-textui) - Terminal client prototype for Orbit.
 - [IPFS](https://ipfs.io) - IPFS
+
+## Table of Contents
+
+- [From Source Code](#from-source-code)
+- [Development](#development)
+	- [Run](#run)
+	- [Build](#build)
+		- [Release](#release)
+		- [Debug](#debug)
+		- [Distribution Package](#distribution-package)
+	- [Publish](#publish)
+	- [Clean](#clean)
+- [Contribute](#contribute)
+- [License](#license)
 
 ## From Source Code
 
@@ -95,11 +109,17 @@ or
 
 *This automatically opens an issue in ipfs/ops-requests with the hash of the build. You will need to have a GitHub basic authentication token called `$NODE_GITHUB_ISSUE_BOT` with `repos` scope enabled in order for this to work.*
 
-`make publish` 
+`make publish`
 
 ### Clean
 
 `make clean`
+
+## Contribute
+
+If you think this could be better, please [open an issue](https://github.com/orbitdb/orbit-web/issues/new)!
+
+Please note that all interactions in [@orbitdb](https://github.com/orbitdb) fall under our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## License
 
