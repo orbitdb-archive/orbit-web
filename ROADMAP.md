@@ -4,10 +4,6 @@ The current implementation status, immediate-term plans, and future goals of thi
 
 We welcome feature requests as edits to the "[Backlog](#backlog)" section below. Suggest something by opening a pull request editing this file.
 
-## Build Status
-
-TBA
-
 ## Timeline
 
 TBA
@@ -15,13 +11,6 @@ TBA
 ## Roadmap
 
 Our short-to-medium-term roadmap items, in order of descending priority.
-
-### _Example Backlog_
-
-| Status  | Feature                         | Owner                                    | Details                                                     |
-| :------ | :------------------------------ | :--------------------------------------- | :---------------------------------------------------------- |
-| &#9745; | example thing which is done     | [@haadcode](https://github.com/haadcode) | more detailed explanation about the thing which is done     |
-| &#9744; | example thing which is not done | [@haadcode](https://github.com/haadcode) | more detailed explanation about the thing which is not done |
 
 ### Backlog
 
