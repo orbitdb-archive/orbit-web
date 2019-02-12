@@ -120,12 +120,7 @@ $controls-height: 2.8em;
 }
 
 .blurred  {
-  $amount: 2px;
-  -webkit-filter: blur($amount);
-  -moz-filter: blur($amount);
-  -o-filter: blur($amount);
-  -ms-filter: blur($amount);
-  filter: blur($amount);
+  filter: blur(2px);
 }
 
 .ChannelOptions {
@@ -238,7 +233,7 @@ input[type=button], .channelOptionsButton {
   }
 }
 
-.statusMessage {
+.ChannelStatus {
   bottom: 1.2em;
   right: 1em;
   margin-right: 0.5em;
@@ -261,28 +256,18 @@ input[type=button], .channelOptionsButton {
   background-color: rgba(48, 48, 48, 0.5);
 }
 
-.statusMessage:hover {
-  background-color: rgba(48, 48, 48, 1);
-}
-
-.statusMessage:active {
-  background-color: $main-color;
-}
-
 .Messages {
   display: block;
   position: relative;
   box-sizing: border-box;
   width: 100%;
-  overflow: auto;
-  -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
+  overflow: hidden;
+  overflow-y: scroll;
 
   .dateSeparator {
     display: flex;
     justify-content: flex-start;
-    padding-left: 0.3em;
-    font-weight: bold;
     font-size: 0.7em;
     color: rgb(228, 228, 228);
     background-color: rgb(35, 35, 35);
@@ -290,6 +275,7 @@ input[type=button], .channelOptionsButton {
     border-bottom: 0.5em solid white;
     border-color: rgb(35, 35, 35);
     cursor: default;
+    text-transform: capitalize;
   }
 
   .firstMessage {
@@ -302,8 +288,59 @@ input[type=button], .channelOptionsButton {
     font-size: 0.7em;
     padding: 0.5em;
     user-select: none;
-    -webkit-user-select: none;
     cursor: default;
+
+    &.hasMoreHistory{
+      cursor: pointer;
+
+      &::before {
+        content:"^";
+        margin-right: 4px;
+      }
+
+      &::after {
+        content:"^";
+        margin-left: 4px;
+      }
+
+      &:hover {
+        background-color: #303030;
+      }
+    }
+  }
+
+  .messagesEnd {
+    display: block;
+    height: 0;
+  }
+
+  &.size-normal {
+    .dateSeparator{
+      font-size: .7em;
+      margin-left: .3em;
+    }
+  }
+
+  &.size-large {
+    .dateSeparator {
+      font-size: .8em;
+      margin-left: .8em;
+    }
+  }
+
+  &.font-normal {
+    .dateSeparator {
+      font-weight: bold;
+      padding-bottom: .2em;
+    }
+  }
+
+  &.font-monospace {
+    .dateSeparator {
+      font-family: "Roboto Mono";
+      font-weight: normal;
+      padding-bottom: .4em;
+    }
   }
 
 }
@@ -313,16 +350,9 @@ input[type=button], .channelOptionsButton {
 }
 
 .controlsAnimation-appear {
-  $duration: .3s;
-  $animation-name: fadeInUp;
-
-  -webkit-animation: $animation-name;
-  animation: $animation-name;
-  -webkit-animation-duration: $duration;
-  animation-duration: $duration;
-  -webkit-animation-fill-mode: both;
+  animation: fadeInUp;
+  animation-duration: .3s;
   animation-fill-mode: both;
-  -webkit-animation-timing-function: ease-out;
   animation-timing-function: ease-out;
 }
 
@@ -357,14 +387,8 @@ input[type=button], .channelOptionsButton {
 }
 
 .messagesAnimation-enter {
-  $duration: 0.3s;
-
-  -webkit-animation-name: fadeIn;
   animation-name: fadeIn;
-  -webkit-animation-duration: $duration;
-  animation-duration: $duration;
-  -webkit-animation-fill-mode: both;
+  animation-duration: 0.3s;
   animation-fill-mode: both;
-  -webkit-animation-timing-function: ease-in;
   animation-timing-function: ease-in;
 }

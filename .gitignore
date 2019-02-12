@@ -1,6 +1,9 @@
 ### SublimeText ###
 *.sublime-workspace
 
+### VSCode ###
+.vscode
+
 ### OSX ###
 .DS_Store
 .AppleDouble
@@ -34,3 +37,5 @@ test/tests.bundle*
 
 # Sourcemaps
 dist/**/*.js.map
+
+dist

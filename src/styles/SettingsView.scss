@@ -16,9 +16,12 @@
     align-items: center;
     padding: 0.2em;
     padding-left: 1.2em;
-    text-transform: capitalize;
     background-color: rgba(38, 38, 38, 1.0);
     border-bottom: 1px solid rgb(34, 34, 34);
+
+    select, option {
+      font-weight: bold;
+    }
   }
 
   .key {
@@ -35,15 +38,9 @@
   }
 
   .rowAnimation-appear {
-    $duration: 0.3s;
-
-    -webkit-animation-name: fadeIn;
     animation-name: fadeIn;
-    -webkit-animation-duration: $duration;
-    animation-duration: $duration;
-    -webkit-animation-fill-mode: both;
+    animation-duration: .3s;
     animation-fill-mode: both;
-    -webkit-animation-timing-function: ease-in;
     animation-timing-function: ease-in;
   }
 

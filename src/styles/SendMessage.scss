@@ -1,4 +1,3 @@
-@import 'App';
 @import 'Colors';
 
 .SendMessage {
@@ -34,15 +33,8 @@
 }
 
 .emojiPreview-appear {
-  $duration: .1s;
-  $animation-name: fadeInUp2;
-
-  -webkit-animation: $animation-name;
-  animation: $animation-name;
-  -webkit-animation-duration: $duration;
-  animation-duration: $duration;
-  -webkit-animation-fill-mode: both;
+  animation: fadeInUp2;
+  animation-duration: .1s;
   animation-fill-mode: both;
-  -webkit-animation-timing-function: ease-out;
   animation-timing-function: ease-out;
 }

@@ -76,15 +76,8 @@ $border-focused: 1px solid $main-color;
 }
 
 .passwordFieldAnimation-appear {
-  $duration: 0.2s;
-  $animation-name: appearFromTop;
-
-  -webkit-animation: $animation-name;
-  animation: $animation-name;
-  -webkit-animation-duration: $duration;
-  animation-duration: $duration;
-  -webkit-animation-fill-mode: both;
+  animation: appearFromTop;
+  animation-duration: .2s;
   animation-fill-mode: both;
-  -webkit-animation-timing-function: ease-out;
   animation-timing-function: ease-out;
 }

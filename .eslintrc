@@ -1,4 +1,5 @@
 {
+  "parser": "babel-eslint",
   "extends": [
     "@orbitdb/eslint-config-orbitdb",
     "plugin:react/recommended",
@@ -6,7 +7,8 @@
   ],
   "env": {
     "browser": true,
-    "node": true
+    "node": true,
+    "mocha": true
   },
   "globals": {
     "ipcRenderer": true
@@ -27,6 +29,7 @@
     "prefer-const": "error"
   },
   "settings": {
+    "polyfills": ["promises", "promise-finally"],
     "react": {
       "version": "16.5"
     }
