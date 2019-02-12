@@ -18,7 +18,7 @@ Our short-to-medium-term roadmap items, in order of descending priority.
 | :------ | :-------------------- | :--------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------- |
 | &#9745; | simplify startup      | [@latenssi](https://github.com/latenssi) | start the network automatically                                                                                               |
 | &#9745; | fix build             | [@latenssi](https://github.com/latenssi) | currently build is not outputting a _standalone_ working web app, some paths are incorrect etc.                               |
-| &#9744; | add alpha disclaimer  | [@latenssi](https://github.com/latenssi) | add a disclaimer that this is alpha version, things will break and chats will disappear etc.                                  |
+| &#9745; | add alpha disclaimer  | [@latenssi](https://github.com/latenssi) | add a disclaimer that this is alpha version, things will break and chats will disappear etc.                                  |
 | &#9744; | check documentation   | [@latenssi](https://github.com/latenssi) | make sure documentation is up to date before merging the new [version](https://github.com/orbitdb/orbit-chat) in to this repo |
 | &#9744; | merge                 | [@latenssi](https://github.com/latenssi) | merge the new [version](https://github.com/orbitdb/orbit-chat) in to this repo as master branch                               |
 | &#9744; | high memory usage     | [@latenssi](https://github.com/latenssi) | currently the memory usage of the app is very high, check what is causing it                                                  |
