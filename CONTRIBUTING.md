@@ -2,7 +2,7 @@
 
 Please contribute! Here are some things that would be great:
 
-- [Open an issue!](https://github.com/orbitdb/orbit-chat/issues/new)
+- [Open an issue!](https://github.com/orbitdb/orbit-web/issues/new)
 - Open a pull request!
 - Say hi! :wave:
 
