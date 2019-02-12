@@ -17,7 +17,7 @@ Our short-to-medium-term roadmap items, in order of descending priority.
 | Status  | Feature               | Owner                                    | Details                                                                                                                       |
 | :------ | :-------------------- | :--------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------- |
 | &#9745; | simplify startup      | [@latenssi](https://github.com/latenssi) | start the network automatically                                                                                               |
-| &#9744; | fix build             | [@latenssi](https://github.com/latenssi) | currently build is not outputting a _standalone_ working web app, some paths are incorrect etc.                               |
+| &#9745; | fix build             | [@latenssi](https://github.com/latenssi) | currently build is not outputting a _standalone_ working web app, some paths are incorrect etc.                               |
 | &#9744; | add alpha disclaimer  | [@latenssi](https://github.com/latenssi) | add a disclaimer that this is alpha version, things will break and chats will disappear etc.                                  |
 | &#9744; | check documentation   | [@latenssi](https://github.com/latenssi) | make sure documentation is up to date before merging the new [version](https://github.com/orbitdb/orbit-chat) in to this repo |
 | &#9744; | merge                 | [@latenssi](https://github.com/latenssi) | merge the new [version](https://github.com/orbitdb/orbit-chat) in to this repo as master branch                               |
@@ -34,7 +34,7 @@ Our short-to-medium-term roadmap items, in order of descending priority.
 | &#9744; | /me missing space     | [@latenssi](https://github.com/latenssi) | currently "/me doing something" renders as "mynicknamedoing something" in chat                                                |
 | &#9744; | browser compatibility | [@latenssi](https://github.com/latenssi) | some users have reported that the app is not wokring on Firefox on linux                                                      |
 | &#9744; | ProfilePanel position | [@latenssi](https://github.com/latenssi) | fix MessageUserProfilePanel vertical positioning, currently it can overflow from the top of the view                          |
-| &#9744; | mobile version        | [@latenssi](https://github.com/latenssi) | make the app more progressive (PWA)                                                                                           |
+| &#9745; | mobile version        | [@latenssi](https://github.com/latenssi) | make the app more progressive (PWA)                                                                                           |
 | &#9744; | run ipfs in a worker  | [@latenssi](https://github.com/latenssi) | run ipfs in a service worker to mitigate the slowdowns caused by signature checks etc.                                        |
 | &#9744; | private channels      | [@latenssi](https://github.com/latenssi) | write only for selected people, everyone can read (read can not be limited because of current techical limitations)           |
 | &#9744; | chat pinner           | [@latenssi](https://github.com/latenssi) | a node which pins a chat so even if everybody leaves, it will keep the chat history in case somebody joins (e.g. IRC bot)     |
