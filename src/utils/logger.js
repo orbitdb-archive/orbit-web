@@ -1,3 +1,5 @@
+'use strict'
+
 function Logger () {}
 
 const enableDebug = window.DEV || process.env.NODE_ENV === 'development'

@@ -1,0 +1,68 @@
+@import 'Colors';
+
+$channel-name-max-height: 5vmin;
+$channel-name-min-height: 1.6em;
+
+.Header {
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid $bar-border-color;
+  background-color: $bar-background-color;
+
+  .notificationsIcon {
+    position: absolute;
+    font-size: 0.8em;
+    top: 1.1em;
+    right: 1.1em;
+    padding-top: -0.2em;
+  }
+}
+
+.Header:hover {
+  background-color: $bar-background-hover-color;
+}
+
+.ChannelName {
+  display: flex;
+  box-sizing: border-box;
+  flex: 1 1 100%;
+  flex-direction: row;
+  align-items: center;
+
+  max-height: $channel-name-max-height;
+  min-height: $channel-name-min-height;
+
+  font-weight: bold;
+  font-size: 2em;
+  color: rgb(160, 160, 160);
+
+  padding-left: 0.2em;
+  padding-right: 0.6em;
+
+  .currentChannel {
+    display: flex;
+    flex: 1 0 33%;
+    justify-content: flex-start;
+
+    font-size: 1em;
+    color: rgb(240, 240, 240);
+  }
+
+  .ChannelLink{
+    font-size: 0.5em
+  }
+}
+
+.channelHeaderAnimation-enter {
+  animation: slideFromLeft;
+  animation-duration: .3s;
+  animation-fill-mode: both;
+  animation-timing-function: ease-out;
+}
+
+.channelHeaderAnimation-leave {
+  animation: fadeOutRight;
+  animation-duration: .3s;
+  animation-fill-mode: both;
+  animation-timing-function: ease-out;
+}

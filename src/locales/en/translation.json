@@ -1,0 +1,93 @@
+{
+  "channel": {
+    "beginningOf": "Beginning of #{{channel}}",
+    "file": {
+      "download": "Download",
+      "previewLoading": "$t(loading)...",
+      "open": "Open",
+      "unableToDisplay": "Unable to display file"
+    },
+    "loadingHistory": "Loading history...",
+    "loadMore": "Click to load older messages",
+    "sendMessagePlaceholder": "Type a message...",
+    "status": {
+      "users": "user",
+      "users_plural": "users"
+    }
+  },
+  "configuration": "Configuration",
+  "controlPanel": {
+    "channels": "Channels",
+    "closeChannel": "Close",
+    "startJsIpfs": "Start js-ipfs"
+  },
+  "disclaimer": {
+    "alpha": {
+      "content": "This is an alpha version of the software. Things will break and change \u2014 chats will be lost. Use at your own risk."
+    }
+  },
+  "joinChannel": {
+    "inputPlaceholder": "Join channel"
+  },
+  "login": {
+    "nickname": "Nickname",
+    "orLoginWith": "Or login with",
+    "pressEnterToLogin": "Press ENTER to login"
+  },
+  "loading": "Loading",
+  "settings": {
+    "names": {
+      "themeName": "Theme",
+      "language": "Language",
+      "sidePanelPosition": "Sidepanel position",
+      "colorifyUsernames": "Colorify usernames",
+      "useEmojis": "Use emojis",
+      "emojiSet": "Emoji theme",
+      "useMonospaceFont": "Use monospace font",
+      "useLargeMessage": "Use large messages"
+    },
+    "descriptions": {},
+    "options": {
+      "themeName": {
+        "default": "Default",
+        "purple1": "Purple 1",
+        "purple2": "Purple 2",
+        "magenta": "Magenta",
+        "red": "Red",
+        "orange": "Orange",
+        "brown": "Brown",
+        "lime": "Lime",
+        "green": "Green",
+        "cyan": "Cyan",
+        "blue1": "Blue 1",
+        "blue2": "Blue 2",
+        "grey": "Grey"
+      },
+      "language": {
+        "en": "English",
+        "fi": "Suomi"
+      },
+      "sidePanelPosition": {
+        "left": "Left",
+        "right": "Right"
+      },
+      "emojiSet": {
+        "apple": "Apple",
+        "emojione": "Emojione",
+        "facebook": "Facebook",
+        "google": "Google",
+        "messenger": "Messenger",
+        "twitter": "Twitter"
+      }
+    }
+  },
+  "userProfile": {
+    "identityType": "Identity provider",
+    "identityId": "Identity id",
+    "identityPublicKey": "Public key"
+  },
+  "version": "Version",
+  "viewNames": {
+    "settings": "Settings"
+  }
+}

@@ -1,64 +1,106 @@
 'use strict'
 
-import Reflux from 'reflux'
+import { action, configure, observable, reaction, values, computed } from 'mobx'
 
-import SettingsActions from 'actions/SettingsActions'
+import defaulNetworkSettings from '../config/network.default.json'
+import defaultUiSettings from '../config/ui.default.json'
 
-import UserStore from 'stores/UserStore'
+configure({ enforceActions: 'observed' })
 
-import Themes from 'app/Themes'
+export default class SettingsStore {
+  constructor (rootStore) {
+    this.rootStore = rootStore
+    this.sessionStore = rootStore.sessionStore
 
-const appName = 'anonet.app'
+    this._saveNetworkSettings = this._saveNetworkSettings.bind(this)
+    this._saveUiSettings = this._saveUiSettings.bind(this)
+    this._updateLanguage = this._updateLanguage.bind(this)
 
-const defaultSettings = {
-  theme: 'Default',
-  useEmojis: true,
-  colorifyUsernames: true,
-  font: 'Lato',
-  monospaceFont: 'Roboto Mono',
-  useMonospaceFont: false,
-  leftSidePanel: false,
-  useLargeMessage: false
-}
+    // Reload settings when user changes
+    reaction(() => this.sessionStore.username, this.load)
 
-const settingsDescriptions = {
-  theme: Object.keys(Themes).join(', ')
-}
+    // Need to react to language changes
+    // since we need to call 'i18n.changeLanguage'
+    reaction(() => this.uiSettings.language, this._updateLanguage)
 
-const SettingsStore = Reflux.createStore({
-  listenables: [SettingsActions],
-  init: function () {
-    this.settings = {}
-    this.username = 'default'
-    UserStore.listen(user => {
-      if (user) {
-        this.username = user.name
-        this.loadSettings()
-      }
-    })
-  },
-  loadSettings: function () {
-    // Load from local storage
-    this.settings = Object.assign({}, defaultSettings)
-    const settings = JSON.parse(localStorage.getItem(this._getSettingsKey())) || {}
-    this.settings = Object.assign(this.settings, settings)
-    this._save() // Save the defaults for a new user
-    this.trigger(this.settings, settingsDescriptions)
-  },
-  onGet: function (callback) {
-    callback(this.settings, settingsDescriptions)
-  },
-  onSet: function (key, value) {
-    this.settings[key] = value
-    this._save()
-    this.trigger(this.settings, settingsDescriptions)
-  },
-  _getSettingsKey: function () {
-    return `${appName}.${this.username}.settings`
-  },
-  _save: function () {
-    localStorage.setItem(this._getSettingsKey(), JSON.stringify(this.settings))
+    // Save network settings when they change
+    reaction(() => values(this.networkSettings), this._saveNetworkSettings)
+
+    // Save ui settings when they change
+    reaction(() => values(this.uiSettings), this._saveUiSettings)
   }
-})
 
-export default SettingsStore
+  // Public instance variables
+
+  @observable
+  networkSettings = {}
+
+  @observable
+  uiSettings = {}
+
+  // Private instance getters
+
+  @computed
+  get _settingsKeys () {
+    const username = this.sessionStore.username
+    if (!username) throw new Error('No logged in user')
+    return {
+      networkKey: `orbit-chat.${username}.network-settings`,
+      uiKey: `orbit-chat.${username}.ui-settings`
+    }
+  }
+
+  // Private instance methods
+
+  _saveNetworkSettings () {
+    try {
+      const { networkKey } = this._settingsKeys
+      localStorage.setItem(networkKey, JSON.stringify(this.networkSettings))
+    } catch (err) {}
+  }
+
+  _saveUiSettings () {
+    try {
+      const { uiKey } = this._settingsKeys
+      localStorage.setItem(uiKey, JSON.stringify(this.uiSettings))
+    } catch (err) {}
+  }
+
+  _updateLanguage (lng) {
+    this.rootStore.i18n.changeLanguage(lng)
+  }
+
+  // Public instance actions
+
+  @action.bound
+  load (username) {
+    let networkSettings = {}
+    let uiSettings = {}
+
+    // Create a copy so we can alter the values without affecting the original
+    const defaulNetworkSettingsCopy = JSON.parse(JSON.stringify(defaulNetworkSettings))
+    const defaultUiSettingsCopy = JSON.parse(JSON.stringify(defaultUiSettings))
+
+    // Get user defined settings from local storage
+    try {
+      const { networkKey, uiKey } = this._settingsKeys
+      networkSettings = JSON.parse(localStorage.getItem(networkKey)) || {}
+      uiSettings = JSON.parse(localStorage.getItem(uiKey)) || {}
+    } catch (err) {}
+
+    // Set default orbit root
+    if (username && !networkSettings.orbit) {
+      defaulNetworkSettingsCopy.orbit.root += `/${username}`
+    }
+
+    // Set default ipfs repo
+    if (!networkSettings.ipfs) {
+      const { orbit } = defaulNetworkSettingsCopy
+      defaulNetworkSettingsCopy.ipfs.repo = `${orbit.root}/ipfs`
+    }
+
+    // Merge default settings with user defined settings
+    Object.assign(this.networkSettings, defaulNetworkSettingsCopy, networkSettings)
+    Object.assign(this.uiSettings, defaultUiSettingsCopy, uiSettings)
+  }
+}

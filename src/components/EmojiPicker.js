@@ -1,173 +1,146 @@
 'use strict'
 
-import pickBy from 'lodash.pickby'
 import React from 'react'
-import ReactEmoji from 'react-emoji'
-import { emojiData } from '../utils/emojilist'
-import emojisAnnotations from 'emoji-annotation-to-unicode'
-import 'styles/EmojiPicker.scss'
+import PropTypes from 'prop-types'
+import { Emoji } from 'emoji-mart'
 
-const modulo = (op1, op2) => ((op1 % op2) + op2) % op2
-
-const supportedEmojiUnicodes = Object.keys(emojisAnnotations)
-  .map(e => emojisAnnotations[e])
-  .filter(e => e !== '1f306')
-
-const supportedEmojis = Object.keys(emojiData)
-  .map(e => emojiData[e])
-  .filter(e => supportedEmojiUnicodes.indexOf(e.unicode) > -1)
-
-const emojiList = supportedEmojis.map(e => {
-  if (e.shortname.startsWith(':flag_')) e.shortname = e.shortname.replace('flag_', '')
-  else if (e.shortname === ':ten:') e.shortname = e.shortname.replace('ten', 'keycap_ten')
-  else if (e.shortname.startsWith(':slight_')) e.shortname = e.shortname.replace('slight', 'simple')
-  return e
-})
-
-const filterEmojis = function (emojiList, word, amount) {
-  return Object.keys(emojiList)
-    .map(e => emojiList[e])
-    .filter(e => e.shortname.indexOf(word) > -1 || e.aliases.indexOf(word) > -1 || word === '')
-    .slice(0, amount)
-}
-
-const emojify = (emojis, highlightedIndex, onMouseEnter, onClick) => {
-  const emojiOpts = { emojiType: 'emojione' }
-  return emojis.map(e => ReactEmoji.emojify(e.shortname, emojiOpts)).map((e, index) => {
-    return (
-      <li
-        key={index.toString()}
-        onMouseEnter={e => {
-          e.preventDefault()
-          onMouseEnter(index)
-        }}
-        onClick={e => {
-          e.preventDefault()
-          onClick(index)
-        }}
-        className={index === highlightedIndex ? 'selected' : ''}
-      >
-        {e}
-      </li>
-    )
-  })
-}
-
-const EmojiList = ({ emojis, highlightedIndex, onMouseEnter, onClick }) => (
-  <ul> {emojify(emojis, highlightedIndex, onMouseEnter, onClick)} </ul>
-)
+import 'emoji-mart/css/emoji-mart.css'
+import '../styles/EmojiPicker.scss'
 
 class EmojiPicker extends React.Component {
+  static propTypes = {
+    emojis: PropTypes.array.isRequired,
+    emojiSize: PropTypes.number.isRequired,
+    emojiSet: PropTypes.string.isRequired,
+    onChange: PropTypes.func.isRequired
+  }
+
+  static defaultProps = {}
+
+  state = {
+    selected: 0
+  }
+
   constructor (props) {
     super(props)
-    this.state = {
-      emojis: [],
-      highlightedIndex: 0
+
+    this.listElement = React.createRef()
+
+    this.onChange = this.onChange.bind(this)
+    this.calculateLeftRightIndex = this.calculateLeftRightIndex.bind(this)
+    this.calculateUpDownIndex = this.calculateUpDownIndex.bind(this)
+  }
+
+  onKeyDown (e) {
+    let handled = false
+
+    if (this.state.selected > this.props.emojis.length) this.setState({ selected: 0 })
+
+    switch (e.key) {
+      case 'ArrowRight':
+        this.setState({ selected: this.calculateLeftRightIndex(true) }, this.onChange)
+        handled = true
+        break
+      case 'ArrowLeft':
+        this.setState({ selected: this.calculateLeftRightIndex(false) }, this.onChange)
+        handled = true
+        break
+      case 'ArrowDown':
+        this.setState({ selected: this.calculateUpDownIndex(true) }, this.onChange)
+        handled = true
+        break
+      case 'ArrowUp':
+        this.setState({ selected: this.calculateUpDownIndex(false) }, this.onChange)
+        handled = true
+        break
+      case 'Tab':
+        this.onChange()
+        handled = true
+        break
+      default:
+        break
+    }
+
+    if (handled) e.preventDefault()
+  }
+
+  calculateLeftRightIndex (right) {
+    const { selected: currentIndex } = this.state
+    const { emojis } = this.props
+
+    if (right) {
+      return (currentIndex + 1) % emojis.length
+    } else {
+      return currentIndex > 0 ? currentIndex - 1 : emojis.length - 1
     }
   }
 
-  selectEmoji (index) {
-    const emojiShortName = this.state.emojis[index]
-      ? this.state.emojis[index].shortname
-      : this.props.filterText
-    this.props.onSelectEmoji(emojiShortName)
-  }
+  calculateUpDownIndex (down) {
+    if (!this.listElement.current) return
+    const { selected: currentIndex } = this.state
+    const { emojis } = this.props
 
-  onKeyDown (event) {
-    if (event.which === 8) {
-      // Backspace
-      this.selectEmoji(-1)
-      if (this.state.highlightedIndex !== 0) {
-        event.preventDefault()
-        this.setState({ highlightedIndex: 0 })
+    const actualEmojiSize = this.props.emojiSize + 2 * 1 // 1px padding
+    const actualWidth = this.listElement.current.offsetWidth - 5 * 2 // 5px padding
+    const itemsPerRow = actualWidth / actualEmojiSize
+
+    if (down) {
+      if (currentIndex + itemsPerRow > emojis.length - 1) {
+        // Going over the bottom, must flip
+        return currentIndex % itemsPerRow
+      } else {
+        // Normal case
+        return currentIndex + itemsPerRow
       }
-    } else if (event.which === 9) {
-      // Tab
-      event.preventDefault()
-      if (event.shiftKey)
-      // Shift + Tab
-      {
-        this.cycle(-1)
-      } else this.cycle(1)
-    } else if (event.which === 39) {
-      // Right arrow
-      event.preventDefault()
-      this.cycle(1)
-    } else if (event.which === 37) {
-      // Left arrow
-      event.preventDefault()
-      this.cycle(-1)
-    } else if (event.which === 38) {
-      // Up arrow
-      event.preventDefault()
-      this.cycleRow(-this.props.elemsPerRow)
-    } else if (event.which === 40) {
-      // Down arrow
-      event.preventDefault()
-      this.cycleRow(this.props.elemsPerRow)
-    } else if (event.which === 13 || event.which === 32) {
-      // Return or Space
-      event.preventDefault()
-      this.selectEmoji(this.state.highlightedIndex)
-      this.props.onClose()
-    } else if (event.which === 27) {
-      // ESC
-      this.selectEmoji(-1)
-      this.props.onClose()
+    } else {
+      if (currentIndex - itemsPerRow < 0) {
+        // Going over the top, must flip
+        const rows = Math.floor(emojis.length / itemsPerRow)
+        if (emojis.length % itemsPerRow > currentIndex) {
+          // There is an element at the same index on the last row
+          return currentIndex + itemsPerRow * rows
+        } else {
+          // There is NOT an element at the same index on the last row
+          // Go to the second last row since it should have this index
+          return currentIndex + itemsPerRow * (rows - 1)
+        }
+      } else {
+        // Normal case
+        return currentIndex - itemsPerRow
+      }
     }
   }
 
-  onClick (index) {
-    this.props.onClose()
+  onChange () {
+    try {
+      const emoji = this.props.emojis[this.state.selected]
+      return this.props.onChange(emoji)
+    } catch (e) {
+      return this.props.onChange(null)
+    }
   }
 
-  onMouseEnter (index) {
-    this.setState({ highlightedIndex: index })
-    this.selectEmoji(index)
-  }
-
-  cycleRow (step) {
-    const newIndex = this.state.highlightedIndex + step
-    const elemsPerRow = this.props.elemsPerRow
-    const offset = modulo(newIndex, elemsPerRow)
-    const count = this.state.emojis.length
-    const numRows = Math.ceil(count / elemsPerRow)
-    const maxRow = numRows * elemsPerRow - (elemsPerRow - offset) < count ? numRows : numRows - 1
-    const row = modulo(Math.floor(newIndex / elemsPerRow), maxRow)
-    const highlightedIndex = row * elemsPerRow + offset
-    this.setState({ highlightedIndex: highlightedIndex })
-    this.selectEmoji(highlightedIndex)
-  }
-
-  cycle (step) {
-    const highlightedIndex = modulo(this.state.highlightedIndex + step, this.state.emojis.length)
-    this.setState({ highlightedIndex: highlightedIndex })
-    this.selectEmoji(highlightedIndex)
-  }
-
-  componentWillReceiveProps (nextProps) {
-    const emojis = filterEmojis(emojiList, nextProps.filterText, 100)
-    this.setState({ emojis: emojis })
-    if (nextProps.filterText === '' || emojis.length === 0) this.props.onClose()
-  }
-
-  componentDidMount () {
-    const emojis = filterEmojis(emojiList, this.props.filterText, 100)
-
-    this.setState({ emojis: emojis })
-    if (emojis.length === 0) this.props.onClose()
+  onClick (e, idx) {
+    this.setState({ selected: idx }, this.onChange)
   }
 
   render () {
+    const { selected } = this.state
+    const { emojis, emojiSize, emojiSet, ...rest } = this.props
+
     return (
-      <div className="emoji-picker" style={{ width: this.props.elemsPerRow * 28 + 12 }}>
-        <EmojiList
-          emojis={this.state.emojis}
-          highlightedIndex={this.state.highlightedIndex}
-          onMouseEnter={this.onMouseEnter.bind(this)}
-          onClick={this.onClick.bind(this)}
-        />
-      </div>
+      <ul ref={this.listElement} className="EmojiPicker" {...rest}>
+        {emojis.map((emoji, idx) => {
+          return (
+            <li
+              key={emoji.id}
+              className={selected === idx ? 'selected' : ''}
+              onClick={e => this.onClick(e, idx)}>
+              <Emoji emoji={emoji} size={emojiSize} set={emojiSet} />
+            </li>
+          )
+        })}
+      </ul>
     )
   }
 }

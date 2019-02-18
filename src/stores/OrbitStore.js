@@ -1,65 +1,83 @@
 'use strict'
 
+import { action, configure, observable } from 'mobx'
 import Orbit from 'orbit_'
-import Reflux from 'reflux'
-import path from 'path'
 
-import AppActions from 'actions/AppActions'
-import IpfsDaemonActions from 'actions/IpfsDaemonActions'
-import ChannelActions from 'actions/ChannelActions'
-import NetworkActions from 'actions/NetworkActions'
+import Logger from '../utils/logger'
 
-import IpfsDaemonStore from 'stores/IpfsDaemonStore'
-
-import Logger from 'utils/logger'
+configure({ enforceActions: 'observed' })
 
 const logger = new Logger()
 
-const isElectron = window.remote
-const ipcRenderer = window.ipcRenderer
-
-const OrbitStore = Reflux.createStore({
-  listenables: [AppActions, IpfsDaemonActions, NetworkActions],
-  init: function () {
-    this.orbit = null
-    this.listeners = []
-    this.trigger(this.orbit)
-  },
-  _onOrbitConnected: function (network, user) {
-    if (ipcRenderer) ipcRenderer.send('connected', network, user)
-  },
-  _onOrbitDisconnected: function () {
-    if (ipcRenderer) ipcRenderer.send('disconnected')
-  },
-  onDisconnect: function () {
-    this.orbit.events.removeListener('connected', this._onOrbitConnected)
-    this.orbit.events.removeListener('disconnected', this._onOrbitDisconnected)
-    this.orbit.events.removeListener('message', ChannelActions.userMessage)
-
-    this.orbit.disconnect()
-  },
-  onDaemonStarted: function (ipfs) {
-    logger.debug('IPFS daemon started')
-
-    const options = {
-      // path where to keep generates keys
-      keystorePath: path.join(IpfsDaemonStore.getIpfsSettings().OrbitDataDir, '/data/keys'),
-      // path to orbit-db cache file
-      cachePath: path.join(IpfsDaemonStore.getIpfsSettings().OrbitDataDir, '/data/orbit-db'),
-      // how many messages to retrieve from history on joining a channel
-      maxHistory: isElectron ? 2 : 2
-    }
-
-    this.orbit = new Orbit(ipfs, options)
-
-    this.orbit.events.on('connected', this._onOrbitConnected)
-    this.orbit.events.on('disconnected', this._onOrbitDisconnected)
-    this.orbit.events.on('message', ChannelActions.userMessage)
-
-    AppActions.initialize(this.orbit)
-
-    this.trigger(this.orbit)
+export default class OrbitStore {
+  constructor (networkStore) {
+    this.sessionStore = networkStore.sessionStore
+    this.settingsStore = networkStore.settingsStore
   }
-})
 
-export default OrbitStore
+  @observable
+  node = null
+
+  @observable
+  starting = false
+
+  @observable
+  stopping = false
+
+  @action.bound
+  onStarted (node, callback) {
+    logger.info('orbit node started')
+    this.starting = false
+    this.node = node
+    if (typeof callback === 'function') callback(node)
+  }
+
+  @action.bound
+  onStopped (callback) {
+    logger.info('orbit node stopped')
+    this.stopping = false
+    this.node = null
+    if (typeof callback === 'function') callback()
+  }
+
+  @action.bound
+  async init (ipfs) {
+    if (this.node) return this.node
+
+    if (!ipfs) throw new Error('IPFS is not defined')
+    if (!this.sessionStore.username) throw new Error('Username is not defined')
+    if (this.starting) throw new Error('Already starting Orbit')
+
+    this.starting = true
+    logger.info('Starting orbit node')
+
+    await this.stop()
+
+    return new Promise(resolve => {
+      const settings = this.settingsStore.networkSettings.orbit
+      const options = {
+        dbOptions: {
+          directory: `${settings.root}/data/orbit-db`
+        },
+        channelOptions: {}
+      }
+      const node = new Orbit(ipfs, options)
+      node.events.once('connected', () => this.onStarted(node, resolve))
+      node.connect(this.sessionStore.username)
+    })
+  }
+
+  @action.bound
+  async stop () {
+    if (!this.node) return
+    if (this.stopping) throw new Error('Already stopping Orbit')
+
+    this.stopping = true
+    logger.info('Stopping orbit node')
+
+    await new Promise(resolve => {
+      this.node.events.once('disconnected', () => this.onStopped(resolve))
+      this.node.disconnect()
+    })
+  }
+}

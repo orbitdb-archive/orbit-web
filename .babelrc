@@ -1,17 +1,12 @@
 {
-  "presets": [
-    "@babel/preset-react",
-    [
-      "@babel/preset-env",
-      {
-        "useBuiltIns": "false"
-      }
-    ]
-  ],
+  "presets": ["@babel/preset-react", "@babel/preset-env"],
   "plugins": [
+    "@babel/plugin-syntax-dynamic-import",
+    "@babel/plugin-transform-async-to-generator",
     "@babel/plugin-transform-flow-strip-types",
     "@babel/plugin-syntax-flow",
-    "@babel/plugin-proposal-class-properties",
+    ["@babel/plugin-proposal-decorators", { "legacy": true }],
+    ["@babel/plugin-proposal-class-properties", { "loose": true }],
     "react-hot-loader/babel"
   ]
 }

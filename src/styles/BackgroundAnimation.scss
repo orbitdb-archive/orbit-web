@@ -2,26 +2,17 @@
 
 .BackgroundAnimation {
   position: absolute;
-  // top: 0;
-  // left: 0;
   width: 100%;
   height: 100%;
   margin: auto;
-
   display: flex;
   justify-content: center;
   align-items: center;
-  // z-index: -1;
-
- -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
-  -webkit-backface-visibility: hidden;
-
-  // opacity: 0.75;
+  backface-visibility: hidden;
 
   .transparent {
     opacity: 0.75;
-    // position: absolute;
   }
 
   .Rings {
@@ -34,23 +25,11 @@
   }
 
   .circle {
-    -webkit-transform-style: preserve-3d;
     transform-style: preserve-3d;
-    -webkit-transform: translate3D(0, 0, 0);
     transform: translate3D(0, 0, 0);
-    -webkit-backface-visibility: hidden;
-
-    $duration: .2s;
-    $animation-name: fadeIn;
-
-    -webkit-animation: $animation-name;
-    animation: $animation-name;
-    -webkit-animation-duration: $duration;
-    animation-duration: $duration;
-    -webkit-animation-fill-mode: both;
+    animation: fadeIn;
+    animation-duration: .2s;
     animation-fill-mode: both;
-    -webkit-animation-timing-function: linear;
     animation-timing-function: linear;
   }
-
 }
