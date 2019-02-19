@@ -74,8 +74,13 @@ export default class ChannelStore {
   // Public instance getters
 
   @computed
+  get entryCIDs () {
+    return this.entries.map(e => e.cid)
+  }
+
+  @computed
   get entryHashes () {
-    return this.entries.map(e => e.hash)
+    return this.entryCIDs
   }
 
   @computed
@@ -99,7 +104,7 @@ export default class ChannelStore {
     // TODO: REMOVE
     return this.entries.map(entry =>
       Object.assign(JSON.parse(JSON.stringify(entry.payload.value)), {
-        hash: entry.hash,
+        hash: entry.cid,
         userIdentity: entry.identity,
         unread: !entry.seen
       })
@@ -156,12 +161,12 @@ export default class ChannelStore {
 
   @action.bound
   _updateEntries (entries) {
-    const oldHashes = this.entryHashes
+    const oldCIDs = this.entryCIDs
     const { lastSeenTimestamp = 0 } = this._storableState
 
     const newEntries = entries
       // Filter out entries we already have
-      .filter(e => oldHashes.indexOf(e.hash) === -1)
+      .filter(e => oldCIDs.indexOf(e.cid) === -1)
       // Set entries as seen
       .map(e => Object.assign(e, { seen: e.payload.value.meta.ts <= lastSeenTimestamp }))
 
@@ -253,7 +258,7 @@ export default class ChannelStore {
 
   @action.bound
   markMessageAsRead (message) {
-    this.entries.filter(e => e.hash === message.hash).map(this.markEntryAsRead)
+    this.entries.filter(e => e.cid === message.hash).map(this.markEntryAsRead)
   }
 
   @action.bound
@@ -382,23 +387,21 @@ export default class ChannelStore {
     const log = this.feed._oplog
     const Log = log.constructor
 
-    if (!Log.monkeyPatched) {
-      monkeyPatchIpfsLog(Log)
-      Log.monkeyPatched = true
-    }
-
-    const newLog = await Log.fromEntryHash(
+    const newLog = await Log.fromEntryCid(
       this.feed._ipfs,
-      this.feed.access,
       this.feed.identity,
       log.tails[0].next[0],
-      log.id,
-      log.values.length + 10,
-      log.values,
-      this.feed._onLoadProgress.bind(this.feed)
+      {
+        logId: log.id,
+        access: this.feed.access,
+        length: log.values.length + 10,
+        exclude: log.values,
+        onProgressCallback: this.feed._onLoadProgress.bind(this.feed)
+      }
     )
 
-    await log.join(newLog)
+    // await log.join(newLog)
+    await monkeyPatchedJoin(log, newLog)
 
     await this.feed._updateIndex()
 
@@ -418,29 +421,45 @@ export default class ChannelStore {
   }
 }
 
-function monkeyPatchIpfsLog (Log) {
-  Log.difference = (a, b) => {
-    // let stack = Object.keys(a._headsIndex)
-    const stack = Object.keys(a._entryIndex) // This is the only change
-    const traversed = {}
-    const res = {}
+async function monkeyPatchedJoin (log, newLog) {
+  const Log = log.constructor
 
-    const pushToStack = hash => {
-      if (!traversed[hash] && !b.get(hash)) {
-        stack.push(hash)
-        traversed[hash] = true
-      }
-    }
-
-    while (stack.length > 0) {
-      const hash = stack.shift()
-      const entry = a.get(hash)
-      if (entry && !b.get(hash) && entry.id === b.id) {
-        res[entry.hash] = entry
-        traversed[entry.hash] = true
-        entry.next.forEach(pushToStack)
-      }
-    }
-    return res
+  if (!Log.monkeyPatched) {
+    Log._origDifference = Log.difference
+    Log.difference = differenceMonkeyPatch
+    Log.monkeyPatched = true
   }
+
+  await log.join(newLog)
+
+  if (Log.monkeyPatched) {
+    Log.difference = Log._origDifference
+    delete Log._origDifference
+    delete Log.monkeyPatched
+  }
+}
+
+function differenceMonkeyPatch (a, b) {
+  // let stack = Object.keys(a._headsIndex)
+  const stack = Object.keys(a._entryIndex) // This is the only change
+  const traversed = {}
+  const res = {}
+
+  const pushToStack = hash => {
+    if (!traversed[hash] && !b.get(hash)) {
+      stack.push(hash)
+      traversed[hash] = true
+    }
+  }
+
+  while (stack.length > 0) {
+    const hash = stack.shift()
+    const entry = a.get(hash)
+    if (entry && !b.get(hash) && entry.id === b.id) {
+      res[entry.hash] = entry
+      traversed[entry.hash] = true
+      entry.next.forEach(pushToStack)
+    }
+  }
+  return res
 }
