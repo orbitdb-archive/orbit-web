@@ -43,6 +43,9 @@ function Channel ({ channelName }) {
   }
 
   async function onDrop (event) {
+    event.preventDefault()
+    setDragActive(false)
+
     const files = []
     if (event.dataTransfer.items) {
       console.log(event.dataTransfer.items)
@@ -72,11 +75,7 @@ function Channel ({ channelName }) {
         <DropZone
           channelName={channelName}
           onDragLeave={() => setDragActive(false)}
-          onDrop={event => {
-            event.preventDefault()
-            onDrop(event)
-            setDragActive(false)
-          }}
+          onDrop={event => onDrop(event)}
         />
       )}
       <ChannelMessages channel={channel} />

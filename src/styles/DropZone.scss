@@ -22,4 +22,7 @@
   border: 2px dotted $main-color;
   white-space: nowrap;
   overflow: hidden;
+  .droplabel {
+    pointer-events: none;
+  }
 }

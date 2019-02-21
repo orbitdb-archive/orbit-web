@@ -7,7 +7,7 @@ const DropZone = props => {
   const { onDrop, onDragLeave, channelName } = props
   return (
     <div
-      className="dropzone ondrag"
+      className="dropzone"
       onDrop={event => {
         event.preventDefault()
         onDrop && onDrop(event)
