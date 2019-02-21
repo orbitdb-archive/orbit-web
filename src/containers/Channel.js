@@ -14,9 +14,13 @@ const ChannelControls = LoadAsync({
 const ChannelMessages = LoadAsync({
   loader: () => import(/* webpackChunkName: "ChannelMessages" */ './ChannelMessages')
 })
+const DropZone = LoadAsync({
+  loader: () => import(/* webpackChunkName: "DropZone" */ '../components/DropZone')
+})
 
 function Channel ({ channelName }) {
   const [channel, setChannel] = useState(null)
+  const [dragActive, setDragActive] = useState(false)
   const { networkStore, uiStore } = useContext(RootStoreContext)
 
   let mounted = true
@@ -38,8 +42,43 @@ function Channel ({ channelName }) {
     }
   }
 
+  async function onDrop (event) {
+    const files = []
+    if (event.dataTransfer.items) {
+      console.log(event.dataTransfer.items)
+      for (let i = 0; i < event.dataTransfer.items.length; i++) {
+        const file = event.dataTransfer.items[i]
+        file.kind === 'file' && files.push(file.getAsFile())
+      }
+    } else {
+      event.dataTransfer.files.map(files.push)
+    }
+    try {
+      await channel.sendFiles(files)
+    } catch (err) {
+      throw err
+    }
+  }
+
   return channel ? (
-    <div className="Channel flipped">
+    <div
+      className="Channel flipped"
+      onDragOver={event => {
+        event.preventDefault()
+        !dragActive && setDragActive(true)
+      }}
+    >
+      {dragActive && (
+        <DropZone
+          channelName={channelName}
+          onDragLeave={() => setDragActive(false)}
+          onDrop={event => {
+            event.preventDefault()
+            onDrop(event)
+            setDragActive(false)
+          }}
+        />
+      )}
       <ChannelMessages channel={channel} />
       <ChannelControls channel={channel} />
     </div>

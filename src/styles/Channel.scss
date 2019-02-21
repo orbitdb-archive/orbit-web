@@ -1,5 +1,5 @@
-@import 'Animations';
-@import 'Colors';
+@import "Animations";
+@import "Colors";
 
 $controls-height: 2.8em;
 
@@ -30,7 +30,6 @@ $controls-height: 2.8em;
       background-color: $main-color-highligth;
     }
   }
-
 }
 
 .newMessagesBar {
@@ -78,8 +77,8 @@ $controls-height: 2.8em;
 }
 
 .icon {
-  width: 1.0em;
-  height: 1.0em;
+  width: 1em;
+  height: 1em;
   font-size: 1.2em;
   display: flex;
   align-items: center;
@@ -91,8 +90,8 @@ $controls-height: 2.8em;
 }
 
 .icon-active {
-  width: 1.0em;
-  height: 1.0em;
+  width: 1em;
+  height: 1em;
   font-size: 1.2em;
   display: flex;
   align-items: center;
@@ -119,7 +118,7 @@ $controls-height: 2.8em;
   border-radius: 32px;
 }
 
-.blurred  {
+.blurred {
   filter: blur(2px);
 }
 
@@ -153,12 +152,12 @@ $controls-height: 2.8em;
     margin-left: 1vw;
   }
 
-  input[type=text] {
+  input[type="text"] {
     font-size: 0.8em;
     width: 100%;
   }
 
-  input[type=submit] {
+  input[type="submit"] {
     margin-top: 0.2em;
     font-size: 0.8em;
     align-self: flex-end;
@@ -178,7 +177,8 @@ $controls-height: 2.8em;
   }
 }
 
-input[type=button], .channelOptionsButton {
+input[type="button"],
+.channelOptionsButton {
   border-top: 1px solid $bar-border-color;
   border-bottom: 1px solid $bar-border-color;
   min-width: 2em;
@@ -189,24 +189,25 @@ input[type=button], .channelOptionsButton {
   margin-bottom: 0.5em;
   padding-left: 0.75em;
   padding-right: 0.75em;
-  font-size: 1.0em;
+  font-size: 1em;
 }
 
-  input[type=button], .addFilesButton {
-    display: block;
-    border-top: 1px solid $bar-border-color;
-    border-bottom: 1px solid $bar-border-color;
-    min-width: 2em;
-    height: 100%;
-    margin-left: 0em;
-    margin-right: 0em;
-    margin-top: 0em;
-    margin-bottom: 0em;
-    padding-left: 0.75em;
-    padding-right: 0.75em;
-    font-size: 1.1em;
-    font-weight: bold;
-  }
+input[type="button"],
+.addFilesButton {
+  display: block;
+  border-top: 1px solid $bar-border-color;
+  border-bottom: 1px solid $bar-border-color;
+  min-width: 2em;
+  height: 100%;
+  margin-left: 0em;
+  margin-right: 0em;
+  margin-top: 0em;
+  margin-bottom: 0em;
+  padding-left: 0.75em;
+  padding-right: 0.75em;
+  font-size: 1.1em;
+  font-weight: bold;
+}
 
 .Controls {
   background-color: $bar-background-color;
@@ -290,16 +291,16 @@ input[type=button], .channelOptionsButton {
     user-select: none;
     cursor: default;
 
-    &.hasMoreHistory{
+    &.hasMoreHistory {
       cursor: pointer;
 
       &::before {
-        content:"^";
+        content: "^";
         margin-right: 4px;
       }
 
       &::after {
-        content:"^";
+        content: "^";
         margin-left: 4px;
       }
 
@@ -315,23 +316,23 @@ input[type=button], .channelOptionsButton {
   }
 
   &.size-normal {
-    .dateSeparator{
-      font-size: .7em;
-      margin-left: .3em;
+    .dateSeparator {
+      font-size: 0.7em;
+      margin-left: 0.3em;
     }
   }
 
   &.size-large {
     .dateSeparator {
-      font-size: .8em;
-      margin-left: .8em;
+      font-size: 0.8em;
+      margin-left: 0.8em;
     }
   }
 
   &.font-normal {
     .dateSeparator {
       font-weight: bold;
-      padding-bottom: .2em;
+      padding-bottom: 0.2em;
     }
   }
 
@@ -339,10 +340,9 @@ input[type=button], .channelOptionsButton {
     .dateSeparator {
       font-family: "Roboto Mono";
       font-weight: normal;
-      padding-bottom: .4em;
+      padding-bottom: 0.4em;
     }
   }
-
 }
 
 .flopped {
@@ -351,39 +351,9 @@ input[type=button], .channelOptionsButton {
 
 .controlsAnimation-appear {
   animation: fadeInUp;
-  animation-duration: .3s;
+  animation-duration: 0.3s;
   animation-fill-mode: both;
   animation-timing-function: ease-out;
-}
-
-.dropzone {
-  top: 0;
-  left: 0;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-
-  overflow: hidden;
-  display: flex;
-  align-self: flex-end;
-  align-items: center;
-  flex-direction: row;
-  justify-content: center;
-  white-space: nowrap;
-
-  padding: 0.5em;
-  font-weight: bold;
-  font-size: 4em;
-  color: $main-text-color;
-  background-color: rgba(0, 0, 0, 0.6);
-  border: 2px dotted $main-color;
-}
-
-.dropzoneActive {
-  color: $main-text-color;
-  background-color: rgba(0, 0, 0, 0.6);
-  border: 2px dotted $main-color;
 }
 
 .messagesAnimation-enter {
