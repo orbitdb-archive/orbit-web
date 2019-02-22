@@ -1,7 +1,8 @@
 'use strict'
 
-import { action, configure, observable } from 'mobx'
-import IPFS from 'ipfs'
+import { action, configure, observable, runInAction } from 'mobx'
+import ipfsClient from 'ipfs-http-client'
+import JsIPFS from 'ipfs'
 
 import Logger from '../utils/logger'
 
@@ -40,46 +41,54 @@ export default class IpfsStore {
   }
 
   @action.bound
-  async useJsIPFS () {
-    if (this.node) return this.node
-
-    if (this.starting) throw new Error('Already starting IPFS')
-
-    this.starting = true
-    logger.info('Starting js-ipfs node')
-
-    return new Promise(resolve => {
-      const settings = this.settingsStore.networkSettings.ipfs
-      const node = new IPFS(settings)
-      node.version((err, { version }) => {
-        if (err) return
-        logger.info(`js-ipfs version ${version}`)
-      })
-      node.once('ready', () => this.onStarted(node, resolve))
+  useEmbeddedIPFS () {
+    return new Promise((resolve, reject) => {
+      if (this.node) resolve(this.node)
+      else if (this.starting) reject(new Error('Already starting IPFS'))
+      else {
+        runInAction(() => (this.starting = true))
+        logger.info('Starting js-ipfs node')
+        const settings = this.settingsStore.networkSettings.ipfs
+        const node = new JsIPFS(settings)
+        node.version((err, { version }) => {
+          if (err) return
+          logger.info(`js-ipfs version ${version}`)
+        })
+        node.once('ready', () => this.onStarted(node, resolve))
+      }
     })
   }
 
   @action.bound
-  async useGoIPFS () {
-    if (this.starting) throw new Error('Already starting IPFS')
-
-    this.starting = true
-    logger.debug('Activating go-ipfs node')
-    this.stop()
-    this.starting = false
+  useExternalIPFS () {
+    return new Promise((resolve, reject) => {
+      if (this.node) resolve(this.node)
+      else if (this.starting) reject(new Error('Already starting IPFS'))
+      else {
+        runInAction(() => (this.starting = true))
+        logger.debug('Activating go-ipfs node')
+        // TODO: Allow user to change the settings
+        const node = ipfsClient('localhost', '5001')
+        this.onStarted(node, resolve)
+      }
+    })
   }
 
   @action.bound
-  async stop () {
-    if (!this.node) return
-    if (this.stopping) throw new Error('Already stopping IPFS')
-
-    this.stopping = true
-    logger.info('Stopping ipfs node')
-
-    await new Promise(resolve => {
-      this.node.once('stop', () => this.onStopped(resolve))
-      this.node.stop()
+  stop () {
+    return new Promise((resolve, reject) => {
+      if (!this.node) resolve()
+      else if (this.stopping) reject(new Error('Already stopping IPFS'))
+      // Only the embedded node should be stopped
+      // and only the embedded node has ".once" method
+      else if (this.node.once) {
+        runInAction(() => (this.stopping = true))
+        logger.info('Stopping embedded ipfs node')
+        this.node.once('stop', () => this.onStopped(resolve))
+        this.node.stop()
+      } else {
+        logger.info('Not stopping ipfs node')
+      }
     })
   }
 }
