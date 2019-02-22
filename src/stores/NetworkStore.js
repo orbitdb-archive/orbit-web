@@ -161,7 +161,7 @@ export default class NetworkStore {
     if (this.isOnline) return
     logger.info('Starting network')
 
-    await this.ipfsStore.useJsIPFS()
+    await this.ipfsStore.useEmbeddedIPFS()
     await this.orbitStore.init(this.ipfs)
 
     this._onOrbitStarted(this.orbit)

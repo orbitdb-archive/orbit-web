@@ -46,6 +46,7 @@
     "highlight.js": "^9.13.1",
     "i18next": "^14.0.1",
     "ipfs": "^0.34.4",
+    "ipfs-http-client": "^29.1.1",
     "mobx": "^5.5.2",
     "mobx-react": "^5.4.2",
     "orbit_": "github:orbitdb/orbit-core#9eb14e8a9df93a98de263a17fecca2ebe60b6590",
