@@ -54,7 +54,9 @@ function Channel ({ channelName }) {
         file.kind === 'file' && files.push(file.getAsFile())
       }
     } else {
-      event.dataTransfer.files.map(files.push)
+      for (let i = 0; i < event.dataTransfer.files.length; i++) {
+        files.push(event.dataTransfer.files.item(i))
+      }
     }
     try {
       await channel.sendFiles(files)
