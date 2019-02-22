@@ -48,7 +48,6 @@ function Channel ({ channelName }) {
 
     const files = []
     if (event.dataTransfer.items) {
-      console.log(event.dataTransfer.items)
       for (let i = 0; i < event.dataTransfer.items.length; i++) {
         const file = event.dataTransfer.items[i]
         file.kind === 'file' && files.push(file.getAsFile())
@@ -58,6 +57,7 @@ function Channel ({ channelName }) {
         files.push(event.dataTransfer.files.item(i))
       }
     }
+
     try {
       await channel.sendFiles(files)
     } catch (err) {
