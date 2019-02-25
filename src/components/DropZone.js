@@ -4,17 +4,14 @@ import PropTypes from 'prop-types'
 import '../styles/DropZone.scss'
 
 const DropZone = props => {
-  const { onDrop, onDragLeave, channelName } = props
+  const { onDrop, onDragLeave, label } = props
   return (
     <div
       className="dropzone"
-      onDrop={event => {
-        event.preventDefault()
-        onDrop && onDrop(event)
-      }}
-      onDragLeave={() => onDragLeave()}
+      onDrop={onDrop}
+      onDragLeave={onDragLeave}
     >
-      <div className="droplabel">Add files to #{channelName}</div>
+      <div className="droplabel">{label}</div>
     </div>
   )
 }
@@ -22,7 +19,7 @@ const DropZone = props => {
 DropZone.propTypes = {
   onDrop: PropTypes.func,
   onDragLeave: PropTypes.func,
-  channelName: PropTypes.string
+  label: PropTypes.string
 }
 
 export default DropZone

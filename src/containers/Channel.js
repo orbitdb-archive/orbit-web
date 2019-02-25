@@ -2,6 +2,7 @@
 
 import React, { useContext, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 import LoadAsync from '../components/Loadable'
 
 import RootStoreContext from '../context/RootStoreContext'
@@ -22,6 +23,7 @@ function Channel ({ channelName }) {
   const [channel, setChannel] = useState(null)
   const [dragActive, setDragActive] = useState(false)
   const { networkStore, uiStore } = useContext(RootStoreContext)
+  const [t] = useTranslation()
 
   let mounted = true
 
@@ -75,7 +77,7 @@ function Channel ({ channelName }) {
     >
       {dragActive && (
         <DropZone
-          channelName={channelName}
+          label={t('channel.file.dropzone.add', { channel: channelName })}
           onDragLeave={() => setDragActive(false)}
           onDrop={event => onDrop(event)}
         />

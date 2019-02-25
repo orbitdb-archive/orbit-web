@@ -5,7 +5,10 @@
       "download": "Download",
       "previewLoading": "$t(loading)...",
       "open": "Open",
-      "unableToDisplay": "Unable to display file"
+      "unableToDisplay": "Unable to display file",
+      "dropzone": {
+        "add": "Add files to #{{channel}}"
+      }
     },
     "loadingHistory": "Loading history...",
     "loadMore": "Click to load older messages",
