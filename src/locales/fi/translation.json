@@ -5,7 +5,10 @@
       "download": "Lataa",
       "previewLoading": "$t(loading)...",
       "open": "Avaa",
-      "unableToDisplay": "Tiedostoa ei ole mahdollista näyttää"
+      "unableToDisplay": "Tiedostoa ei ole mahdollista näyttää",
+      "dropzone": {
+        "add": "Lisää tiedostoja kanavalle #{{channel}}"
+      }
     },
     "loadingHistory": "Ladataan historiaa...",
     "loadMore": "Klikkaa ladataksesi vanhempia viestejä",
