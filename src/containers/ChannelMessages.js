@@ -64,6 +64,13 @@ class ChannelMessages extends React.Component {
     channel.loadMore()
   }
 
+  onObserve () {
+    const { channel } = this.props
+    return new Promise(async (resolve, reject) => {
+      await channel.loadMore()
+    })
+  }
+
   renderMessages () {
     const { sessionStore, uiStore } = this.context
     const { colorifyUsernames, useLargeMessage, language, theme, useEmojis, emojiSet } = uiStore
@@ -116,12 +123,14 @@ class ChannelMessages extends React.Component {
           'font-normal': !useMonospaceFont,
           'font-monospace': useMonospaceFont
         })}
-        ref={this.messagesEl}>
+        ref={this.messagesEl}
+      >
         <FirstMessage
           channelName={channel.name}
           loading={channel.loadingHistory}
           hasMoreHistory={channel.hasMoreHistory}
           onClick={this.onFirstMessageClick}
+          observed={() => this.onObserve()}
         />
         {messageEls}
         <span className="messagesEnd" ref={this.messagesEnd} />
