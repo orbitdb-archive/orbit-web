@@ -5,13 +5,9 @@ import PropTypes from 'prop-types'
 import { withTranslation } from 'react-i18next'
 import { CSSTransitionGroup } from 'react-transition-group'
 import { emojiIndex } from 'emoji-mart'
-import LoadAsync from '../components/Loadable'
+import EmojiPicker from '../components/EmojiPicker'
 
 import '../styles/SendMessage.scss'
-
-const EmojiPicker = LoadAsync({
-  loader: () => import(/* webpackChunkName: "EmojiPicker" */ '../components/EmojiPicker')
-})
 
 class SendMessage extends React.Component {
   static propTypes = {
