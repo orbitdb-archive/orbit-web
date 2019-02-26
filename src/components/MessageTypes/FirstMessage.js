@@ -9,14 +9,17 @@ function FirstMessage ({ loading, hasMoreHistory, channelName, observed, ...rest
   const [t] = useTranslation()
   const firstMessage = useRef()
 
-  const onObserve = event => event[0].isIntersecting && observed(event)
-  const observer = IntersectionObserver && new IntersectionObserver(onObserve, {})
+  if ('IntersectionObserver' in window) {
+    const onObserve = event => event[0].isIntersecting && observed(event)
+    // eslint-disable-next-line compat/compat
+    const observer = new IntersectionObserver(onObserve, {})
+    useEffect(
+      () =>
+        observer && firstMessage && firstMessage.current && observer.observe(firstMessage.current),
+      []
+    )
+  }
 
-  useEffect(
-    () =>
-      observer && firstMessage && firstMessage.current && observer.observe(firstMessage.current),
-    []
-  )
   return (
     <div className={classNames('firstMessage', { hasMoreHistory })} ref={firstMessage} {...rest}>
       {loading
