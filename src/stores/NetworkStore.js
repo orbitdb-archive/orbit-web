@@ -85,9 +85,11 @@ export default class NetworkStore {
   _onJoinedChannel (channelName) {
     if (this.channelNames.indexOf(channelName) !== -1) return
 
-    this.channels[channelName] = new ChannelStore(
-      Object.assign({}, this.orbit.channels[channelName], { network: this })
-    )
+    this.channels[channelName] = new ChannelStore({
+      name: channelName,
+      feed: this.orbit.channels[channelName].feed,
+      network: this
+    })
 
     // Save the channel to localstorage
     // so user will connect to it automatically next time
