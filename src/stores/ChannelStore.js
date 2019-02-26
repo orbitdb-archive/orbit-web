@@ -387,6 +387,8 @@ export default class ChannelStore {
     const log = this.feed._oplog
     const Log = log.constructor
 
+    if (!log.tails[0]) return
+
     const newLog = await Log.fromEntryCid(
       this.feed._ipfs,
       this.feed.identity,

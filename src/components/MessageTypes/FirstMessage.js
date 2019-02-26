@@ -9,10 +9,9 @@ function FirstMessage ({ loading, hasMoreHistory, channelName, observed, ...rest
   const [t] = useTranslation()
   const firstMessage = useRef()
 
-  const onObserve = async () => {
-    !loading && hasMoreHistory && (await observed())
-  }
+  const onObserve = event => event[0].isIntersecting && observed(event)
   const observer = IntersectionObserver && new IntersectionObserver(onObserve, {})
+
   useEffect(
     () =>
       observer && firstMessage && firstMessage.current && observer.observe(firstMessage.current),

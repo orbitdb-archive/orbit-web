@@ -29,6 +29,7 @@ class ChannelMessages extends React.Component {
     this.scrollToBottom = this.scrollToBottom.bind(this)
     this.onMessageUserClick = this.onMessageUserClick.bind(this)
     this.onFirstMessageClick = this.onFirstMessageClick.bind(this)
+    this.onObserve = this.onObserve.bind(this)
   }
 
   componentDidMount () {
@@ -64,11 +65,9 @@ class ChannelMessages extends React.Component {
     channel.loadMore()
   }
 
-  onObserve () {
+  onObserve (event) {
     const { channel } = this.props
-    return new Promise(async (resolve, reject) => {
-      await channel.loadMore()
-    })
+    channel.loadMore()
   }
 
   renderMessages () {
@@ -130,7 +129,7 @@ class ChannelMessages extends React.Component {
           loading={channel.loadingHistory}
           hasMoreHistory={channel.hasMoreHistory}
           onClick={this.onFirstMessageClick}
-          observed={() => this.onObserve()}
+          observed={this.onObserve}
         />
         {messageEls}
         <span className="messagesEnd" ref={this.messagesEnd} />
