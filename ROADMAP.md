@@ -34,7 +34,7 @@ Our short-to-medium-term roadmap items, in order of descending priority.
 | &#9744; | render spaces         | [@latenssi](https://github.com/latenssi) | currently "test&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;test" renders as "test test" in chat               |
 | &#9744; | /me missing space     | [@latenssi](https://github.com/latenssi) | currently "/me doing something" renders as "mynicknamedoing something" in chat                                                |
 | &#9744; | browser compatibility | [@latenssi](https://github.com/latenssi) | some users have reported that the app is not wokring on Firefox on linux                                                      |
-| &#9744; | ProfilePanel position | [@latenssi](https://github.com/latenssi) | fix MessageUserProfilePanel vertical positioning, currently it can overflow from the top of the view                          |
+| &#9745; | ProfilePanel position | [@latenssi](https://github.com/latenssi) | fix MessageUserProfilePanel vertical positioning, currently it can overflow from the top of the view                          |
 | &#9745; | mobile version        | [@latenssi](https://github.com/latenssi) | make the app more progressive (PWA)                                                                                           |
 | &#9744; | run ipfs in a worker  | [@latenssi](https://github.com/latenssi) | run ipfs in a service worker to mitigate the slowdowns caused by signature checks etc.                                        |
 | &#9744; | private channels      | [@latenssi](https://github.com/latenssi) | write only for selected people, everyone can read (read can not be limited because of current techical limitations)           |
