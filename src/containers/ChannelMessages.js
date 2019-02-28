@@ -132,7 +132,7 @@ class ChannelMessages extends React.Component {
         ref={this.messagesEl}
       >
         <FirstMessage
-          channelName={channel.name}
+          channelName={channel.channelName}
           loading={channel.loadingHistory}
           hasMoreHistory={channel.hasMoreHistory}
           onClick={this.onFirstMessageClick}

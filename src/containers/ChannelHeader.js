@@ -42,11 +42,11 @@ function ChannelHeader ({ match }) {
               {currentChannelName ? `#${currentChannelName}` : overrideName}
             </div>
             {networkStore.channelsAsArray
-              .filter(c => c.name !== currentChannelName)
-              .sort((a, b) => a.name.localeCompare(b.name))
+              .filter(c => c.channelName !== currentChannelName)
+              .sort((a, b) => a.channelName.localeCompare(b.channelName))
               .map(c => (
                 <ChannelLink
-                  key={c.name}
+                  key={c.channelName}
                   channel={c}
                   theme={{ ...uiStore.theme }}
                   onClick={onChannelClick}

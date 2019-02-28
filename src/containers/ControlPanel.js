@@ -103,7 +103,8 @@ class ControlPanel extends React.Component {
       <CSSTransitionGroup
         {...transitionProps}
         transitionName="joinChannelAnimation"
-        className="joinChannelInput">
+        className="joinChannelInput"
+      >
         <JoinChannel
           onSubmit={this.onJoinChannel}
           autoFocus
@@ -116,7 +117,8 @@ class ControlPanel extends React.Component {
       <button
         className="startIpfsButton submitButton"
         style={{ ...uiStore.theme }}
-        onClick={() => networkStore.start()}>
+        onClick={() => networkStore.start()}
+      >
         {t('controlPanel.startJsIpfs')}
       </button>
     ) : (
@@ -127,7 +129,7 @@ class ControlPanel extends React.Component {
   }
 
   renderChannelsList (channels) {
-    const { uiStore } = this.context
+    const { networkStore, uiStore } = this.context
     const { t } = this.props
 
     return (
@@ -136,23 +138,25 @@ class ControlPanel extends React.Component {
           {channels.map(c => (
             <div
               className={classNames('row link', {
-                active: uiStore.currentChannelName === c.name
+                active: uiStore.currentChannelName === c.channelName
               })}
-              key={c.name}>
+              key={c.channelName}
+            >
               <ChannelLink
                 channel={c}
                 theme={{ ...uiStore.theme }}
                 onClick={e => {
                   e.preventDefault()
-                  this.redirect(`/channel/${c.name}`)
+                  this.redirect(`/channel/${c.channelName}`)
                 }}
               />
               <span
                 className="closeChannelButton"
                 onClick={() => {
-                  if (uiStore.currentChannelName === c.name) this.redirect('/')
-                  c.leave()
-                }}>
+                  if (uiStore.currentChannelName === c.channelName) this.redirect('/')
+                  networkStore.leaveChannel(c.channelName)
+                }}
+              >
                 {t('controlPanel.closeChannel')}
               </span>
             </div>
@@ -209,19 +213,23 @@ class ControlPanel extends React.Component {
       transitionLeaveTimeout: 5000
     }
 
-    const channels = networkStore.channelsAsArray.sort((a, b) => a.name.localeCompare(b.name))
+    const channels = networkStore.channelsAsArray.sort(({ channelName: a }, { channelName: b }) =>
+      a.localeCompare(b)
+    )
 
     return (
       <React.Fragment>
         <CSSTransitionGroup
           {...transitionProps}
-          transitionName={leftSide ? 'openPanelAnimationLeft' : 'openPanelAnimationRight'}>
+          transitionName={leftSide ? 'openPanelAnimationLeft' : 'openPanelAnimationRight'}
+        >
           <div
             className={classNames('ControlPanel', {
               left: leftSide,
               right: !leftSide,
               'no-close': !this.isClosable()
-            })}>
+            })}
+          >
             <div style={{ opacity: 0.8, zIndex: -1 }}>
               <BackgroundAnimation
                 size={320}
@@ -232,7 +240,8 @@ class ControlPanel extends React.Component {
             </div>
             <CSSTransitionGroup
               {...transitionProps}
-              transitionName={leftSide ? 'panelHeaderAnimationLeft' : 'panelHeaderAnimationRight'}>
+              transitionName={leftSide ? 'panelHeaderAnimationLeft' : 'panelHeaderAnimationRight'}
+            >
               <div className="header" onClick={this.onClose}>
                 <div className="logo">Orbit</div>
               </div>
@@ -252,14 +261,16 @@ class ControlPanel extends React.Component {
               className={classNames({
                 panelHeader: channels.length > 0,
                 hidden: channels.length === 0
-              })}>
+              })}
+            >
               {t('controlPanel.channels')}
             </div>
 
             <CSSTransitionGroup
               {...transitionProps}
               transitionName="joinChannelAnimation"
-              className="openChannels">
+              className="openChannels"
+            >
               {this.renderChannelsList(channels)}
             </CSSTransitionGroup>
 
