@@ -38,13 +38,24 @@ class ChannelMessages extends React.Component {
   }
 
   updateViewPosition () {
+    // Prevent excessive function calls
     if (!this.messagesEnd.current || this.props.channel.loadingHistory) return
+
+    /*
+     * If the bottom of the visible messages is under or exactly
+     * 300 pixels from the bottom of all messages,
+     * scroll to the latest message in the bottom of messagesEl.
+     */
     if (
       this.messagesEl.current.scrollHeight - this.messagesEl.current.scrollTop <=
       this.messagesEl.current.clientHeight + 300
     ) {
       this.messagesEnd.current.scrollIntoView()
     } else {
+      /*
+       * Prevent unwanted subsequent calls to channel.loadMore() by scrolling
+       * down so that the load more messages element is not in the view.
+       */
       this.messagesEl.current.scrollTop = 50
     }
   }
