@@ -24,20 +24,20 @@ class ChannelMessages extends React.Component {
     super(props)
     this.messagesEl = React.createRef()
     this.messagesEnd = React.createRef()
-    this.scrollToBottom = this.scrollToBottom.bind(this)
+    this.updateViewPosition = this.updateViewPosition.bind(this)
     this.onMessageUserClick = this.onMessageUserClick.bind(this)
     this.onFirstMessageClick = this.onFirstMessageClick.bind(this)
   }
 
   componentDidMount () {
-    this.scrollToBottom()
+    this.updateViewPosition()
   }
 
   componentDidUpdate () {
-    this.scrollToBottom()
+    this.updateViewPosition()
   }
 
-  scrollToBottom () {
+  updateViewPosition () {
     if (!this.messagesEnd.current || this.props.channel.loadingHistory) return
     if (
       this.messagesEl.current.scrollHeight - this.messagesEl.current.scrollTop <=
@@ -89,8 +89,8 @@ class ChannelMessages extends React.Component {
           colorifyUsernames={colorifyUsernames}
           useLargeMessage={useLargeMessage}
           highlightWords={[sessionStore.username]}
-          onInViewChange={inView => {
-            if (message.unread && inView) channel.markMessageAsRead(message)
+          onInViewChange={() => {
+            if (message.unread) channel.markMessageAsRead(message)
           }}
           onMessageUserClick={this.onMessageUserClick}
           loadFile={channel.loadFile}

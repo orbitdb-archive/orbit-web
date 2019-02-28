@@ -17,10 +17,8 @@ function MessageRow ({
   onMessageUserClick,
   ...messageContentProps
 }) {
-  const [ref, inView] = useInView({ triggerOnce: true })
-  if (inView) {
-    onInViewChange()
-  }
+  const [inViewRef, inView] = useInView({ triggerOnce: true })
+  if (inView) onInViewChange()
 
   const isCommand = message.content && message.content.startsWith('/me')
 
@@ -72,7 +70,7 @@ function MessageRow ({
   )
 
   return (
-    <div className="Message" ref={ref}>
+    <div className="Message" ref={inViewRef}>
       {useLargeMessage ? <MessageUserAvatar message={message} /> : null}
       {content}
     </div>

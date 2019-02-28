@@ -8,12 +8,12 @@ import { useInView } from 'react-intersection-observer'
 
 function FirstMessage ({ loading, hasMoreHistory, channelName, observeReaction, ...rest }) {
   const [t] = useTranslation()
-  const [ref, inView] = useInView()
+  const [inViewRef, inView] = useInView()
   if (inView && !loading && hasMoreHistory) {
     observeReaction()
   }
   return (
-    <div className={classNames('firstMessage', { hasMoreHistory })} ref={ref} {...rest}>
+    <div className={classNames('firstMessage', { hasMoreHistory })} ref={inViewRef} {...rest}>
       {loading
         ? t('channel.loadingHistory')
         : hasMoreHistory
