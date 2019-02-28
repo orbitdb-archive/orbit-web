@@ -1,10 +1,12 @@
-@import 'Fonts';
+@import "Fonts";
 
-html, body {
+html,
+body {
   font-family: "Lato";
   font-weight: normal;
   background: #222222;
   color: white;
+  height: 100%;
 }
 
 h1 {

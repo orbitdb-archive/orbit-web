@@ -1,27 +1,19 @@
 'use strict'
 
-import React, { useRef, useEffect } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { useTranslation } from 'react-i18next'
+import { useInView } from 'react-intersection-observer'
 
-function FirstMessage ({ loading, hasMoreHistory, channelName, observed, ...rest }) {
+function FirstMessage ({ loading, hasMoreHistory, channelName, observeReaction, ...rest }) {
   const [t] = useTranslation()
-  const firstMessage = useRef()
-
-  if ('IntersectionObserver' in window) {
-    const onObserve = event => event[0].isIntersecting && observed(event)
-    // eslint-disable-next-line compat/compat
-    const observer = new IntersectionObserver(onObserve, {})
-    useEffect(
-      () =>
-        observer && firstMessage && firstMessage.current && observer.observe(firstMessage.current),
-      []
-    )
+  const [ref, inView] = useInView()
+  if (inView && !loading && hasMoreHistory) {
+    observeReaction()
   }
-
   return (
-    <div className={classNames('firstMessage', { hasMoreHistory })} ref={firstMessage} {...rest}>
+    <div className={classNames('firstMessage', { hasMoreHistory })} ref={ref} {...rest}>
       {loading
         ? t('channel.loadingHistory')
         : hasMoreHistory
@@ -35,7 +27,7 @@ FirstMessage.propTypes = {
   loading: PropTypes.bool.isRequired,
   hasMoreHistory: PropTypes.bool.isRequired,
   channelName: PropTypes.string.isRequired,
-  observed: PropTypes.func
+  observeReaction: PropTypes.func
 }
 
 export default FirstMessage

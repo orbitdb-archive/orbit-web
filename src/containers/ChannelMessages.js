@@ -22,14 +22,11 @@ class ChannelMessages extends React.Component {
 
   constructor (props) {
     super(props)
-
     this.messagesEl = React.createRef()
     this.messagesEnd = React.createRef()
-
     this.scrollToBottom = this.scrollToBottom.bind(this)
     this.onMessageUserClick = this.onMessageUserClick.bind(this)
     this.onFirstMessageClick = this.onFirstMessageClick.bind(this)
-    this.onObserve = this.onObserve.bind(this)
   }
 
   componentDidMount () {
@@ -41,11 +38,15 @@ class ChannelMessages extends React.Component {
   }
 
   scrollToBottom () {
-    if (!this.messagesEnd.current) return
-
-    // Smooth scroll will cause the chat input field to bounce when sending
-    // messages so we use the default ("auto")
-    this.messagesEnd.current.scrollIntoView()
+    if (!this.messagesEnd.current || this.props.channel.loadingHistory) return
+    if (
+      this.messagesEl.current.scrollHeight - this.messagesEl.current.scrollTop <=
+      this.messagesEl.current.clientHeight + 300
+    ) {
+      this.messagesEnd.current.scrollIntoView()
+    } else {
+      this.messagesEl.current.scrollTop = 50
+    }
   }
 
   onMessageUserClick (evt, profile, identity) {
@@ -62,11 +63,6 @@ class ChannelMessages extends React.Component {
   onFirstMessageClick (evt) {
     const { channel } = this.props
     evt.preventDefault()
-    channel.loadMore()
-  }
-
-  onObserve (event) {
-    const { channel } = this.props
     channel.loadMore()
   }
 
@@ -129,7 +125,7 @@ class ChannelMessages extends React.Component {
           loading={channel.loadingHistory}
           hasMoreHistory={channel.hasMoreHistory}
           onClick={this.onFirstMessageClick}
-          observed={this.onObserve}
+          observeReaction={() => channel.loadMore()}
         />
         {messageEls}
         <span className="messagesEnd" ref={this.messagesEnd} />
