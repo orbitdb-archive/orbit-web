@@ -28,7 +28,7 @@ Our short-to-medium-term roadmap items, in order of descending priority.
 | &#9744; | deploying             | [@latenssi](https://github.com/latenssi) | figure out an automated deployment strategy (deploying to IPFS is preferred)                                                  |
 | &#9744; | domain                | [@latenssi](https://github.com/latenssi) | point orbit.chat domain to this repos deployment (wherever it is)                                                             |
 | &#9744; | basic automated tests | [@latenssi](https://github.com/latenssi) | start implementing automated tests, keep it simple and lean                                                                   |
-| &#9744; | load more messages    | [@latenssi](https://github.com/latenssi) | automatically load more messages as user scrolls up in the channels history                                                   |
+| &#9745; | load more messages    | [@latenssi](https://github.com/latenssi) | automatically load more messages as user scrolls up in the channels history                                                   |
 | &#9744; | notifications         | [@latenssi](https://github.com/latenssi) | send notification to a user when somebody mentions her in the chat (e.g. "&commat;somebody hi!")                              |
 | &#9745; | drag and drop files   | [@latenssi](https://github.com/latenssi) | support drag and drop of files                                                                                                |
 | &#9744; | render spaces         | [@latenssi](https://github.com/latenssi) | currently "test&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;test" renders as "test test" in chat               |
