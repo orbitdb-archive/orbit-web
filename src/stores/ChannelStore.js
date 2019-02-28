@@ -20,6 +20,7 @@ export default class ChannelStore {
     this.processSendQueue = throttleFunc(this._processSendQueue.bind(this))
     this.updatePeers = throttleFunc(this._updatePeers.bind(this))
 
+    this.loadMore = this.loadMore.bind(this)
     this.sendMessage = this.sendMessage.bind(this)
     this.sendFiles = this.sendFiles.bind(this)
 
@@ -384,6 +385,7 @@ export default class ChannelStore {
   }
 
   loadMore () {
-    return this.orbitChannel.loadMore(loadAmount)
+    if (!this.loadingHistory && this.hasMoreHistory) return this.orbitChannel.loadMore(loadAmount)
+    else return Promise.resolve()
   }
 }
