@@ -22,29 +22,42 @@ class ChannelMessages extends React.Component {
 
   constructor (props) {
     super(props)
-
     this.messagesEl = React.createRef()
     this.messagesEnd = React.createRef()
-
-    this.scrollToBottom = this.scrollToBottom.bind(this)
+    this.updateViewPosition = this.updateViewPosition.bind(this)
     this.onMessageUserClick = this.onMessageUserClick.bind(this)
     this.onFirstMessageClick = this.onFirstMessageClick.bind(this)
   }
 
   componentDidMount () {
-    this.scrollToBottom()
+    this.updateViewPosition()
   }
 
   componentDidUpdate () {
-    this.scrollToBottom()
+    this.updateViewPosition()
   }
 
-  scrollToBottom () {
-    if (!this.messagesEnd.current) return
+  updateViewPosition () {
+    // Prevent excessive function calls
+    if (!this.messagesEnd.current || this.props.channel.loadingHistory) return
 
-    // Smooth scroll will cause the chat input field to bounce when sending
-    // messages so we use the default ("auto")
-    this.messagesEnd.current.scrollIntoView()
+    /*
+     * If the bottom of the visible messages is under or exactly
+     * 300 pixels from the bottom of all messages,
+     * scroll to the latest message in the bottom of messagesEl.
+     */
+    if (
+      this.messagesEl.current.scrollHeight - this.messagesEl.current.scrollTop <=
+      this.messagesEl.current.clientHeight + 300
+    ) {
+      this.messagesEnd.current.scrollIntoView()
+    } else {
+      /*
+       * Prevent unwanted subsequent calls to channel.loadMore() by scrolling
+       * down so that the load more messages element is not in the view.
+       */
+      this.messagesEl.current.scrollTop = 50
+    }
   }
 
   onMessageUserClick (evt, profile, identity) {
@@ -87,8 +100,8 @@ class ChannelMessages extends React.Component {
           colorifyUsernames={colorifyUsernames}
           useLargeMessage={useLargeMessage}
           highlightWords={[sessionStore.username]}
-          onInViewChange={inView => {
-            if (message.unread && inView) channel.markMessageAsRead(message)
+          onInViewChange={() => {
+            if (message.unread) channel.markMessageAsRead(message)
           }}
           onMessageUserClick={this.onMessageUserClick}
           loadFile={channel.loadFile}
@@ -116,12 +129,14 @@ class ChannelMessages extends React.Component {
           'font-normal': !useMonospaceFont,
           'font-monospace': useMonospaceFont
         })}
-        ref={this.messagesEl}>
+        ref={this.messagesEl}
+      >
         <FirstMessage
           channelName={channel.name}
           loading={channel.loadingHistory}
           hasMoreHistory={channel.hasMoreHistory}
           onClick={this.onFirstMessageClick}
+          observeReaction={() => channel.loadMore()}
         />
         {messageEls}
         <span className="messagesEnd" ref={this.messagesEnd} />

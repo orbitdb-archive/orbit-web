@@ -382,7 +382,7 @@ export default class ChannelStore {
     // TODO: This is a bit hacky, but at the time of writing is the only way
     // to load more entries
 
-    if (!this.hasMoreHistory) return
+    if (!this.hasMoreHistory || this.loadingNewMessages) return
 
     const log = this.feed._oplog
     const Log = log.constructor

@@ -2,7 +2,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import IntersectObserver from 'react-intersection-observer'
+import { useInView } from 'react-intersection-observer'
 
 import { MessageContent, MessageTimestamp, MessageUser, MessageUserAvatar } from './MessageParts'
 
@@ -17,6 +17,9 @@ function MessageRow ({
   onMessageUserClick,
   ...messageContentProps
 }) {
+  const [inViewRef, inView] = useInView({ triggerOnce: true })
+  if (inView) onInViewChange()
+
   const isCommand = message.content && message.content.startsWith('/me')
 
   const messageTimestamp = <MessageTimestamp message={message} />
@@ -67,10 +70,10 @@ function MessageRow ({
   )
 
   return (
-    <IntersectObserver tag="div" onChange={onInViewChange} triggerOnce={true} className="Message">
+    <div className="Message" ref={inViewRef}>
       {useLargeMessage ? <MessageUserAvatar message={message} /> : null}
       {content}
-    </IntersectObserver>
+    </div>
   )
 }
 
