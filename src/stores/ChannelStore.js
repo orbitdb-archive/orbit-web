@@ -9,6 +9,8 @@ configure({ enforceActions: 'observed' })
 
 const logger = new Logger()
 
+const loadAmount = 10 // How many entries are loaded per load call
+
 export default class ChannelStore {
   constructor ({ network, orbitChannel }) {
     this.network = network
@@ -17,6 +19,9 @@ export default class ChannelStore {
     this.loadFile = this.loadFile.bind(this)
     this.processSendQueue = throttleFunc(this._processSendQueue.bind(this))
     this.updatePeers = throttleFunc(this._updatePeers.bind(this))
+
+    this.sendMessage = this.sendMessage.bind(this)
+    this.sendFiles = this.sendFiles.bind(this)
 
     this._saveState = this._saveState.bind(this)
 
@@ -30,7 +35,7 @@ export default class ChannelStore {
 
     this._loadState()
 
-    this.orbitChannel.load(10)
+    this.orbitChannel.load(loadAmount)
 
     // Save channel state on changes
     reaction(() => values(this._storableState), this._saveState)
@@ -164,6 +169,16 @@ export default class ChannelStore {
 
   // Private instance actions
 
+  @action.bound
+  _decrementSendingMessageCounter () {
+    this._sendingMessageCounter = Math.max(0, this._sendingMessageCounter - 1)
+  }
+
+  @action.bound
+  _incrementSendingMessageCounter () {
+    this._sendingMessageCounter += 1
+  }
+
   _onNewEntry (entry) {
     this._updateEntries([entry])
   }
@@ -221,9 +236,9 @@ export default class ChannelStore {
     this.loadingNewMessages = false
   }
 
-  @action // Called when the user writes a message (text or file)
+  // Called when the user writes a message (text or file)
   _onWrite () {
-    this._sendingMessageCounter = Math.max(0, this._sendingMessageCounter - 1)
+    this._decrementSendingMessageCounter()
   }
 
   @action
@@ -258,26 +273,22 @@ export default class ChannelStore {
     this.entries.filter(e => e.cid === message.hash).forEach(this.markEntryAsRead)
   }
 
-  @action.bound
   sendMessage (text) {
     if (typeof text !== 'string' || text === '') return Promise.resolve()
 
-    this._sendingMessageCounter += 1
+    this._incrementSendingMessageCounter()
 
     return new Promise((resolve, reject) => {
       this._sendQueue.push({ text, resolve, reject })
     })
   }
 
-  @action.bound
   sendFiles (files) {
     const promises = []
     for (let i = 0; i < files.length; i++) {
       promises.push(
         new Promise((resolve, reject) => {
-          runInAction(() => {
-            this._sendingMessageCounter += 1
-          })
+          this._incrementSendingMessageCounter()
           const f = files[i]
           const reader = new FileReader()
           reader.onload = event => {
@@ -339,9 +350,7 @@ export default class ChannelStore {
     if (promise && promise.then) {
       // Wrap the tasks reject function so we can decrement the '_sendingMessageCounter'
       const wrappedReject = (...args) => {
-        runInAction(() => {
-          if (this._sendingMessageCounter > 0) this._sendingMessageCounter -= 1
-        })
+        this._decrementSendingMessageCounter()
         task.reject(...args)
       }
 
@@ -375,6 +384,6 @@ export default class ChannelStore {
   }
 
   loadMore () {
-    return this.orbitChannel.loadMore(10)
+    return this.orbitChannel.loadMore(loadAmount)
   }
 }

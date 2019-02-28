@@ -12,6 +12,9 @@ configure({ enforceActions: 'observed' })
 
 const logger = new Logger()
 
+const peerUpdateInterval = 1000 // ms
+const processSendQueueInterval = 100 // ms
+
 export default class NetworkStore {
   constructor (rootStore) {
     this.sessionStore = rootStore.sessionStore
@@ -24,11 +27,11 @@ export default class NetworkStore {
 
     this.channelPeerInterval = setInterval(() => {
       this.channelsAsArray.forEach(c => c.updatePeers())
-    }, 1000)
+    }, peerUpdateInterval)
 
     this.channelProcessInterval = setInterval(() => {
       this.channelsAsArray.forEach(c => c.processSendQueue())
-    }, 100)
+    }, processSendQueueInterval)
 
     // Stop if user logs out, start if not already online or not starting
     reaction(
@@ -132,23 +135,6 @@ export default class NetworkStore {
     this.swarmPeers = []
   }
 
-  // Private instance methods
-
-  _onOrbitStarted (orbitNode) {
-    orbitNode.events.on('joined', this._onJoinedChannel)
-    orbitNode.events.on('left', this._onLeftChannel)
-    orbitNode.events.on('peers', this._onSwarmPeerUpdate)
-
-    // Join all channnels that are saved in localstorage for current user
-    this.settingsStore.networkSettings.channels.forEach(this.joinChannel)
-  }
-
-  _onOrbitStopped (orbitNode) {
-    orbitNode.events.removeListener('joined', this._onJoinedChannel)
-    orbitNode.events.removeListener('left', this._onLeftChannel)
-    orbitNode.events.removeListener('peers', this._onSwarmPeerUpdate)
-  }
-
   // Public instance methods
 
   async joinChannel (channelName) {
@@ -171,9 +157,14 @@ export default class NetworkStore {
     logger.info('Starting network')
 
     await this.ipfsStore.useEmbeddedIPFS()
-    await this.orbitStore.init(this.ipfs)
+    const orbitNode = await this.orbitStore.init(this.ipfs)
 
-    this._onOrbitStarted(this.orbit)
+    orbitNode.events.on('joined', this._onJoinedChannel)
+    orbitNode.events.on('left', this._onLeftChannel)
+    orbitNode.events.on('peers', this._onSwarmPeerUpdate)
+
+    // Join all channnels that are saved in localstorage for current user
+    this.settingsStore.networkSettings.channels.forEach(this.joinChannel)
   }
 
   async stop () {
@@ -185,7 +176,6 @@ export default class NetworkStore {
 
     this.channelNames.forEach(this._removeChannel)
     this._resetSwarmPeers()
-    this._onOrbitStopped(this.orbit)
 
     await this.orbitStore.stop()
     await this.ipfsStore.stop()
