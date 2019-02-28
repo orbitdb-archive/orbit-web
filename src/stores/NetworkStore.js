@@ -22,6 +22,14 @@ export default class NetworkStore {
 
     this.joinChannel = this.joinChannel.bind(this)
 
+    this.channelPeerInterval = setInterval(() => {
+      this.channelsAsArray.forEach(c => c.updatePeers())
+    }, 1000)
+
+    this.channelProcessInterval = setInterval(() => {
+      this.channelsAsArray.forEach(c => c.processSendQueue())
+    }, 100)
+
     // Stop if user logs out, start if not already online or not starting
     reaction(
       () => this.sessionStore.username,
@@ -85,10 +93,10 @@ export default class NetworkStore {
   _onJoinedChannel (channelName) {
     if (this.channelNames.indexOf(channelName) !== -1) return
 
+    const orbitChannel = this.orbit.channels[channelName]
     this.channels[channelName] = new ChannelStore({
-      name: channelName,
-      feed: this.orbit.channels[channelName].feed,
-      network: this
+      network: this,
+      orbitChannel
     })
 
     // Save the channel to localstorage
@@ -116,7 +124,6 @@ export default class NetworkStore {
 
   @action.bound
   _removeChannel (channelName) {
-    this.channels[channelName].stop()
     delete this.channels[channelName]
   }
 
@@ -133,7 +140,7 @@ export default class NetworkStore {
     orbitNode.events.on('peers', this._onSwarmPeerUpdate)
 
     // Join all channnels that are saved in localstorage for current user
-    this.settingsStore.networkSettings.channels.map(this.joinChannel)
+    this.settingsStore.networkSettings.channels.forEach(this.joinChannel)
   }
 
   _onOrbitStopped (orbitNode) {
@@ -173,7 +180,10 @@ export default class NetworkStore {
     if (!this.isOnline) return
     logger.info('Stopping network')
 
-    this.channelNames.map(this._removeChannel)
+    clearInterval(this.channelPeerInterval)
+    clearInterval(this.channelProcessInterval)
+
+    this.channelNames.forEach(this._removeChannel)
     this._resetSwarmPeers()
     this._onOrbitStopped(this.orbit)
 
