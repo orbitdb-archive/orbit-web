@@ -9,32 +9,34 @@ configure({ enforceActions: 'observed' })
 
 const logger = new Logger()
 
+const loadAmount = 10 // How many entries are loaded per load call
+
 export default class ChannelStore {
-  constructor ({ network, feed, name }) {
+  constructor ({ network, orbitChannel }) {
     this.network = network
-    this.feed = feed
-    this.name = name
+    this.orbitChannel = orbitChannel
 
-    this.leave = this.leave.bind(this)
     this.loadFile = this.loadFile.bind(this)
-    this.stop = this.stop.bind(this)
+    this.processSendQueue = throttleFunc(this._processSendQueue.bind(this))
+    this.updatePeers = throttleFunc(this._updatePeers.bind(this))
 
-    this._processSendQueue = throttleFunc(this._processSendQueue.bind(this))
+    this.loadMore = this.loadMore.bind(this)
+    this.sendMessage = this.sendMessage.bind(this)
+    this.sendFiles = this.sendFiles.bind(this)
+
     this._saveState = this._saveState.bind(this)
 
-    this.peerInterval = setInterval(this._updatePeers, 1000)
-    this.processSendQueueInterval = setInterval(this._processSendQueue, 10)
-
-    this.feed.events.on('error', this._onError.bind(this))
-    this.feed.events.on('load.progress', this._onLoadProgress.bind(this))
-    this.feed.events.on('ready', this._onLoaded.bind(this))
-    this.feed.events.on('replicate.progress', this._onReplicateProgress.bind(this))
-    this.feed.events.on('replicated', this._onReplicated.bind(this))
-    this.feed.events.on('write', this._onWrite.bind(this))
+    this.orbitChannel.on('error', this._onError.bind(this))
+    this.orbitChannel.on('entry', this._onNewEntry.bind(this))
+    this.orbitChannel.on('write', this._onWrite.bind(this))
+    this.orbitChannel.on('load.progress', this._onLoadProgress.bind(this))
+    this.orbitChannel.on('load.done', this._onLoaded.bind(this))
+    this.orbitChannel.on('replicate.progress', this._onReplicateProgress.bind(this))
+    this.orbitChannel.on('replicate.done', this._onReplicated.bind(this))
 
     this._loadState()
 
-    this.feed.load(20)
+    this.orbitChannel.load(loadAmount)
 
     // Save channel state on changes
     reaction(() => values(this._storableState), this._saveState)
@@ -50,9 +52,6 @@ export default class ChannelStore {
 
   @observable
   _sendingMessageCounter = 0
-
-  _loadEntriesBatch = []
-  _replicateEntriesBatch = []
 
   @observable
   _replicationStatus = {}
@@ -72,6 +71,18 @@ export default class ChannelStore {
   loadingNewMessages = false
 
   // Public instance getters
+
+  get channelName () {
+    return this.orbitChannel.channelName
+  }
+
+  // TODO: object.name is reserved so remove code which uses this
+  get name () {
+    console.warn(
+      'Deprecation warning: "channel.name" is deprecated, use channel.channelName instead'
+    )
+    return this.channelName
+  }
 
   @computed
   get entryCIDs () {
@@ -100,8 +111,7 @@ export default class ChannelStore {
 
   @computed
   get messages () {
-    // For backwards compatibility
-    // TODO: REMOVE
+    // Format entries to better suit a chat channel
     return this.entries.map(entry =>
       Object.assign(JSON.parse(JSON.stringify(entry.payload.value)), {
         hash: entry.cid,
@@ -157,7 +167,22 @@ export default class ChannelStore {
   get userCount () {
     return this.peers.length + 1
   }
+
   // Private instance actions
+
+  @action.bound
+  _decrementSendingMessageCounter () {
+    this._sendingMessageCounter = Math.max(0, this._sendingMessageCounter - 1)
+  }
+
+  @action.bound
+  _incrementSendingMessageCounter () {
+    this._sendingMessageCounter += 1
+  }
+
+  _onNewEntry (entry) {
+    this._updateEntries([entry])
+  }
 
   @action.bound
   _updateEntries (entries) {
@@ -175,7 +200,7 @@ export default class ChannelStore {
       .sort((a, b) => a.payload.value.meta.ts - b.payload.value.meta.ts)
   }
 
-  @action.bound
+  @action
   async _updatePeers () {
     const peers = await this._getPeers()
     runInAction(() => {
@@ -185,48 +210,36 @@ export default class ChannelStore {
 
   @action.bound
   _updateReplicationStatus () {
-    Object.assign(this._replicationStatus, this.feed.replicationStatus)
+    Object.assign(this._replicationStatus, this.orbitChannel.replicationStatus)
   }
 
   @action // Called while loading from local filesystem
-  _onLoadProgress (...args) {
+  _onLoadProgress () {
     this._updateReplicationStatus()
-    const entry = args[2]
-    this._loadEntriesBatch.push(entry)
     this.loadingHistory = true
   }
 
   @action // Called when done loading from local filesystem
   _onLoaded () {
     this._updateReplicationStatus()
-    const entries = this._loadEntriesBatch.filter(e => e)
-    this._loadEntriesBatch = []
-    this._updateEntries(entries)
     this.loadingHistory = false
   }
 
   @action // Called while loading from IPFS (receiving new messages)
-  _onReplicateProgress (...args) {
+  _onReplicateProgress () {
     this._updateReplicationStatus()
-    const entry = args[2]
-    this._replicateEntriesBatch.push(entry)
     this.loadingNewMessages = true
   }
 
   @action // Called when done loading from IPFS
   _onReplicated () {
     this._updateReplicationStatus()
-    const entries = this._replicateEntriesBatch.filter(e => e)
-    this._replicateEntriesBatch = []
-    this._updateEntries(entries)
     this.loadingNewMessages = false
   }
 
-  @action // Called when the user writes a message (text or file)
-  _onWrite (...args) {
-    const entry = args[2][0]
-    this._updateEntries([entry])
-    if (this._sendingMessageCounter > 0) this._sendingMessageCounter -= 1
+  // Called when the user writes a message (text or file)
+  _onWrite () {
+    this._decrementSendingMessageCounter()
   }
 
   @action
@@ -239,7 +252,7 @@ export default class ChannelStore {
   @action.bound
   _loadState () {
     try {
-      Object.assign(this._storableState, this._getStoredStates()[this.name] || {})
+      Object.assign(this._storableState, this._getStoredStates()[this.channelName] || {})
     } catch (err) {}
   }
 
@@ -258,29 +271,25 @@ export default class ChannelStore {
 
   @action.bound
   markMessageAsRead (message) {
-    this.entries.filter(e => e.cid === message.hash).map(this.markEntryAsRead)
+    this.entries.filter(e => e.cid === message.hash).forEach(this.markEntryAsRead)
   }
 
-  @action.bound
   sendMessage (text) {
     if (typeof text !== 'string' || text === '') return Promise.resolve()
 
-    this._sendingMessageCounter += 1
+    this._incrementSendingMessageCounter()
 
     return new Promise((resolve, reject) => {
       this._sendQueue.push({ text, resolve, reject })
     })
   }
 
-  @action.bound
   sendFiles (files) {
     const promises = []
     for (let i = 0; i < files.length; i++) {
       promises.push(
         new Promise((resolve, reject) => {
-          runInAction(() => {
-            this._sendingMessageCounter += 1
-          })
+          this._incrementSendingMessageCounter()
           const f = files[i]
           const reader = new FileReader()
           reader.onload = event => {
@@ -305,7 +314,7 @@ export default class ChannelStore {
   // Private instance methods
 
   _getPeers () {
-    return this.network.ipfs.pubsub.peers(this.feed.address.toString())
+    return this.orbitChannel.peers
   }
 
   _getStoredStates () {
@@ -314,7 +323,9 @@ export default class ChannelStore {
 
   _saveState () {
     try {
-      const states = Object.assign(this._getStoredStates(), { [this.name]: this._storableState })
+      const states = Object.assign(this._getStoredStates(), {
+        [this.channelName]: this._storableState
+      })
       localStorage.setItem(this.storagekey, JSON.stringify(states))
     } catch (err) {
       logger.error(err)
@@ -332,17 +343,15 @@ export default class ChannelStore {
     let promise
 
     if (task.text) {
-      promise = this.network.orbit.send(this.name, task.text)
+      promise = this.orbitChannel.sendMessage(task.text)
     } else if (task.file) {
-      promise = this.network.orbit.addFile(this.name, task.file)
+      promise = this.orbitChannel.sendFile(task.file)
     }
 
     if (promise && promise.then) {
       // Wrap the tasks reject function so we can decrement the '_sendingMessageCounter'
       const wrappedReject = (...args) => {
-        runInAction(() => {
-          if (this._sendingMessageCounter > 0) this._sendingMessageCounter -= 1
-        })
+        this._decrementSendingMessageCounter()
         task.reject(...args)
       }
 
@@ -353,9 +362,6 @@ export default class ChannelStore {
   }
 
   // Public instance methods
-  leave () {
-    this.network.leaveChannel(this.name)
-  }
 
   loadFile (hash, asStream) {
     return new Promise((resolve, reject) => {
@@ -378,88 +384,8 @@ export default class ChannelStore {
     })
   }
 
-  async loadMore () {
-    // TODO: This is a bit hacky, but at the time of writing is the only way
-    // to load more entries
-
-    if (!this.hasMoreHistory || this.loadingNewMessages) return
-
-    const log = this.feed._oplog
-    const Log = log.constructor
-
-    const newLog = await Log.fromEntryCid(
-      this.feed._ipfs,
-      this.feed.identity,
-      log.tails[0].next[0],
-      {
-        logId: log.id,
-        access: this.feed.access,
-        length: log.values.length + 10,
-        exclude: log.values,
-        onProgressCallback: this.feed._onLoadProgress.bind(this.feed)
-      }
-    )
-
-    // await log.join(newLog)
-    await monkeyPatchedJoin(log, newLog)
-
-    await this.feed._updateIndex()
-
-    this.feed.events.emit('ready', this.feed.address.toString(), log.heads)
+  loadMore () {
+    if (!this.loadingHistory && this.hasMoreHistory) return this.orbitChannel.loadMore(loadAmount)
+    else return Promise.resolve()
   }
-
-  stop () {
-    clearInterval(this.peerInterval)
-    clearInterval(this.processSendQueueInterval)
-
-    this.feed.events.removeListener('error', this._onError)
-    this.feed.events.removeListener('load.progress', this._onLoadProgress)
-    this.feed.events.removeListener('ready', this._onLoaded)
-    this.feed.events.removeListener('replicate.progress', this._onReplicateProgress)
-    this.feed.events.removeListener('replicated', this._onReplicated)
-    this.feed.events.removeListener('write', this._onWrite)
-  }
-}
-
-async function monkeyPatchedJoin (log, newLog) {
-  const Log = log.constructor
-
-  if (!Log.monkeyPatched) {
-    Log._origDifference = Log.difference
-    Log.difference = differenceMonkeyPatch
-    Log.monkeyPatched = true
-  }
-
-  await log.join(newLog)
-
-  if (Log.monkeyPatched) {
-    Log.difference = Log._origDifference
-    delete Log._origDifference
-    delete Log.monkeyPatched
-  }
-}
-
-function differenceMonkeyPatch (a, b) {
-  // let stack = Object.keys(a._headsIndex)
-  const stack = Object.keys(a._entryIndex) // This is the only change
-  const traversed = {}
-  const res = {}
-
-  const pushToStack = hash => {
-    if (!traversed[hash] && !b.get(hash)) {
-      stack.push(hash)
-      traversed[hash] = true
-    }
-  }
-
-  while (stack.length > 0) {
-    const hash = stack.shift()
-    const entry = a.get(hash)
-    if (entry && !b.get(hash) && entry.id === b.id) {
-      res[entry.hash] = entry
-      traversed[entry.hash] = true
-      entry.next.forEach(pushToStack)
-    }
-  }
-  return res
 }

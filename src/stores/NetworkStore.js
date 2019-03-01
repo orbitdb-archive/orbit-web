@@ -12,6 +12,9 @@ configure({ enforceActions: 'observed' })
 
 const logger = new Logger()
 
+const peerUpdateInterval = 1000 // ms
+const processSendQueueInterval = 100 // ms
+
 export default class NetworkStore {
   constructor (rootStore) {
     this.sessionStore = rootStore.sessionStore
@@ -21,6 +24,14 @@ export default class NetworkStore {
     this.orbitStore = new OrbitStore(this)
 
     this.joinChannel = this.joinChannel.bind(this)
+
+    this.channelPeerInterval = setInterval(() => {
+      this.channelsAsArray.forEach(c => c.updatePeers())
+    }, peerUpdateInterval)
+
+    this.channelProcessInterval = setInterval(() => {
+      this.channelsAsArray.forEach(c => c.processSendQueue())
+    }, processSendQueueInterval)
 
     // Stop if user logs out, start if not already online or not starting
     reaction(
@@ -85,10 +96,10 @@ export default class NetworkStore {
   _onJoinedChannel (channelName) {
     if (this.channelNames.indexOf(channelName) !== -1) return
 
+    const orbitChannel = this.orbit.channels[channelName]
     this.channels[channelName] = new ChannelStore({
-      name: channelName,
-      feed: this.orbit.channels[channelName].feed,
-      network: this
+      network: this,
+      orbitChannel
     })
 
     // Save the channel to localstorage
@@ -116,30 +127,12 @@ export default class NetworkStore {
 
   @action.bound
   _removeChannel (channelName) {
-    this.channels[channelName].stop()
     delete this.channels[channelName]
   }
 
   @action.bound
   _resetSwarmPeers () {
     this.swarmPeers = []
-  }
-
-  // Private instance methods
-
-  _onOrbitStarted (orbitNode) {
-    orbitNode.events.on('joined', this._onJoinedChannel)
-    orbitNode.events.on('left', this._onLeftChannel)
-    orbitNode.events.on('peers', this._onSwarmPeerUpdate)
-
-    // Join all channnels that are saved in localstorage for current user
-    this.settingsStore.networkSettings.channels.map(this.joinChannel)
-  }
-
-  _onOrbitStopped (orbitNode) {
-    orbitNode.events.removeListener('joined', this._onJoinedChannel)
-    orbitNode.events.removeListener('left', this._onLeftChannel)
-    orbitNode.events.removeListener('peers', this._onSwarmPeerUpdate)
   }
 
   // Public instance methods
@@ -164,18 +157,25 @@ export default class NetworkStore {
     logger.info('Starting network')
 
     await this.ipfsStore.useEmbeddedIPFS()
-    await this.orbitStore.init(this.ipfs)
+    const orbitNode = await this.orbitStore.init(this.ipfs)
 
-    this._onOrbitStarted(this.orbit)
+    orbitNode.events.on('joined', this._onJoinedChannel)
+    orbitNode.events.on('left', this._onLeftChannel)
+    orbitNode.events.on('peers', this._onSwarmPeerUpdate)
+
+    // Join all channnels that are saved in localstorage for current user
+    this.settingsStore.networkSettings.channels.forEach(this.joinChannel)
   }
 
   async stop () {
     if (!this.isOnline) return
     logger.info('Stopping network')
 
-    this.channelNames.map(this._removeChannel)
+    clearInterval(this.channelPeerInterval)
+    clearInterval(this.channelProcessInterval)
+
+    this.channelNames.forEach(this._removeChannel)
     this._resetSwarmPeers()
-    this._onOrbitStopped(this.orbit)
 
     await this.orbitStore.stop()
     await this.ipfsStore.stop()

@@ -19,10 +19,10 @@ class DebugChannelList extends React.Component {
         Channels: <br />
         <ul>
           {networkStore.channelsAsArray.map(channel => (
-            <li key={channel.name}>
-              <strong>Channel name: {channel.name}</strong> <br />
+            <li key={channel.channelName}>
+              <strong>Channel name: {channel.channelName}</strong> <br />
               <strong>Peers: {channel.peers.length}</strong> <br />
-              <button onClick={() => channel.leave()}>Leave</button>
+              <button onClick={() => networkStore.leaveChannel(channel.channelName)}>Leave</button>
             </li>
           ))}
         </ul>
@@ -42,7 +42,8 @@ class DebugControlButtons extends React.Component {
       <div>
         <button
           onClick={() => sessionStore.login({ username: 'test-user-' + Date.now() })}
-          disabled={sessionStore.isAuthenticated}>
+          disabled={sessionStore.isAuthenticated}
+        >
           Login
         </button>
         <button onClick={() => sessionStore.logout()} disabled={!sessionStore.isAuthenticated}>
@@ -51,12 +52,14 @@ class DebugControlButtons extends React.Component {
         <br />
         <button
           onClick={() => ipfsStore.useGoIPFS()}
-          disabled={ipfsStore.node || ipfsStore.starting || !sessionStore.username}>
+          disabled={ipfsStore.node || ipfsStore.starting || !sessionStore.username}
+        >
           Use go-ipfs
         </button>
         <button
           onClick={() => ipfsStore.useJsIPFS()}
-          disabled={ipfsStore.node || ipfsStore.starting || !sessionStore.username}>
+          disabled={ipfsStore.node || ipfsStore.starting || !sessionStore.username}
+        >
           Use js-ipfs
         </button>
         <button onClick={() => networkStore.stop()} disabled={!networkStore.isOnline}>
@@ -77,12 +80,14 @@ class DebugControlButtons extends React.Component {
         <button onClick={() => uiStore.toggleControlPanel()}>Toggle control panel</button>
         <button
           disabled={uiStore.sidePanelPosition === 'left'}
-          onClick={() => (uiStore.sidePanelPosition = 'left')}>
+          onClick={() => (uiStore.sidePanelPosition = 'left')}
+        >
           Left side
         </button>
         <button
           disabled={!uiStore.sidePanelPosition === 'right'}
-          onClick={() => (uiStore.sidePanelPosition = 'right')}>
+          onClick={() => (uiStore.sidePanelPosition = 'right')}
+        >
           Right side
         </button>
 
@@ -91,17 +96,20 @@ class DebugControlButtons extends React.Component {
 
         <button
           disabled={uiStore.themeName === 'Default'}
-          onClick={() => (uiStore.themeName = 'Default')}>
+          onClick={() => (uiStore.themeName = 'Default')}
+        >
           Set default theme
         </button>
         <button
           disabled={uiStore.themeName === 'Green'}
-          onClick={() => (uiStore.themeName = 'Green')}>
+          onClick={() => (uiStore.themeName = 'Green')}
+        >
           Set green theme
         </button>
         <button
           disabled={uiStore.themeName === 'Blue1'}
-          onClick={() => (uiStore.themeName = 'Blue1')}>
+          onClick={() => (uiStore.themeName = 'Blue1')}
+        >
           Set blue theme
         </button>
 
@@ -118,12 +126,14 @@ class DebugControlButtons extends React.Component {
 
         <button
           disabled={uiStore.colorifyUsernames}
-          onClick={() => (uiStore.colorifyUsernames = true)}>
+          onClick={() => (uiStore.colorifyUsernames = true)}
+        >
           Set colorifyUsernames to true
         </button>
         <button
           disabled={!uiStore.colorifyUsernames}
-          onClick={() => (uiStore.colorifyUsernames = false)}>
+          onClick={() => (uiStore.colorifyUsernames = false)}
+        >
           Set colorifyUsernames to false
         </button>
 
@@ -140,28 +150,33 @@ class DebugControlButtons extends React.Component {
 
         <button
           disabled={uiStore.emojiSet === 'emojione'}
-          onClick={() => (uiStore.emojiSet = 'emojione')}>
+          onClick={() => (uiStore.emojiSet = 'emojione')}
+        >
           Set emojiSet to emojione
         </button>
         <button
           disabled={uiStore.emojiSet === 'google'}
-          onClick={() => (uiStore.emojiSet = 'google')}>
+          onClick={() => (uiStore.emojiSet = 'google')}
+        >
           Set emojiSet to google
         </button>
         <button
           disabled={uiStore.emojiSet === 'apple'}
-          onClick={() => (uiStore.emojiSet = 'apple')}>
+          onClick={() => (uiStore.emojiSet = 'apple')}
+        >
           Set emojiSet to apple
         </button>
         <br />
         <button
           disabled={uiStore.emojiSet === 'facebook'}
-          onClick={() => (uiStore.emojiSet = 'facebook')}>
+          onClick={() => (uiStore.emojiSet = 'facebook')}
+        >
           Set emojiSet to facebook
         </button>
         <button
           disabled={uiStore.emojiSet === 'twitter'}
-          onClick={() => (uiStore.emojiSet = 'twitter')}>
+          onClick={() => (uiStore.emojiSet = 'twitter')}
+        >
           Set emojiSet to twitter
         </button>
 
@@ -172,7 +187,8 @@ class DebugControlButtons extends React.Component {
         </button>
         <button
           disabled={!uiStore.useLargeMessage}
-          onClick={() => (uiStore.useLargeMessage = false)}>
+          onClick={() => (uiStore.useLargeMessage = false)}
+        >
           Set useLargeMessage to false
         </button>
 
@@ -180,12 +196,14 @@ class DebugControlButtons extends React.Component {
 
         <button
           disabled={uiStore.useMonospaceFont}
-          onClick={() => (uiStore.useMonospaceFont = true)}>
+          onClick={() => (uiStore.useMonospaceFont = true)}
+        >
           Set useMonospaceFont to true
         </button>
         <button
           disabled={!uiStore.useMonospaceFont}
-          onClick={() => (uiStore.useMonospaceFont = false)}>
+          onClick={() => (uiStore.useMonospaceFont = false)}
+        >
           Set useMonospaceFont to false
         </button>
 

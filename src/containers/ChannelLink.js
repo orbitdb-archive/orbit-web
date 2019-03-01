@@ -13,15 +13,16 @@ function ChannelLink ({ channel, theme, ...navLinkProps }) {
     <Observer>
       {() => (
         <NavLink
-          to={`/channel/${channel.name}`}
-          key={channel.name}
+          to={`/channel/${channel.channelName}`}
+          key={channel.channelName}
           className={classNames('ChannelLink', {
             hasUnreadMessages: channel.hasUnreadMessages,
             hasMentions: channel.hasMentions
           })}
           style={theme}
-          {...navLinkProps}>
-          #{channel.name}
+          {...navLinkProps}
+        >
+          #{channel.channelName}
           {channel.hasUnreadMessages ? (
             <span className="unreadMessages">{channel.unreadMessages.length}</span>
           ) : null}
