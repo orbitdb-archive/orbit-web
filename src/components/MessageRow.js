@@ -1,7 +1,8 @@
 'use strict'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 import { useInView } from 'react-intersection-observer'
 
 import { MessageContent, MessageTimestamp, MessageUser, MessageUserAvatar } from './MessageParts'
@@ -13,12 +14,20 @@ function MessageRow ({
   colorifyUsernames,
   useLargeMessage,
   highlightWords,
-  onInViewChange,
+  onInView,
   onMessageUserClick,
+  onInViewRoot,
   ...messageContentProps
 }) {
-  const [inViewRef, inView] = useInView({ triggerOnce: true })
-  if (inView) onInViewChange()
+  const [inViewRef, inView] = useInView({
+    root: onInViewRoot,
+    threshold: 0.5,
+    triggerOnce: true
+  })
+
+  useEffect(() => {
+    if (inView && typeof onInView === 'function') onInView(message)
+  }, [inView])
 
   const isCommand = message.content && message.content.startsWith('/me')
 
@@ -70,7 +79,7 @@ function MessageRow ({
   )
 
   return (
-    <div className="Message" ref={inViewRef}>
+    <div className={classNames('Message', { unread: message.unread })} ref={inViewRef}>
       {useLargeMessage ? <MessageUserAvatar message={message} /> : null}
       {content}
     </div>
@@ -82,7 +91,8 @@ MessageRow.propTypes = {
   colorifyUsernames: PropTypes.bool,
   useLargeMessage: PropTypes.bool,
   highlightWords: PropTypes.array,
-  onInViewChange: PropTypes.func.isRequired,
+  onInView: PropTypes.func,
+  onInViewRoot: PropTypes.instanceOf(Element),
   onMessageUserClick: PropTypes.func,
   loadFile: PropTypes.func.isRequired
 }
