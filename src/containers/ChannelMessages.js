@@ -4,6 +4,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { observer } from 'mobx-react'
 import classNames from 'classnames'
+import { InView } from 'react-intersection-observer'
 
 import getMousePosition from '../utils/mouse-position'
 
@@ -22,11 +23,16 @@ class ChannelMessages extends React.Component {
 
   constructor (props) {
     super(props)
+
+    this.state = {
+      stayAtBottom: true
+    }
+
     this.messagesEl = React.createRef()
     this.messagesEnd = React.createRef()
     this.updateViewPosition = this.updateViewPosition.bind(this)
     this.onMessageUserClick = this.onMessageUserClick.bind(this)
-    this.onFirstMessageClick = this.onFirstMessageClick.bind(this)
+    this.onFirstMessageInteract = this.onFirstMessageInteract.bind(this)
   }
 
   componentDidMount () {
@@ -41,23 +47,7 @@ class ChannelMessages extends React.Component {
     // Prevent excessive function calls
     if (!this.messagesEnd.current || this.props.channel.loadingHistory) return
 
-    /*
-     * If the bottom of the visible messages is under or exactly
-     * 300 pixels from the bottom of all messages,
-     * scroll to the latest message in the bottom of messagesEl.
-     */
-    if (
-      this.messagesEl.current.scrollHeight - this.messagesEl.current.scrollTop <=
-      this.messagesEl.current.clientHeight + 300
-    ) {
-      this.messagesEnd.current.scrollIntoView()
-    } else {
-      /*
-       * Prevent unwanted subsequent calls to channel.loadMore() by scrolling
-       * down so that the load more messages element is not in the view.
-       */
-      this.messagesEl.current.scrollTop = 50
-    }
+    if (this.state.stayAtBottom) this.messagesEnd.current.scrollIntoView()
   }
 
   onMessageUserClick (evt, profile, identity) {
@@ -69,12 +59,6 @@ class ChannelMessages extends React.Component {
     const mousePosition = getMousePosition(evt)
 
     uiStore.openUserProfilePanel({ identity, profile }, mousePosition)
-  }
-
-  onFirstMessageClick (evt) {
-    const { channel } = this.props
-    evt.preventDefault()
-    channel.loadMore()
   }
 
   renderMessages () {
@@ -90,19 +74,20 @@ class ChannelMessages extends React.Component {
 
       if (date.getDate() !== prevDate) {
         prevDate = date.getDate()
-        els.push(<MessagesDateSeparator key={date} date={date} locale={language} />)
+        els.push(
+          <MessagesDateSeparator key={'date-sep-' + date.getTime()} date={date} locale={language} />
+        )
       }
 
       els.push(
         <MessageRow
-          key={message.hash}
+          key={'message-' + message.hash}
           message={message}
           colorifyUsernames={colorifyUsernames}
           useLargeMessage={useLargeMessage}
           highlightWords={[sessionStore.username]}
-          onInViewChange={() => {
-            if (message.unread) channel.markMessageAsRead(message)
-          }}
+          onInView={channel.markMessageAsRead}
+          onInViewRoot={this.messagesEl.current}
           onMessageUserClick={this.onMessageUserClick}
           loadFile={channel.loadFile}
           theme={theme}
@@ -113,6 +98,12 @@ class ChannelMessages extends React.Component {
 
       return els
     }, [])
+  }
+
+  onFirstMessageInteract () {
+    this.setState({ stayAtBottom: false }, () => {
+      this.props.channel.loadMore()
+    })
   }
 
   render () {
@@ -135,11 +126,18 @@ class ChannelMessages extends React.Component {
           channelName={channel.channelName}
           loading={channel.loadingHistory}
           hasMoreHistory={channel.hasMoreHistory}
-          onClick={this.onFirstMessageClick}
-          observeReaction={() => channel.loadMore()}
+          onClick={this.onFirstMessageInteract}
+          onInView={this.onFirstMessageInteract}
+          onInViewRoot={this.messagesEl.current}
         />
         {messageEls}
-        <span className="messagesEnd" ref={this.messagesEnd} />
+        <InView
+          onChange={inView => {
+            if (inView) this.setState({ stayAtBottom: true })
+          }}
+        >
+          <span className="messagesEnd" ref={this.messagesEnd} />
+        </InView>
       </div>
     )
   }

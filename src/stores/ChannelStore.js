@@ -271,6 +271,7 @@ export default class ChannelStore {
 
   @action.bound
   markMessageAsRead (message) {
+    if (!message.unread) return
     this.entries.filter(e => e.cid === message.hash).forEach(this.markEntryAsRead)
   }
 
