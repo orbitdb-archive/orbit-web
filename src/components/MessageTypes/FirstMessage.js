@@ -1,21 +1,15 @@
 'use strict'
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { useTranslation } from 'react-i18next'
-import { useInView } from 'react-intersection-observer'
 
-function FirstMessage ({ loading, hasMoreHistory, channelName, onInView, onInViewRoot, ...rest }) {
+function FirstMessage ({ loading, hasMoreHistory, channelName, ...rest }) {
   const [t] = useTranslation()
-  const [inViewRef, inView] = useInView({ root: onInViewRoot, threshold: 1 })
-
-  useEffect(() => {
-    if (inView && typeof onInView === 'function') onInView()
-  }, [inView])
 
   return (
-    <div className={classNames('firstMessage', { hasMoreHistory })} ref={inViewRef} {...rest}>
+    <div className={classNames('firstMessage', { hasMoreHistory })} {...rest}>
       {loading
         ? t('channel.loadingHistory')
         : hasMoreHistory
@@ -28,9 +22,7 @@ function FirstMessage ({ loading, hasMoreHistory, channelName, onInView, onInVie
 FirstMessage.propTypes = {
   loading: PropTypes.bool.isRequired,
   hasMoreHistory: PropTypes.bool.isRequired,
-  channelName: PropTypes.string.isRequired,
-  onInView: PropTypes.func,
-  onInViewRoot: PropTypes.instanceOf(Element)
+  channelName: PropTypes.string.isRequired
 }
 
 export default FirstMessage

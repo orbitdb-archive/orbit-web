@@ -343,6 +343,10 @@ input[type="button"],
       padding-bottom: 0.4em;
     }
   }
+
+  &.hasNewerMessages {
+    border-bottom: 2px solid $second-color;
+  }
 }
 
 .flopped {
