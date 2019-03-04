@@ -14,19 +14,19 @@ function MessageRow ({
   colorifyUsernames,
   useLargeMessage,
   highlightWords,
-  onInView,
   onMessageUserClick,
-  onInViewRoot,
+  onMessageInView,
+  messageInViewRoot,
   ...messageContentProps
 }) {
   const [inViewRef, inView] = useInView({
-    root: onInViewRoot,
+    root: messageInViewRoot,
     threshold: 0.5,
     triggerOnce: true
   })
 
   useEffect(() => {
-    if (inView && typeof onInView === 'function') onInView(message)
+    if (inView && typeof onMessageInView === 'function') onMessageInView(message)
   }, [inView])
 
   const isCommand = message.content && message.content.startsWith('/me')
@@ -91,8 +91,8 @@ MessageRow.propTypes = {
   colorifyUsernames: PropTypes.bool,
   useLargeMessage: PropTypes.bool,
   highlightWords: PropTypes.array,
-  onInView: PropTypes.func,
-  onInViewRoot: PropTypes.instanceOf(Element),
+  onMessageInView: PropTypes.func,
+  messageInViewRoot: PropTypes.instanceOf(Element),
   onMessageUserClick: PropTypes.func,
   loadFile: PropTypes.func.isRequired
 }
