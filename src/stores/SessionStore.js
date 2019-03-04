@@ -59,7 +59,8 @@ export default class SessionStore {
   _cacheUser (user) {
     if (user) {
       cookies.setCookie(cookieKey, user.username, 1)
-    } else {
+        }
+    else {
       cookies.expireCookie(cookieKey)
     }
   }

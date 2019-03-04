@@ -17,6 +17,10 @@ import RootStoreContext from '../context/RootStoreContext'
 
 import '../styles/LoginView.scss'
 
+import { CookieStorage } from 'cookie-storage';
+
+const cookieStorage = new CookieStorage();
+
 const BackgroundAnimation = LoadAsync({
   loader: () =>
     import(/* webpackChunkName: "BackgroundAnimation" */ '../components/BackgroundAnimation')
@@ -47,11 +51,26 @@ class LoginView extends React.Component {
     uiStore.closeControlPanel()
   }
 
-  onConfigure () {
+  async onConfigure () {
     logger.warn('Settings view not implemented')
+    var databases = await indexedDB.databases()
+    for(var i=0; i < cookieStorage.length ; i++ )
+      cookieStorage.removeItem(cookieStorage.key(i))
+    for (var i = 0; i < databases.length; i++){
+      var database = await databases[i]
+      indexedDB.deleteDatabase(database.name)
+      logger.warn(databases[i].name+' Deleted Successfully')
+      }   
+    var backup = [{}]
+    for (var i = 0; i < localStorage.length; i++){
+      var key = localStorage.key(i)   
+      var value = localStorage.getItem(key)
+      backup[key]=value
+    }  
+    logger.warn('BackupCompleted')
   }
 
-  onLogin (e, username) {
+  onLogin (e, username, password) {
     const { sessionStore } = this.context
 
     e.preventDefault()

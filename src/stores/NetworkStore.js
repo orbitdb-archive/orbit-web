@@ -8,6 +8,10 @@ import OrbitStore from './OrbitStore'
 
 import Logger from '../utils/logger'
 
+
+//const OrbitDB = require('orbit-db')
+
+
 configure({ enforceActions: 'observed' })
 
 const logger = new Logger()
@@ -158,7 +162,20 @@ export default class NetworkStore {
 
     await this.ipfsStore.useEmbeddedIPFS()
     const orbitNode = await this.orbitStore.init(this.ipfs)
-
+    
+    try{
+    const db=await orbitNode._orbitdb.open('/orbitdb/QmRnETbQ2bL12xPQQTRLAgkPGCE5pD8XJzefn6prJJd6ND/UsersCredentials',{directory: '/orbitdb/QmRnETbQ2bL12xPQQTRLAgkPGCE5pD8XJzefn6prJJd6ND'})
+    //const db = await orbitdb.open('/orbitdb/QmT5gJhVMULVGvWUcjHmwMrfE71C4MyG1rTpkrqwZigJF7/users',{create:true,type:'keyvalue',write: ['*']})
+    logger.warn("HI HI HI")
+    await db.set('dev','{"dev":"DEVELOPER"}')
+    const result = await db.get('dev')
+    logger.warn(result,'....Fetching')
+    await db.stop()
+    }
+    catch(err)
+    {
+      logger.error(err.message)
+    }
     orbitNode.events.on('joined', this._onJoinedChannel)
     orbitNode.events.on('left', this._onLeftChannel)
     orbitNode.events.on('peers', this._onSwarmPeerUpdate)

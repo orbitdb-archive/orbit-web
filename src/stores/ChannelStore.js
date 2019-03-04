@@ -9,7 +9,7 @@ configure({ enforceActions: 'observed' })
 
 const logger = new Logger()
 
-const loadAmount = 10 // How many entries are loaded per load call
+const loadAmount = 20 // How many entries are loaded per load call
 
 export default class ChannelStore {
   constructor ({ network, orbitChannel }) {

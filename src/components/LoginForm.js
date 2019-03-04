@@ -10,19 +10,24 @@ import '../styles/InputField.scss'
 
 function LoginForm ({ theme, onSubmit, setUsernameInputRef }) {
   const [t] = useTranslation()
-  const [currentLength, setCurrentLength] = useState(0)
+  const [usernameLength, setUsernameLength] = useState(0)
+  const [passwordLength, setPasswordLength] = useState(0)
 
   const usernameInputRef = useRef()
+  const passwordInputRef = useRef()
+  var PasswordRequired = false
 
   useEffect(() => {
     if (typeof setUsernameInputRef === 'function') setUsernameInputRef(usernameInputRef)
+    if (typeof setPasswordInputRef === 'function') setPasswordInputRef(passwordInputRef)
     return () => {
       if (typeof setUsernameInputRef === 'function') setUsernameInputRef(null)
-    }
+      if (typeof setPasswordInputRef === 'function') setPasswordInputRef(null)
+    }    
   })
 
   return (
-    <form onSubmit={e => onSubmit(e, usernameInputRef.current.value.trim())}>
+    <form onSubmit={e => passwordLength > 0 ?(onSubmit(e, usernameInputRef.current.value.trim(),passwordInputRef.current.value.trim())):(PasswordRequired=true)}>
       <CSSTransitionGroup
         transitionName="loginScreenAnimation"
         transitionAppear={true}
@@ -35,15 +40,26 @@ function LoginForm ({ theme, onSubmit, setUsernameInputRef }) {
           <input
             ref={usernameInputRef}
             type="text"
-            placeholder={t('login.nickname')}
+            placeholder={t('Email')}
             maxLength="32"
             autoFocus
             style={theme}
-            onChange={() => setCurrentLength(usernameInputRef.current.value.length)}
+            onChange={() => setUsernameLength(usernameInputRef.current.value.length)}
+          />
+        </div>
+        <div className="usernameRow" >
+          <input  
+            ref={passwordInputRef}          
+            type="password"
+            placeholder={t('Password')}
+            maxLength="32"
+            style={theme}
+            onChange={() => setPasswordLength(passwordInputRef.current.value.length)}
           />
         </div>
         <div className="connectButtonRow">
-          <span className="hint">{currentLength > 0 ? t('login.pressEnterToLogin') : null}</span>
+          <span className="hint">{usernameLength > 0 ? t('login.pressEnterToLogin') : PasswordRequired=false }</span>
+          <span className="hint">{usernameLength > 0 ? null : (PasswordRequired = true ? t('Please provide the username and password'): null )}</span>
           <input type="submit" value="Connect" style={{ display: 'none' }} />
         </div>
       </CSSTransitionGroup>

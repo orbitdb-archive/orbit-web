@@ -32,6 +32,7 @@ export default class OrbitStore {
     if (typeof callback === 'function') callback(node)
   }
 
+  
   @action.bound
   onStopped (callback) {
     logger.info('orbit node stopped')
