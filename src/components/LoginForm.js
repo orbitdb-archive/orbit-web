@@ -23,7 +23,7 @@ function LoginForm ({ theme, onSubmit, setUsernameInputRef }) {
     return () => {
       if (typeof setUsernameInputRef === 'function') setUsernameInputRef(null)
       if (typeof setPasswordInputRef === 'function') setPasswordInputRef(null)
-    }    
+    }
   })
 
   return (
@@ -55,7 +55,7 @@ function LoginForm ({ theme, onSubmit, setUsernameInputRef }) {
             maxLength="32"
             style={theme}
             onChange={() => setPasswordLength(passwordInputRef.current.value.length)}
-          />
+           />
         </div>
         <div className="connectButtonRow">
           <span className="hint">{usernameLength > 0 ? t('login.pressEnterToLogin') : PasswordRequired=false }</span>

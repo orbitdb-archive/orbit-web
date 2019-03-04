@@ -9,7 +9,7 @@ function IndexView () {
   const { uiStore } = useContext(RootStoreContext)
 
   useEffect(() => {
-    uiStore.setTitle('Orbit')
+    uiStore.setTitle('IPFS ORBIT')
     uiStore.openControlPanel()
   })
 

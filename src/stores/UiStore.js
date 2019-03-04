@@ -61,7 +61,7 @@ export default class UiStore {
   _userProfilePanelUser = null
 
   @observable
-  _title = 'Orbit'
+  _title = 'IPFS-ORBIT'
 
   // Private static methods
 

@@ -30,7 +30,7 @@ function Channel ({ channelName }) {
   useEffect(handleChannelNameChange, [channelName])
 
   function handleChannelNameChange () {
-    uiStore.setTitle(`#${channelName} | Orbit`)
+    uiStore.setTitle(`#${channelName} | IPFS ORBIT`)
     uiStore.setCurrentChannelName(channelName)
 
     networkStore.joinChannel(channelName).then(channel => {

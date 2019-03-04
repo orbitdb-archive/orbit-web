@@ -24,7 +24,7 @@ class LoadingView extends React.Component {
 
   componentDidMount () {
     const { uiStore } = this.context
-    uiStore.setTitle('Loading | Orbit')
+    uiStore.setTitle('Loading')
   }
 
   render () {

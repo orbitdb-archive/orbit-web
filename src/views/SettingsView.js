@@ -37,7 +37,7 @@ class SettingsView extends React.Component {
   componentDidMount () {
     const { uiStore } = this.context
     const { t } = this.props
-    uiStore.setTitle(`${t('viewNames.settings')} | Orbit`)
+    uiStore.setTitle(`${t('viewNames.settings')} | IPFS ORBIT`)
   }
 
   handleChange (e, field) {

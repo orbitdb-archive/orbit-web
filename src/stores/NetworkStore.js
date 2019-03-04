@@ -49,7 +49,7 @@ export default class NetworkStore {
 
   // Public instance variables
 
-  networkName = 'Orbit DEV Network'
+  networkName = 'IPFS Orbit DEV Network'
 
   @observable
   channels = {}

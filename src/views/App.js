@@ -88,7 +88,7 @@ function AppView () {
       </Switch>
 
       {/* Render an alpha disclaimer on login page */}
-      <Route exact path={loginPath} component={AlphaDisclaimer} />
+      <Route exact path={loginPath} component={IndexView} />
     </div>
   )
 }

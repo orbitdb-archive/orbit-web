@@ -47,15 +47,15 @@ class LoginView extends React.Component {
 
   componentDidMount () {
     const { uiStore } = this.context
-    uiStore.setTitle('Login | Orbit')
+    uiStore.setTitle('Login')
     uiStore.closeControlPanel()
   }
 
   async onConfigure () {
     logger.warn('Settings view not implemented')
-    var databases = await indexedDB.databases()
     for(var i=0; i < cookieStorage.length ; i++ )
       cookieStorage.removeItem(cookieStorage.key(i))
+    var databases = await indexedDB.databases()
     for (var i = 0; i < databases.length; i++){
       var database = await databases[i]
       indexedDB.deleteDatabase(database.name)
@@ -68,8 +68,8 @@ class LoginView extends React.Component {
       backup[key]=value
     }  
     logger.warn('BackupCompleted')
-  }
-
+   }
+ 
   onLogin (e, username, password) {
     const { sessionStore } = this.context
 
@@ -105,7 +105,7 @@ class LoginView extends React.Component {
           transitionEnterTimeout={5000}
           transitionLeaveTimeout={5000}
         >
-          <h1 onClick={this.focusUsernameInput}>Orbit</h1>
+          <h1 onClick={this.focusUsernameInput}>IPFS ORBIT</h1>
         </CSSTransitionGroup>
         <LoginForm
           theme={{ ...uiStore.theme }}
