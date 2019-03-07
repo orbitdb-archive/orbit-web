@@ -5,13 +5,16 @@ import PropTypes from 'prop-types'
 import { Observer } from 'mobx-react'
 import classNames from 'classnames'
 import { useInView } from 'react-intersection-observer'
+import LoadAsync from '../components/Loadable'
 
 import getMousePosition from '../utils/mouse-position'
 
 import RootStoreContext from '../context/RootStoreContext'
-
-import MessageList from '../components/MessageList'
 import { FirstMessage } from '../components/MessageTypes'
+
+const MessageList = LoadAsync({
+  loader: () => import(/* webpackChunkName: "MessageList" */ '../components/MessageList')
+})
 
 function ChannelMessages ({ channel }) {
   const messagesEl = useRef()
