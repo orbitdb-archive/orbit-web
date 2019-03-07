@@ -4,14 +4,23 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { CSSTransitionGroup } from 'react-transition-group'
 import { useTranslation } from 'react-i18next'
-
-import PreviewAudioFile from './PreviewAudioFile'
-import PreviewImageFile from './PreviewImageFile'
-import PreviewTextFile from './PreviewTextFile'
-import PreviewVideoFile from './PreviewVideoFile'
+import LoadAsync from '../Loadable'
 
 import Logger from '../../utils/logger'
 import { isAudio, isImage, isVideo, toArrayBuffer } from '../../utils/file-helpers'
+
+const PreviewAudioFile = LoadAsync({
+  loader: () => import(/* webpackChunkName: "PreviewAudioFile" */ './PreviewAudioFile')
+})
+const PreviewImageFile = LoadAsync({
+  loader: () => import(/* webpackChunkName: "PreviewImageFile" */ './PreviewImageFile')
+})
+const PreviewTextFile = LoadAsync({
+  loader: () => import(/* webpackChunkName: "PreviewTextFile" */ './PreviewTextFile')
+})
+const PreviewVideoFile = LoadAsync({
+  loader: () => import(/* webpackChunkName: "PreviewVideoFile" */ './PreviewVideoFile')
+})
 
 const logger = new Logger()
 
