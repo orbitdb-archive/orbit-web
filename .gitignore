@@ -39,3 +39,6 @@ test/tests.bundle*
 dist/**/*.js.map
 
 dist
+
+# Bundle stats
+stats.json
