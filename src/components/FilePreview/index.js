@@ -16,8 +16,6 @@ import { isAudio, isImage, isVideo, toArrayBuffer } from '../../utils/file-helpe
 const logger = new Logger()
 
 async function loadPreviewContent (loadFunc, hash, name, mimeType) {
-  // TODO: Handle electron
-
   const fileIsAudio = isAudio(name)
   const fileIsImage = isImage(name)
   const fileIsVideo = isVideo(name)
@@ -41,7 +39,14 @@ async function loadPreviewContent (loadFunc, hash, name, mimeType) {
     } else if (fileIsImage) {
       return <PreviewImageFile src={srcUrl} />
     } else if (fileIsVideo) {
-      return <PreviewVideoFile src={srcUrl} stream={stream} filename={name} mimeType={mimeType} />
+      return (
+        <PreviewVideoFile
+          loadAsBlob={async () => loadFunc(hash, false)}
+          stream={stream}
+          filename={name}
+          mimeType={mimeType}
+        />
+      )
     } else {
       return <PreviewTextFile blob={blob} filename={name} />
     }
