@@ -15,6 +15,12 @@ function PreviewVideoFile ({ loadAsBlob, stream, filename, mimeType, ...rest }) 
 
   const [url, setUrl] = useState(window.URL.createObjectURL(source))
 
+  async function loadBlob () {
+    const { buffer } = await loadAsBlob()
+    const blob = new Blob([toArrayBuffer(buffer)], { type: mimeType })
+    setUrl(window.URL.createObjectURL(blob))
+  }
+
   function processStream () {
     if (!fallback) {
       const sourceBuffer = source.sourceBuffers.length === 0 && source.addSourceBuffer(codec)
@@ -43,6 +49,8 @@ function PreviewVideoFile ({ loadAsBlob, stream, filename, mimeType, ...rest }) 
         })
         stream.on('error', e => console.error(e))
       }
+    } else {
+      loadBlob()
     }
   }
 
@@ -50,18 +58,7 @@ function PreviewVideoFile ({ loadAsBlob, stream, filename, mimeType, ...rest }) 
     processStream()
   })
 
-  return (
-    <video
-      controls
-      autoPlay={true}
-      src={url}
-      onError={async () => {
-        const { buffer } = await loadAsBlob()
-        const blob = new Blob([toArrayBuffer(buffer)], { type: mimeType })
-        setUrl(window.URL.createObjectURL(blob))
-      }}
-    />
-  )
+  return <video controls autoPlay={true} src={url} onError={() => loadBlob()} />
 }
 
 PreviewVideoFile.propTypes = {
