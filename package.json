@@ -49,7 +49,7 @@
     "ipfs-http-client": "^29.1.1",
     "mobx": "^5.5.2",
     "mobx-react": "^5.4.2",
-    "orbit_": "github:orbitdb/orbit-core#dev/overall-refactor",
+    "orbit_": "github:orbitdb/orbit-core#dev/overall-refactor-debug",
     "pleasejs": "^0.4.2",
     "prop-types": "^15.6.2",
     "react": "^16.8.1",
