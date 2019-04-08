@@ -7,6 +7,7 @@ import classNames from 'classnames'
 import { useInView } from 'react-intersection-observer'
 
 import getMousePosition from '../utils/mouse-position'
+import { debounce } from '../utils/throttle'
 
 import RootStoreContext from '../context/RootStoreContext'
 
@@ -20,11 +21,23 @@ function ChannelMessages ({ channel }) {
   const [topRef, topInView] = useInView({ root: messagesEl.current })
   const [bottomRef, bottomInView] = useInView({ root: messagesEl.current, rootMargin: '50px' })
 
+  const debounceOnScroll = debounce(onScroll, 100, true)
+
   // When top in view
   useEffect(onTopInteract, [topInView])
 
   // When bottom in view
   useEffect(onBottomInteract, [bottomInView])
+
+  // Handle scroll and touch events
+  useEffect(() => {
+    document.addEventListener('wheel', debounceOnScroll, { passive: true })
+    document.addEventListener('touchmove', debounceOnScroll, { passive: true })
+    return () => {
+      document.removeEventListener('wheel', debounceOnScroll)
+      document.removeEventListener('touchmove', debounceOnScroll)
+    }
+  })
 
   function updateViewPosition () {
     // Prevent calls in rendering edge cases
@@ -37,7 +50,13 @@ function ChannelMessages ({ channel }) {
     if (atBottom) messagesEl.current.scrollTop = messagesEl.current.scrollHeight
   }
 
+  function onScroll (e) {
+    if (e.deltaY >= 0) return
+    onTopInteract()
+  }
+
   function onTopInteract () {
+    if (channel.loadingHistory) return
     if (topInView) channel.loadMore()
   }
 
