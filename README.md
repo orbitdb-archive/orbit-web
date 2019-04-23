@@ -1,6 +1,6 @@
 # Orbit Web
 
-[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/orbitdb/Lobby)
+[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/orbitdb/Lobby) [![CircleCI](https://circleci.com/gh/orbitdb/orbit-web/tree/master.svg?style=shield)](https://circleci.com/gh/orbitdb/orbit-web/tree/master)
 
 > A distributed, peer-to-peer chat application built on [IPFS](http://ipfs.io)
 
