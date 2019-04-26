@@ -11,7 +11,8 @@
     "mocha": true
   },
   "globals": {
-    "ipcRenderer": true
+    "ipcRenderer": true,
+    "cy": true
   },
   "rules": {
     "max-len": [
