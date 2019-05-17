@@ -39,3 +39,5 @@ test/tests.bundle*
 dist/**/*.js.map
 
 dist
+
+.env
