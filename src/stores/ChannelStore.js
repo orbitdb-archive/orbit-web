@@ -191,7 +191,7 @@ export default class ChannelStore {
 
     const newEntries = entries
       // Filter out entries we already have
-      .filter(e => oldCIDs.indexOf(e.cid) === -1)
+      .filter(e => !oldCIDs.includes(e.cid))
       // Set entries as seen
       .map(e => Object.assign(e, { seen: e.payload.value.meta.ts <= lastSeenTimestamp }))
 
