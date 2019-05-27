@@ -47,7 +47,20 @@ class ControlPanel extends React.Component {
   }
 
   componentDidMount () {
+    const {
+      networkStore: {
+        defaultChannels = [],
+        settingsStore: {
+          networkSettings: { channels = [] }
+        }
+      }
+    } = this.context
     this.focusJoinChannelInput()
+    if (channels.length === 1) {
+      this.redirect(`/channel/${channels[0]}`)
+    } else if (channels.every(channel => defaultChannels.includes(channel))) {
+      this.redirect('/channel/orbitdb')
+    }
   }
 
   componentDidUpdate () {
