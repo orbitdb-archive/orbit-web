@@ -53,6 +53,9 @@ export default class NetworkStore {
   @observable
   swarmPeers = []
 
+  @observable
+  defaultChannels = ['orbitdb']
+
   // Public instance getters
 
   @computed
@@ -94,7 +97,7 @@ export default class NetworkStore {
 
   @action.bound
   _onJoinedChannel (channelName) {
-    if (this.channelNames.indexOf(channelName) !== -1) return
+    if (this.channelNames.includes(channelName)) return
 
     const orbitChannel = this.orbit.channels[channelName]
     this.channels[channelName] = new ChannelStore({
@@ -139,7 +142,7 @@ export default class NetworkStore {
 
   async joinChannel (channelName) {
     if (!this.isOnline) throw new Error('Network is not online')
-    if (this.channelNames.indexOf(channelName) === -1) {
+    if (!this.channelNames.includes(channelName)) {
       await this.orbit.join(channelName)
     }
     return this.channels[channelName]
@@ -147,7 +150,7 @@ export default class NetworkStore {
 
   async leaveChannel (channelName) {
     if (!this.isOnline) throw new Error('Network is not online')
-    if (this.channelNames.indexOf(channelName) !== -1) {
+    if (this.channelNames.includes(channelName)) {
       await this.orbit.leave(channelName)
     }
   }
@@ -165,6 +168,11 @@ export default class NetworkStore {
 
     // Join all channnels that are saved in localstorage for current user
     this.settingsStore.networkSettings.channels.forEach(this.joinChannel)
+
+    // Join channels that should be joined by default
+    if (this.settingsStore.networkSettings.channels.length === 0) {
+      this.defaultChannels.forEach(this.joinChannel)
+    }
   }
 
   async stop () {
