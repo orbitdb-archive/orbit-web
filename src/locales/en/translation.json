@@ -11,7 +11,7 @@
       }
     },
     "loadingHistory": "Loading history...",
-    "loadMore": "Click to load older messages",
+    "loadMore": "Click or scroll up to load older messages",
     "sendMessagePlaceholder": "Type a message...",
     "status": {
       "users": "user",
