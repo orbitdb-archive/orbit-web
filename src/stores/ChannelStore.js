@@ -85,13 +85,8 @@ export default class ChannelStore {
   }
 
   @computed
-  get entryCIDs () {
-    return this.entries.map(e => e.cid)
-  }
-
-  @computed
   get entryHashes () {
-    return this.entryCIDs
+    return this.entries.map(e => e.hash)
   }
 
   @computed
@@ -114,7 +109,7 @@ export default class ChannelStore {
     // Format entries to better suit a chat channel
     return this.entries.map(entry =>
       Object.assign(JSON.parse(JSON.stringify(entry.payload.value)), {
-        hash: entry.cid,
+        hash: entry.hash,
         userIdentity: entry.identity,
         unread: !entry.seen
       })
@@ -186,12 +181,12 @@ export default class ChannelStore {
 
   @action.bound
   _updateEntries (entries) {
-    const oldCIDs = this.entryCIDs
+    const oldHashes = this.entryHashes
     const { lastSeenTimestamp = 0 } = this._storableState
 
     const newEntries = entries
       // Filter out entries we already have
-      .filter(e => !oldCIDs.includes(e.cid))
+      .filter(e => !oldHashes.includes(e.hash))
       // Set entries as seen
       .map(e => Object.assign(e, { seen: e.payload.value.meta.ts <= lastSeenTimestamp }))
 
@@ -272,7 +267,7 @@ export default class ChannelStore {
   @action.bound
   markMessageAsRead (message) {
     if (!message.unread) return
-    this.entries.filter(e => e.cid === message.hash).forEach(this.markEntryAsRead)
+    this.entries.filter(e => e.hash === message.hash).forEach(this.markEntryAsRead)
   }
 
   sendMessage (text) {

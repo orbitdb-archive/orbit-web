@@ -11,7 +11,7 @@
       }
     },
     "loadingHistory": "Histórico de carregamento...",
-    "loadMore": "Clique para carregar mensagens antigas",
+    "loadMore": "Clique ou role para cima para carregar mensagens antigas",
     "sendMessagePlaceholder": "Digite uma mensagem",
     "status": {
       "users": "Usário",
