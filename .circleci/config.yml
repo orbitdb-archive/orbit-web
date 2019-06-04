@@ -5,6 +5,9 @@ jobs:
       - image: circleci/node:10
     steps:
       - checkout
+      - run:
+          name: install puppeteer
+          command: "sh .circleci/setup.sh"
       - run: npm install
       - run: npm run build
       - run: npm test
