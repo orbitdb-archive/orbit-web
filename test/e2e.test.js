@@ -8,19 +8,34 @@ const channelName2 = 'testchannel2'
 const username = 'testuser'
 const testMessage = 'testing testing'
 
+jest.setTimeout(30000)
+
 describe('User scenario', () => {
   beforeAll(async () => {
     await page.goto(baseUrl)
   })
   it('successfully loads', async () => {
+    await page.waitForSelector('h1')
     await expect(page).toMatchElement('h1', { text: 'Orbit' })
   })
   it('is able to log in', async () => {
+    await page.waitForSelector('input[type=text]')
     await expect(page).toFill('input[type=text]', username)
     await page.keyboard.press('Enter')
+    await page.waitForSelector('.username')
     await expect(page).toMatchElement('.username', { text: username })
   })
+  it('joins #orbitdb by default', async () => {
+    await page.waitForSelector('.Controls .SendMessage input[type=text]')
+    await page.waitForSelector('.Header .ChannelName .currentChannel')
+    await expect(page).toMatchElement('.Header .ChannelName .currentChannel', {
+      text: '#orbitdb'
+    })
+  })
   it('joins a channel', async () => {
+    await page.waitForSelector('.Header .ChannelName .currentChannel')
+    await expect(page).toClick('.Header .ChannelName .currentChannel')
+
     await page.waitForSelector('.JoinChannel span.field input[placeholder="Join channel"]')
     await expect(page).toFill(
       '.JoinChannel span.field input[placeholder="Join channel"]',
