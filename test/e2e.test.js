@@ -22,8 +22,12 @@ describe('User scenario', () => {
     await page.waitForSelector('input[type=text]')
     await expect(page).toFill('input[type=text]', username)
     await page.keyboard.press('Enter')
+    await page.waitForSelector('.Header .ChannelName .currentChannel')
+    await expect(page).toClick('.Header .ChannelName .currentChannel')
     await page.waitForSelector('.username')
+    await page.waitForSelector('.darkener')
     await expect(page).toMatchElement('.username', { text: username })
+    await expect(page).toClick('.darkener')
   })
   it('joins #orbitdb by default', async () => {
     await page.waitForSelector('.Controls .SendMessage input[type=text]')
@@ -83,16 +87,11 @@ describe('User scenario', () => {
   })
   it('is able to change channels', async () => {
     await page.waitForSelector('.Header .ChannelName .ChannelLink')
-    await expect(page).toClick('.Header .ChannelName .ChannelLink')
+    await expect(page).toClick('.Header .ChannelName .ChannelLink', { text: `#${channelName}` })
 
     await page.waitForSelector('.Header .ChannelName .currentChannel')
     await expect(page).toMatchElement('.Header .ChannelName .currentChannel', {
       text: `#${channelName}`
-    })
-
-    await page.waitForSelector('.Header .ChannelName .ChannelLink')
-    await expect(page).toMatchElement('.Header .ChannelName .ChannelLink', {
-      text: `#${channelName2}`
     })
   })
 })
