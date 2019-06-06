@@ -215,7 +215,6 @@ describe('User scenario', () => {
     await expect(page).toMatchElement('.ChannelLink', {
       text: '#orbitdb'
     })
-    await page.screenshot({ path: 'buddy-screenshot.png' })
     await expect(page).toMatchElement('.ChannelLink', {
       text: `#${channelName}`
     })
