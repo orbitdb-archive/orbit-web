@@ -60,7 +60,7 @@ describe('User scenario', () => {
     await page.waitForSelector('.Header .ChannelName .currentChannel')
     const currentChannel = await page.$eval(
       '.Header .ChannelName .currentChannel',
-      e => e.innerHTML
+      e => e.innerText
     )
     await expect(currentChannel).toBe('#orbitdb')
   })
@@ -83,7 +83,7 @@ describe('User scenario', () => {
     // Current channel name should equal "testchannel" in the header
     const currentChannel = await page.$eval(
       '.Header .ChannelName .currentChannel',
-      e => e.innerHTML
+      e => e.innerText
     )
     await expect(currentChannel).toBe(`#${channelName}`)
   })
@@ -104,9 +104,26 @@ describe('User scenario', () => {
     )
     const sentMessage = await page.$eval(
       '.Channel .Messages .Message .Message__Content .TextMessage .content div',
-      e => e.innerHTML.replace(/\s+/g, ' ').trim()
+      e => e.innerText.replace(/\s+/g, ' ').trim()
     )
     await expect(sentMessage).toBe(timedMessage)
+  })
+
+  it('sends another message to channel', async () => {
+    // Create a unique, timestamped message
+    timedMessage2 = testMessage + " I'm second " + Date.now()
+
+    // Fill in a message and send it
+    await page.waitForSelector('.Controls .SendMessage input[type=text]')
+    await page.click('.Controls .SendMessage input[type=text]')
+    await page.type('.Controls .SendMessage input[type=text]', timedMessage2)
+    await page.keyboard.press('Enter')
+
+    await page.waitFor(500)
+
+    // The sent message should show up in messages
+    const messages = await page.$$('.Channel .Messages .Message')
+    await expect(messages.length).toBe(2)
   })
 
   it('is able to join another channel', async () => {
@@ -143,33 +160,8 @@ describe('User scenario', () => {
     )
     const sentMessage = await page.$eval(
       '.Channel .Messages .Message .Message__Content .TextMessage .content div',
-      e => e.innerHTML.replace(/\s+/g, ' ').trim()
+      e => e.innerText.replace(/\s+/g, ' ').trim()
     )
     await expect(sentMessage).toBe(timedMessage3)
   })
-
-  /* it('is able to change channels', async () => {
-    // Press "testchannel" link in the header
-    await page.waitForSelector('.Header .ChannelName .ChannelLink')
-    await expect(page).toClick('.Header .ChannelName .ChannelLink', { text: `#${channelName}` })
-
-    // "testchannel" should be the current channel instead of "testchannel2"
-    await page.waitForSelector('.Header .ChannelName .currentChannel')
-    await expect(page).toMatchElement('.Header .ChannelName .currentChannel', {
-      text: `#${channelName}`
-    })
-  })
-
-  it('persists messages between channel changes', async () => {
-    // Both previously sent messages should be loaded in "testchannel"
-    await page.waitForSelector('.Channel .Messages .Message')
-    await expect(page).toMatch(timedMessage)
-    await expect(page).toMatch(timedMessage2)
-
-    // A previously sent message should be loaded on join in "testchannel2"
-    await page.waitForSelector('.Header .ChannelName .ChannelLink')
-    await expect(page).toClick('.Header .ChannelName .ChannelLink', { text: `#${channelName2}` })
-    await page.waitForSelector('.Channel .Messages .Message')
-    await expect(page).toMatch(timedMessage3)
-  }) */
 })
