@@ -2,8 +2,9 @@
 
 import { action, computed, configure, observable, reaction, runInAction, values } from 'mobx'
 
-import { throttleFunc } from '../utils/throttle'
+import { throttleFunc, debounce } from '../utils/throttle'
 import Logger from '../utils/logger'
+import notify from '../utils/notify'
 
 configure({ enforceActions: 'observed' })
 
@@ -175,7 +176,16 @@ export default class ChannelStore {
     this._sendingMessageCounter += 1
   }
 
+  sendNotification (payload) {
+    if (this.unreadMessages.length > 1) {
+      notify(`${this.unreadMessages.length} unread messages in #${this.channelName}`, '')
+    } else {
+      notify(`New message in #${this.channelName}`, `${payload.meta.from.name}: ${payload.content}`)
+    }
+  }
+
   _onNewEntry (entry) {
+    this.sendNotification(entry.payload.value)
     this._updateEntries([entry])
   }
 
