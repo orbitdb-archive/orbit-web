@@ -97,6 +97,26 @@ describe('User scenario', () => {
     )
   })
 
+  it('sends a video file to channel', async () => {
+    // Create a unique, timestamped message
+    timedMessage = testMessage + Date.now()
+
+    // Fill in a message and send it
+    await page.waitForSelector('.Controls .FileUploadButton input[type=file]')
+
+    const fileInput = await page.$('.FileUploadButton input[type=file]')
+    await fileInput.uploadFile('./sample.mp4')
+
+    // The sent message should show up in messages
+    await page.waitForSelector(
+      '.Channel .Messages .Message .Message__Content .TextMessage .content div'
+    ) /*
+    await expect(page).toMatchElement(
+      '.Channel .Messages .Message .Message__Content .TextMessage .content div',
+      { text: timedMessage }
+    ) */
+  })
+
   it('sends another message to channel', async () => {
     // Create a unique, timestamped message
     timedMessage2 = testMessage + " I'm second " + Date.now()
