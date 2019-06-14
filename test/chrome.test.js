@@ -1,4 +1,5 @@
 /* eslint-disable no-undef */
+
 require('@babel/polyfill')
 
 // URL of the http-server running the production build
@@ -98,23 +99,19 @@ describe('User scenario', () => {
   })
 
   it('sends a video file to channel', async () => {
-    // Create a unique, timestamped message
-    timedMessage = testMessage + Date.now()
+    // Upload the sample video from test directory to testchannel
+    await page.waitForSelector('#file')
+    const fileInput = await page.$('#file')
+    await fileInput.uploadFile('/home/jani/dev/projects/haja/orbit-web/test/sample.mp4')
 
-    // Fill in a message and send it
-    await page.waitForSelector('.Controls .FileUploadButton input[type=file]')
+    // The uploaded video's name should show in messages
+    await page.waitForSelector('.FileMessage .content .name')
+    /* await expect(page).toClick('.FileMessage .content .name')
 
-    const fileInput = await page.$('.FileUploadButton input[type=file]')
-    await fileInput.uploadFile('./sample.mp4')
-
-    // The sent message should show up in messages
-    await page.waitForSelector(
-      '.Channel .Messages .Message .Message__Content .TextMessage .content div'
-    ) /*
-    await expect(page).toMatchElement(
-      '.Channel .Messages .Message .Message__Content .TextMessage .content div',
-      { text: timedMessage }
-    ) */
+    // When the video's name is pressed, the video should be opened and start playing
+    await page.waitForSelector('.FilePreview video') */
+    /* const videoElement = await page.$('.FilePreview video')
+    await expect(videoElement.paused).toBe(false) */
   })
 
   it('sends another message to channel', async () => {
