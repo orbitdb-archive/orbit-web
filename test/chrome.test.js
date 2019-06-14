@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 
 require('@babel/polyfill')
+const path = require('path')
 
 // URL of the http-server running the production build
 const baseUrl = 'http://localhost:8001'
@@ -102,15 +103,15 @@ describe('User scenario', () => {
     // Upload the sample video from test directory to testchannel
     await page.waitForSelector('#file')
     const fileInput = await page.$('#file')
-    await fileInput.uploadFile('/home/jani/dev/projects/haja/orbit-web/test/sample.mp4')
+    await fileInput.uploadFile(path.join(__dirname, 'sample.mp4'))
 
     // The uploaded video's name should show in messages
     await page.waitForSelector('.FileMessage .content .name')
     /* await expect(page).toClick('.FileMessage .content .name')
 
     // When the video's name is pressed, the video should be opened and start playing
-    await page.waitForSelector('.FilePreview video') */
-    /* const videoElement = await page.$('.FilePreview video')
+    await page.waitForSelector('.FilePreview video')
+    const videoElement = await page.$('.FilePreview video')
     await expect(videoElement.paused).toBe(false) */
   })
 
