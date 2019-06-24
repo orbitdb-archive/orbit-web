@@ -4,6 +4,7 @@ import { action, computed, configure, observable, reaction, runInAction, values 
 
 import { throttleFunc } from '../utils/throttle'
 import Logger from '../utils/logger'
+import notify from '../utils/notify'
 
 configure({ enforceActions: 'observed' })
 
@@ -175,7 +176,27 @@ export default class ChannelStore {
     this._sendingMessageCounter += 1
   }
 
+  sendNotification (entry) {
+    const {
+      sessionStore: {
+        rootStore: { uiStore: currentChannelName }
+      }
+    } = this.network
+    const payload = entry.payload.value
+    if (document.hidden || this.channelName !== currentChannelName) {
+      if (this.unreadMessages.length > 1) {
+        notify(`${this.unreadMessages.length} unread messages in #${this.channelName}`, '')
+      } else {
+        notify(
+          `New message in #${this.channelName}`,
+          `${payload.meta.from.name}: ${payload.content}`
+        )
+      }
+    }
+  }
+
   _onNewEntry (entry) {
+    this.sendNotification(entry)
     this._updateEntries([entry])
   }
 

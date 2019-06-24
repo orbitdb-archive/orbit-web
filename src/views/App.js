@@ -8,6 +8,7 @@ import i18n from '../config/i18n.config'
 import RootStore from '../stores/RootStore'
 
 import { addDebug } from '../utils/debug'
+import { askPermission } from '../utils/notify'
 
 import PrivateRouteWithContext from '../containers/PrivateRouteWithContext'
 
@@ -29,6 +30,8 @@ rootStore.settingsStore.load()
 rootStore.sessionStore.loadFromCache()
 
 addDebug({ rootStore })
+
+askPermission()
 
 const loginPath = '/connect'
 
