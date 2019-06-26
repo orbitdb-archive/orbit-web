@@ -35,9 +35,14 @@
   "login": {
     "nickname": "Nickname",
     "orLoginWith": "Or login with",
-    "pressEnterToLogin": "Press ENTER to login"
+    "pressEnterToLogin": "Press ENTER to login",
+    "metamask": {
+      "disabled": "Log in with Metamask",
+      "enabled": "Metamask Connected"
+    }
   },
   "loading": "Loading",
+  "or": "or",
   "settings": {
     "names": {
       "themeName": "Theme",

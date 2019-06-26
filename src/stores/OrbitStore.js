@@ -55,15 +55,27 @@ export default class OrbitStore {
 
     return new Promise(resolve => {
       const settings = this.settingsStore.networkSettings.orbit
+
       const options = {
         dbOptions: {
           directory: `${settings.root}/data/orbit-db`
         },
         channelOptions: {}
       }
+
       const node = new Orbit(ipfs, options)
+
       node.events.once('connected', () => this.onStarted(node, resolve))
-      node.connect(this.sessionStore.username)
+
+      const credentials = this.sessionStore.metamask
+        ? {
+          type: 'purser-metamask',
+          username: this.sessionStore.username,
+          provider: this.sessionStore.metamask
+        }
+        : this.sessionStore.username
+
+      node.connect(credentials)
     })
   }
 

@@ -96,6 +96,44 @@ $text-color: rgba(228, 228, 228, 0.9);
       }
     }
 
+    .loginOptions {
+      display: flex;
+      margin-top: 12px;
+      flex-direction: column;
+      align-items: center;
+      button {
+        margin-top: 6px;
+        cursor: pointer;
+        padding: 6px 12px 6px 6px;
+        font-size: 1em;
+        font-weight: 600;
+        border: 0;
+        border-radius: 4px;
+        border: 1px solid #404040;
+      }
+      .metamaskButton {
+        background: rgba(22, 22, 22, 0.4);
+        color: $text-color;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        transition: 0.1s ease background, 0.1s ease color;
+        .metamaskLogo {
+          height: 28px;
+          width: 28px;
+          margin-right: 6px;
+        }
+        &:hover {
+          background: rgba(22, 22, 22, 1);
+        }
+        &.enabled {
+          background: #d46718;
+          border: 1px #d46718 solid;
+        }
+      }
+    }
+
     .lastRow {
       align-items: center;
       flex-direction: column;
@@ -154,14 +192,15 @@ $text-color: rgba(228, 228, 228, 0.9);
       text-align: center;
     }
 
-    input[type=text], input[type=password] {
+    input[type="text"],
+    input[type="password"] {
       border-bottom: 1px solid #a951af;
       margin-bottom: 0;
       width: 100%;
       text-align: center;
     }
 
-    input[type=text]:disabled {
+    input[type="text"]:disabled {
       color: rgba(228, 228, 228, 0.25);
       font-style: italic;
       cursor: not-allowed;
@@ -176,19 +215,18 @@ $text-color: rgba(228, 228, 228, 0.9);
     justify-content: center;
     width: 100%;
   }
-
 }
 
 .loginHeaderAnimation-appear {
   animation: bounceInDown;
-  animation-duration: .5s;
+  animation-duration: 0.5s;
   animation-fill-mode: both;
   animation-timing-function: ease-out;
 }
 
 .loginScreenAnimation-appear {
   animation: fadeIn;
-  animation-duration: .5s;
+  animation-duration: 0.5s;
   animation-fill-mode: both;
   animation-timing-function: ease-out;
 }

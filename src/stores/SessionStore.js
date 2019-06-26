@@ -24,6 +24,9 @@ export default class SessionStore {
   @observable
   _user = null
 
+  @observable
+  _metamask = false
+
   // Public instance variable getters
 
   @computed
@@ -35,6 +38,15 @@ export default class SessionStore {
   @computed
   get isAuthenticated () {
     return !!(this._user && this._user.username)
+  }
+
+  @computed
+  get metamask () {
+    return this._metamask
+  }
+
+  set metamask (val) {
+    this._metamask = val
   }
 
   // Private instance actions

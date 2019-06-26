@@ -63,49 +63,45 @@ const AlphaDisclaimer = LoadAsync({
   loader: () => import(/* webpackChunkName: "AlphaDisclaimer" */ '../containers/AlphaDisclaimer')
 })
 
-function AppView () {
-  return (
-    <div className="App view">
-      {/* Only render ControlPanel when logged in */}
-      <PrivateRouteWithContext component={ControlPanel} loginPath={loginPath} />
+const AppView = () => (
+  <div className="App view">
+    {/* Only render ControlPanel when logged in */}
+    <PrivateRouteWithContext component={ControlPanel} loginPath={loginPath} />
 
-      {/* Render ChannelHeader when in a channel OR when in settings */}
-      <Route exact path="/channel/:channel" component={ChannelHeader} />
-      <Route exact path="/settings" component={ChannelHeader} />
+    {/* Render ChannelHeader when in a channel OR when in settings */}
+    <Route exact path="/channel/:channel" component={ChannelHeader} />
+    <Route exact path="/settings" component={ChannelHeader} />
 
-      <Switch>
-        <Route exact path={loginPath} component={LoginView} />
-        <PrivateRouteWithContext
-          exact
-          path="/channel/:channel"
-          component={ChannelView}
-          loginPath={loginPath}
-        />
-        <PrivateRouteWithContext
-          exact
-          path="/settings"
-          component={SettingsView}
-          loginPath={loginPath}
-        />
-        <PrivateRouteWithContext component={IndexView} loginPath={loginPath} />
-      </Switch>
+    <Switch>
+      <Route exact path={loginPath} component={LoginView} />
+      <PrivateRouteWithContext
+        exact
+        path="/channel/:channel"
+        component={ChannelView}
+        loginPath={loginPath}
+      />
+      <PrivateRouteWithContext
+        exact
+        path="/settings"
+        component={SettingsView}
+        loginPath={loginPath}
+      />
+      <PrivateRouteWithContext component={IndexView} loginPath={loginPath} />
+    </Switch>
 
-      {/* Render an alpha disclaimer on login page */}
-      <Route exact path={loginPath} component={AlphaDisclaimer} />
-    </div>
-  )
-}
+    {/* Render an alpha disclaimer on login page */}
+    <Route exact path={loginPath} component={AlphaDisclaimer} />
+  </div>
+)
 
-function App () {
-  return (
-    <RootStoreContext.Provider value={rootStore}>
-      <Router>
-        {/* Render App in a route so it will receive the "location"
+const App = () => (
+  <RootStoreContext.Provider value={rootStore}>
+    <Router>
+      {/* Render App in a route so it will receive the "location"
               prop and rerender properly on location changes */}
-        <Route component={AppView} />
-      </Router>
-    </RootStoreContext.Provider>
-  )
-}
+      <Route component={AppView} />
+    </Router>
+  </RootStoreContext.Provider>
+)
 
 export default App
