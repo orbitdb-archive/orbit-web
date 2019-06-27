@@ -1,7 +1,6 @@
 'use strict'
 
 const path = require('path')
-const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 
@@ -10,7 +9,8 @@ const config = {
   output: {
     path: path.join(__dirname, 'dist'),
     publicPath: './',
-    filename: '[name].[hash:20].js'
+    filename: '[name].[hash:20].js',
+    globalObject: 'this'
   },
   resolve: {
     alias: {
@@ -30,6 +30,11 @@ const config = {
   },
   module: {
     rules: [
+      {
+        test: /\.worker\.js$/,
+        exclude: /node_modules/,
+        use: ['worker-loader', 'babel-loader']
+      },
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
@@ -116,8 +121,6 @@ module.exports = (env, argv) => {
       port: 8001,
       publicPath: '/'
     }
-
-    config.plugins.push(new webpack.HotModuleReplacementPlugin())
   }
 
   if (!isDevServer) {
