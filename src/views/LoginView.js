@@ -42,25 +42,9 @@ class LoginView extends React.Component {
   }
 
   componentDidMount () {
-    const { uiStore, sessionStore } = this.context
+    const { uiStore } = this.context
     uiStore.setTitle('Login | Orbit')
     uiStore.closeControlPanel()
-    if (window.ethereum && window.ethereum.enabled) {
-      sessionStore.metamask = true
-    }
-  }
-
-  enableMetamask () {
-    const { sessionStore } = this.context
-    if (window.ethereum) {
-      try {
-        window.ethereum.enable().then(() => {
-          sessionStore.metamask = true
-        })
-      } catch (error) {
-        sessionStore.metamask = false
-      }
-    }
   }
 
   onConfigure () {
@@ -108,7 +92,7 @@ class LoginView extends React.Component {
           theme={{ ...uiStore.theme }}
           onSubmit={this.onLogin}
           setUsernameInputRef={ref => (this.usernameInputRef = ref)}
-          enableMetamask={() => this.enableMetamask()}
+          enableMetamask={() => sessionStore.enableMetamask()}
           metamaskEnabled={sessionStore.metamask}
         />
         <div className="Version">

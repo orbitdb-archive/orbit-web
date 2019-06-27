@@ -15,6 +15,10 @@ export default class SessionStore {
   constructor (rootStore) {
     this.rootStore = rootStore
 
+    if (window.ethereum && window.ethereum.enabled) {
+      this.enableMetamask()
+    }
+
     this.login = this.login.bind(this)
     this.logout = this.logout.bind(this)
   }
@@ -59,6 +63,19 @@ export default class SessionStore {
       this._user = user
     })
     this._cacheUser(user)
+  }
+
+  @action.bound
+  enableMetamask () {
+    if (window.ethereum) {
+      try {
+        window.ethereum.enable().then(() => {
+          this.metamask = true
+        })
+      } catch (error) {
+        this.metamask = false
+      }
+    }
   }
 
   // Private instance methods
