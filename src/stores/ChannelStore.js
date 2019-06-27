@@ -1,6 +1,6 @@
 'use strict'
 
-import { action, computed, configure, observable, reaction, runInAction, values } from 'mobx'
+import { action, computed, configure, observable, reaction, values } from 'mobx'
 
 import { throttleFunc } from '../utils/throttle'
 import Logger from '../utils/logger'
@@ -13,9 +13,9 @@ const logger = new Logger()
 const loadAmount = 10 // How many entries are loaded per load call
 
 export default class ChannelStore {
-  constructor ({ network, orbitChannel }) {
+  constructor ({ network, channelName }) {
     this.network = network
-    this.orbitChannel = orbitChannel
+    this.channelName = channelName
 
     this.loadFile = this.loadFile.bind(this)
     this.processSendQueue = throttleFunc(this._processSendQueue.bind(this))
@@ -27,17 +27,7 @@ export default class ChannelStore {
 
     this._saveState = this._saveState.bind(this)
 
-    this.orbitChannel.on('error', this._onError.bind(this))
-    this.orbitChannel.on('entry', this._onNewEntry.bind(this))
-    this.orbitChannel.on('write', this._onWrite.bind(this))
-    this.orbitChannel.on('load.progress', this._onLoadProgress.bind(this))
-    this.orbitChannel.on('load.done', this._onLoaded.bind(this))
-    this.orbitChannel.on('replicate.progress', this._onReplicateProgress.bind(this))
-    this.orbitChannel.on('replicate.done', this._onReplicated.bind(this))
-
     this._loadState()
-
-    this.orbitChannel.load(loadAmount)
 
     // Save channel state on changes
     reaction(() => values(this._storableState), this._saveState)
@@ -72,10 +62,6 @@ export default class ChannelStore {
   loadingNewMessages = false
 
   // Public instance getters
-
-  get channelName () {
-    return this.orbitChannel.channelName
-  }
 
   // TODO: object.name is reserved so remove code which uses this
   get name () {
@@ -217,39 +203,36 @@ export default class ChannelStore {
   }
 
   @action
-  async _updatePeers () {
-    const peers = await this._getPeers()
-    runInAction(() => {
-      this.peers = peers
-    })
+  _updatePeers (peers) {
+    this.peers = peers
   }
 
   @action.bound
-  _updateReplicationStatus () {
-    Object.assign(this._replicationStatus, this.orbitChannel.replicationStatus)
+  _updateReplicationStatus (replicationStatus) {
+    Object.assign(this._replicationStatus, replicationStatus)
   }
 
   @action // Called while loading from local filesystem
-  _onLoadProgress () {
-    this._updateReplicationStatus()
+  _onLoadProgress (replicationStatus) {
+    this._updateReplicationStatus(replicationStatus)
     this.loadingHistory = true
   }
 
   @action // Called when done loading from local filesystem
-  _onLoaded () {
-    this._updateReplicationStatus()
+  _onLoaded (replicationStatus) {
+    this._updateReplicationStatus(replicationStatus)
     this.loadingHistory = false
   }
 
   @action // Called while loading from IPFS (receiving new messages)
-  _onReplicateProgress () {
-    this._updateReplicationStatus()
+  _onReplicateProgress (replicationStatus) {
+    this._updateReplicationStatus(replicationStatus)
     this.loadingNewMessages = true
   }
 
   @action // Called when done loading from IPFS
-  _onReplicated () {
-    this._updateReplicationStatus()
+  _onReplicated (replicationStatus) {
+    this._updateReplicationStatus(replicationStatus)
     this.loadingNewMessages = false
   }
 
@@ -294,45 +277,67 @@ export default class ChannelStore {
   sendMessage (text) {
     if (typeof text !== 'string' || text === '') return Promise.resolve()
 
-    this._incrementSendingMessageCounter()
+    // this._incrementSendingMessageCounter()
 
-    return new Promise((resolve, reject) => {
-      this._sendQueue.push({ text, resolve, reject })
+    // return new Promise((resolve, reject) => {
+    //   this._sendQueue.push({ text, resolve, reject })
+    // })
+
+    this.network.worker.postMessage({
+      action: 'channel:send-text-message',
+      options: { channelName: this.channelName, message: text }
     })
+
+    return Promise.resolve()
   }
 
   sendFiles (files) {
-    const promises = []
-    for (let i = 0; i < files.length; i++) {
-      promises.push(
-        new Promise((resolve, reject) => {
-          this._incrementSendingMessageCounter()
-          const f = files[i]
-          const reader = new FileReader()
-          reader.onload = event => {
-            this._sendQueue.push({
-              file: {
-                filename: f.name,
-                buffer: event.target.result,
-                meta: { mimeType: f.type, size: f.size }
-              },
-              resolve,
-              reject
-            })
-          }
-          reader.readAsArrayBuffer(f)
-        })
-      )
-    }
+    // const promises = []
+    // for (let i = 0; i < files.length; i++) {
+    //   promises.push(
+    //     new Promise((resolve, reject) => {
+    //       this._incrementSendingMessageCounter()
+    //       const f = files[i]
+    //       const reader = new FileReader()
+    //       reader.onload = event => {
+    //         this._sendQueue.push({
+    //           file: {
+    //             filename: f.name,
+    //             buffer: event.target.result,
+    //             meta: { mimeType: f.type, size: f.size }
+    //           },
+    //           resolve,
+    //           reject
+    //         })
+    //       }
+    //       reader.readAsArrayBuffer(f)
+    //     })
+    //   )
+    // }
 
-    return Promise.all(promises)
+    // return Promise.all(promises)
+
+    for (let i = 0; i < files.length; i++) {
+      const f = files[i]
+      const reader = new FileReader()
+      reader.onload = event => {
+        this.network.worker.postMessage({
+          action: 'channel:send-file-message',
+          options: {
+            channelName: this.channelName,
+            file: {
+              filename: f.name,
+              buffer: event.target.result,
+              meta: { mimeType: f.type, size: f.size }
+            }
+          }
+        })
+      }
+      reader.readAsArrayBuffer(f)
+    }
   }
 
   // Private instance methods
-
-  _getPeers () {
-    return this.orbitChannel.peers
-  }
 
   _getStoredStates () {
     return JSON.parse(localStorage.getItem(this.storagekey)) || {}

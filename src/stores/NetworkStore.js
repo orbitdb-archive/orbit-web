@@ -1,12 +1,22 @@
 'use strict'
 
-import { action, computed, configure, keys, observable, reaction, values } from 'mobx'
+import {
+  action,
+  computed,
+  configure,
+  keys,
+  observable,
+  reaction,
+  values,
+  toJS,
+  runInAction
+} from 'mobx'
 
 import ChannelStore from './ChannelStore'
-import IpfsStore from './IpfsStore'
-import OrbitStore from './OrbitStore'
 
 import Logger from '../utils/logger'
+
+import NetworkWorker from '../workers/network.worker.js'
 
 configure({ enforceActions: 'observed' })
 
@@ -16,22 +26,27 @@ const peerUpdateInterval = 1000 // ms
 const processSendQueueInterval = 100 // ms
 
 export default class NetworkStore {
+  worker = null
+
   constructor (rootStore) {
     this.sessionStore = rootStore.sessionStore
     this.settingsStore = rootStore.settingsStore
 
-    this.ipfsStore = new IpfsStore(this)
-    this.orbitStore = new OrbitStore(this)
-
     this.joinChannel = this.joinChannel.bind(this)
 
-    this.channelPeerInterval = setInterval(() => {
-      this.channelsAsArray.forEach(c => c.updatePeers())
-    }, peerUpdateInterval)
+    // this.channelPeerInterval = setInterval(() => {
+    //   this.channelsAsArray.forEach(c => c.updatePeers())
+    // }, peerUpdateInterval)
 
-    this.channelProcessInterval = setInterval(() => {
-      this.channelsAsArray.forEach(c => c.processSendQueue())
-    }, processSendQueueInterval)
+    // this.channelProcessInterval = setInterval(() => {
+    //   this.channelsAsArray.forEach(c => c.processSendQueue())
+    // }, processSendQueueInterval)
+
+    this.worker = new NetworkWorker()
+    this.worker.onmessage = this._onWorkerMessage.bind(this)
+    this.worker.onerror = this._onWorkerError.bind(this)
+
+    this.worker.postMessage('') // Init the worker
 
     // Stop if user logs out, start if not already online or not starting
     reaction(
@@ -48,6 +63,15 @@ export default class NetworkStore {
   networkName = 'Orbit DEV Network'
 
   @observable
+  starting = false
+
+  @observable
+  stopping = false
+
+  @observable
+  isOnline = false
+
+  @observable
   channels = {}
 
   @observable
@@ -57,26 +81,6 @@ export default class NetworkStore {
   defaultChannels = ['orbitdb']
 
   // Public instance getters
-
-  @computed
-  get ipfs () {
-    return this.ipfsStore.node
-  }
-
-  @computed
-  get orbit () {
-    return this.orbitStore.node
-  }
-
-  @computed
-  get isOnline () {
-    return this.ipfs && this.orbit
-  }
-
-  @computed
-  get starting () {
-    return this.ipfsStore.starting || this.orbitStore.starting
-  }
 
   @computed
   get hasUnreadMessages () {
@@ -96,13 +100,36 @@ export default class NetworkStore {
   // Private instance actions
 
   @action.bound
-  _onJoinedChannel (channelName) {
-    if (this.channelNames.includes(channelName)) return
+  _onOrbitConnected () {
+    this.isOnline = true
+    this.starting = false
 
-    const orbitChannel = this.orbit.channels[channelName]
+    // Join all channnels that are saved in localstorage for current user
+    this.settingsStore.networkSettings.channels.forEach(this.joinChannel)
+
+    // Join channels that should be joined by default
+    if (this.settingsStore.networkSettings.channels.length === 0) {
+      this.defaultChannels.forEach(this.joinChannel)
+    }
+  }
+
+  @action.bound
+  _onOrbitDisconnected () {
+    this.isOnline = false
+    this.stopping = false
+  }
+
+  @action.bound
+  _onJoinedChannel (channelName) {
+    if (typeof channelName !== 'string') return
+    if (this.channelNames.includes(channelName)) {
+      return this.channels[channelName]
+    }
+
+    // const orbitChannel = this.orbit.channels[channelName]
     this.channels[channelName] = new ChannelStore({
       network: this,
-      orbitChannel
+      channelName
     })
 
     // Save the channel to localstorage
@@ -112,10 +139,15 @@ export default class NetworkStore {
       ...networkSettings.channels.filter(c => c !== channelName),
       channelName
     ]
+
+    return this.channels[channelName]
   }
 
   @action.bound
   _onLeftChannel (channelName) {
+    if (typeof channelName !== 'string') return
+    if (!this.channelNames.includes(channelName)) return
+
     this._removeChannel(channelName)
 
     // Remove the channel from localstorage
@@ -130,6 +162,7 @@ export default class NetworkStore {
 
   @action.bound
   _removeChannel (channelName) {
+    if (typeof channelName !== 'string') return
     delete this.channels[channelName]
   }
 
@@ -138,54 +171,138 @@ export default class NetworkStore {
     this.swarmPeers = []
   }
 
+  // Private instance methods
+
+  _onWorkerMessage ({ data }) {
+    if (typeof data.action !== 'string') return
+    if (typeof data.name !== 'string') return
+
+    switch (data.action) {
+      case 'orbit-event':
+        switch (data.name) {
+          case 'connected':
+            this._onOrbitConnected()
+            break
+          case 'disconnected':
+            this._onOrbitDisconnected()
+            break
+          case 'joined':
+            this._onJoinedChannel(...data.args)
+            break
+          case 'left':
+            this._onLeftChannel(...data.args)
+            break
+          case 'peers':
+            this._onSwarmPeerUpdate(...data.args)
+            break
+          default:
+            break
+        }
+        break
+      case 'channel-event':
+        const channelName = data.meta.channelName
+        const channel = this.channels[channelName]
+
+        switch (data.name) {
+          case 'error':
+            channel._onError(...data.args)
+            break
+          case 'entry':
+            channel._onNewEntry(...data.args)
+            break
+          case 'write':
+            channel._onWrite(...data.args)
+            break
+          case 'load.progress':
+            channel._onLoadProgress(data.meta.replicationStatus)
+            break
+          case 'load.done':
+            channel._onLoaded(data.meta.replicationStatus)
+            break
+          case 'replicate.progress':
+            channel._onReplicateProgress(data.meta.replicationStatus)
+            break
+          case 'replicate.done':
+            channel._onReplicated(data.meta.replicationStatus)
+            break
+          default:
+            break
+        }
+        break
+      default:
+        break
+    }
+  }
+
+  _onWorkerError (error) {
+    console.error(error.message)
+  }
+
   // Public instance methods
 
   async joinChannel (channelName) {
+    if (typeof channelName !== 'string') return
     if (!this.isOnline) throw new Error('Network is not online')
     if (!this.channelNames.includes(channelName)) {
-      await this.orbit.join(channelName)
+      // await this.orbit.join(channelName)
+      this.worker.postMessage({
+        action: 'orbit:join-channel',
+        options: { channelName }
+      })
     }
-    return this.channels[channelName]
+    return this._onJoinedChannel(channelName)
   }
 
   async leaveChannel (channelName) {
+    if (typeof channelName !== 'string') return
     if (!this.isOnline) throw new Error('Network is not online')
     if (this.channelNames.includes(channelName)) {
-      await this.orbit.leave(channelName)
+      this.worker.postMessage({
+        action: 'orbit:leave-channel',
+        options: { channelName }
+      })
     }
+    return this._onLeftChannel(channelName)
   }
 
+  @action.bound
   async start () {
     if (this.isOnline) return
+
+    runInAction(() => {
+      this.starting = true
+    })
+
     logger.info('Starting network')
 
-    await this.ipfsStore.useEmbeddedIPFS()
-    const orbitNode = await this.orbitStore.init(this.ipfs)
-
-    orbitNode.events.on('joined', this._onJoinedChannel)
-    orbitNode.events.on('left', this._onLeftChannel)
-    orbitNode.events.on('peers', this._onSwarmPeerUpdate)
-
-    // Join all channnels that are saved in localstorage for current user
-    this.settingsStore.networkSettings.channels.forEach(this.joinChannel)
-
-    // Join channels that should be joined by default
-    if (this.settingsStore.networkSettings.channels.length === 0) {
-      this.defaultChannels.forEach(this.joinChannel)
-    }
+    this.worker.postMessage({
+      action: 'network:start',
+      options: {
+        ipfs: toJS(this.settingsStore.networkSettings.ipfs),
+        orbit: toJS(this.settingsStore.networkSettings.orbit),
+        username: this.sessionStore.username
+      }
+    })
   }
 
+  @action.bound
   async stop () {
     if (!this.isOnline) return
+
+    runInAction(() => {
+      this.stopping = true
+    })
+
     logger.info('Stopping network')
 
     clearInterval(this.channelPeerInterval)
     clearInterval(this.channelProcessInterval)
 
+    this.worker.postMessage({
+      action: 'network:stop'
+    })
+
     this.channelNames.forEach(this._removeChannel)
     this._resetSwarmPeers()
-
-    await this.orbitStore.stop()
-    await this.ipfsStore.stop()
   }
 }
