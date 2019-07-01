@@ -10,15 +10,12 @@ configure({ enforceActions: 'observed' })
 
 const logger = new Logger()
 
-const loadAmount = 10 // How many entries are loaded per load call
-
 export default class ChannelStore {
   constructor ({ network, channelName }) {
     this.network = network
     this.channelName = channelName
 
     this.loadFile = this.loadFile.bind(this)
-    this.processSendQueue = throttleFunc(this._processSendQueue.bind(this))
     this.updatePeers = throttleFunc(this._updatePeers.bind(this))
 
     this.loadMore = this.loadMore.bind(this)
@@ -182,6 +179,7 @@ export default class ChannelStore {
   }
 
   _onNewEntry (entry) {
+    // TOOD: This is not called anymore; how to handle notification?
     this.sendNotification(entry)
     this._updateEntries([entry])
   }
@@ -219,8 +217,9 @@ export default class ChannelStore {
   }
 
   @action // Called when done loading from local filesystem
-  _onLoaded (replicationStatus) {
+  _onLoaded (replicationStatus, entries) {
     this._updateReplicationStatus(replicationStatus)
+    this._updateEntries(entries)
     this.loadingHistory = false
   }
 
@@ -231,13 +230,16 @@ export default class ChannelStore {
   }
 
   @action // Called when done loading from IPFS
-  _onReplicated (replicationStatus) {
+  _onReplicated (replicationStatus, entries) {
     this._updateReplicationStatus(replicationStatus)
+    this._updateEntries(entries)
     this.loadingNewMessages = false
   }
 
   // Called when the user writes a message (text or file)
-  _onWrite () {
+  _onWrite (replicationStatus, entries) {
+    this._updateReplicationStatus(replicationStatus)
+    this._updateEntries(entries)
     this._decrementSendingMessageCounter()
   }
 
@@ -277,11 +279,7 @@ export default class ChannelStore {
   sendMessage (text) {
     if (typeof text !== 'string' || text === '') return Promise.resolve()
 
-    // this._incrementSendingMessageCounter()
-
-    // return new Promise((resolve, reject) => {
-    //   this._sendQueue.push({ text, resolve, reject })
-    // })
+    this._incrementSendingMessageCounter()
 
     this.network.worker.postMessage({
       action: 'channel:send-text-message',
@@ -292,31 +290,6 @@ export default class ChannelStore {
   }
 
   sendFiles (files) {
-    // const promises = []
-    // for (let i = 0; i < files.length; i++) {
-    //   promises.push(
-    //     new Promise((resolve, reject) => {
-    //       this._incrementSendingMessageCounter()
-    //       const f = files[i]
-    //       const reader = new FileReader()
-    //       reader.onload = event => {
-    //         this._sendQueue.push({
-    //           file: {
-    //             filename: f.name,
-    //             buffer: event.target.result,
-    //             meta: { mimeType: f.type, size: f.size }
-    //           },
-    //           resolve,
-    //           reject
-    //         })
-    //       }
-    //       reader.readAsArrayBuffer(f)
-    //     })
-    //   )
-    // }
-
-    // return Promise.all(promises)
-
     for (let i = 0; i < files.length; i++) {
       const f = files[i]
       const reader = new FileReader()
@@ -354,35 +327,6 @@ export default class ChannelStore {
     }
   }
 
-  @action
-  _processSendQueue () {
-    if (this._sendQueue.length === 0 || this._sending) return
-
-    this._sending = true
-
-    const task = this._sendQueue.shift()
-
-    let promise
-
-    if (task.text) {
-      promise = this.orbitChannel.sendMessage(task.text)
-    } else if (task.file) {
-      promise = this.orbitChannel.sendFile(task.file)
-    }
-
-    if (promise && promise.then) {
-      // Wrap the tasks reject function so we can decrement the '_sendingMessageCounter'
-      const wrappedReject = (...args) => {
-        this._decrementSendingMessageCounter()
-        task.reject(...args)
-      }
-
-      promise.then(task.resolve, wrappedReject).finally(() => {
-        this._sending = false
-      })
-    } else this._sending = false
-  }
-
   // Public instance methods
 
   loadFile (hash, asStream) {
@@ -407,7 +351,8 @@ export default class ChannelStore {
   }
 
   loadMore () {
-    if (!this.loadingHistory && this.hasMoreHistory) return this.orbitChannel.loadMore(loadAmount)
-    else return Promise.resolve()
+    // TODO: Refactor the use array  indexes and orbit log iterator
+    // if (!this.loadingHistory && this.hasMoreHistory) return this.orbitChannel.loadMore(loadAmount)
+    // else return Promise.resolve()
   }
 }

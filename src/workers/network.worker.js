@@ -5,11 +5,13 @@ import '@babel/polyfill'
 import JsIPFS from 'ipfs'
 import Orbit from 'orbit_'
 
+import promiseQueue from '../utils/promise-queue'
+
 const ORBIT_EVENTS = ['connected', 'disconnected', 'joined', 'left', 'peers']
 const CHANNEL_EVENTS = [
   'error',
-  'entry',
-  'write',
+  // 'entry',
+  // 'write',
   'load.progress',
   'load.done',
   'replicate.progress',
@@ -47,39 +49,40 @@ function onMessage ({ data }) {
 function orbitEvent (eventName, ...args) {
   if (typeof eventName !== 'string') return
 
-  switch (eventName) {
-    case 'joined':
-      this.postMessage({ action: 'orbit-event', name: eventName, args: [args[0]] })
-      break
-    case 'left':
-      this.postMessage({ action: 'orbit-event', name: eventName, args: [args[0]] })
-      break
-    default:
-      this.postMessage({ action: 'orbit-event', name: eventName, args: [] })
-      break
+  if (['joined', 'left'].indexOf(eventName) !== -1) {
+    args = [args[0]]
+  } else {
+    args = []
   }
+
+  this.postMessage({ action: 'orbit-event', name: eventName, args })
 }
 
 async function channelEvent (eventName, channelName, ...args) {
   if (typeof eventName !== 'string') return
+  if (typeof channelName !== 'string') return
 
   const channel = this.orbit.channels[channelName]
 
-  const replicationStatus = channel.replicationStatus
-
-  switch (eventName) {
-    default:
-      this.postMessage({
-        action: 'channel-event',
-        name: eventName,
-        meta: {
-          channelName,
-          replicationStatus
-        },
-        args
-      })
-      break
+  const meta = {
+    channelName: channelName,
+    replicationStatus: channel.replicationStatus
   }
+
+  if (['load.done', 'replicate.done'].indexOf(eventName) !== -1) {
+    meta['entries'] = channel.feed.iterator({ limit: -1 }).collect()
+  }
+
+  if (eventName === 'write') {
+    meta['entries'] = [args[2][0]]
+  }
+
+  this.postMessage({
+    action: 'channel-event',
+    name: eventName,
+    meta,
+    args
+  })
 }
 
 async function handleStart ({ options }) {
@@ -103,6 +106,9 @@ async function handleJoinChannel ({ options }) {
   CHANNEL_EVENTS.forEach(eventName => {
     channel.on(eventName, channelEvent.bind(this, eventName, options.channelName))
   })
+
+  // Bind to "feed on write" directly since "channel on write" does not include the entry
+  channel.feed.events.on('write', channelEvent.bind(this, 'write', options.channelName))
 }
 
 function handleLeaveChannel ({ options }) {
@@ -110,11 +116,32 @@ function handleLeaveChannel ({ options }) {
 }
 
 function handleSendTextMessage ({ options }) {
-  this.orbit.channels[options.channelName].sendMessage(options.message)
+  const channel = this.orbit.channels[options.channelName]
+  const sendFunc = channel.sendMessage.bind(channel, options.message)
+  queueCall.call(this, sendFunc)
 }
 
 function handleSendFileMessage ({ options }) {
-  this.orbit.channels[options.channelName].sendFile(options.file)
+  const channel = this.orbit.channels[options.channelName]
+  const sendFunc = channel.sendFile.bind(channel, options.file)
+  queueCall.call(this, sendFunc)
+}
+
+// Queue the calls to a promise queue
+function queueCall (func) {
+  // Get a reference to the buffer used by current promise queue
+  this._callBuffer = this._callBuffer || []
+  // Push to the buffer used by current promise queue
+  this._callBuffer.push(func)
+
+  // Either let the current queue run until it is done
+  // or create a new queue
+  this._promiseQueue =
+    this._promiseQueue ||
+    promiseQueue(this._callBuffer, () => {
+      // Remove the current queue when done
+      this._promiseQueue = null
+    })
 }
 
 function startIPFS (options) {
