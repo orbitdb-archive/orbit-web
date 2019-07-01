@@ -2,7 +2,6 @@
 
 import { action, computed, configure, observable, reaction, values } from 'mobx'
 
-import { throttleFunc } from '../utils/throttle'
 import Logger from '../utils/logger'
 import notify from '../utils/notify'
 
@@ -15,19 +14,15 @@ export default class ChannelStore {
     this.network = network
     this.channelName = channelName
 
-    this.loadFile = this.loadFile.bind(this)
-    this.updatePeers = throttleFunc(this._updatePeers.bind(this))
-
-    this.loadMore = this.loadMore.bind(this)
     this.sendMessage = this.sendMessage.bind(this)
     this.sendFiles = this.sendFiles.bind(this)
-
-    this._saveState = this._saveState.bind(this)
+    this.loadFile = this.loadFile.bind(this)
+    this.loadMore = this.loadMore.bind(this)
 
     this._loadState()
 
     // Save channel state on changes
-    reaction(() => values(this._storableState), this._saveState)
+    reaction(() => values(this._storableState), this._saveState.bind(this))
   }
 
   // Private instance variables
@@ -59,14 +54,6 @@ export default class ChannelStore {
   loadingNewMessages = false
 
   // Public instance getters
-
-  // TODO: object.name is reserved so remove code which uses this
-  get name () {
-    console.warn(
-      'Deprecation warning: "channel.name" is deprecated, use channel.channelName instead'
-    )
-    return this.channelName
-  }
 
   @computed
   get entryHashes () {
@@ -149,38 +136,19 @@ export default class ChannelStore {
 
   // Private instance actions
 
-  @action.bound
+  @action
   _decrementSendingMessageCounter () {
     this._sendingMessageCounter = Math.max(0, this._sendingMessageCounter - 1)
   }
 
-  @action.bound
+  @action
   _incrementSendingMessageCounter () {
     this._sendingMessageCounter += 1
   }
 
-  sendNotification (entry) {
-    const {
-      sessionStore: {
-        rootStore: { uiStore: currentChannelName }
-      }
-    } = this.network
-    const payload = entry.payload.value
-    if (document.hidden || this.channelName !== currentChannelName) {
-      if (this.unreadMessages.length > 1) {
-        notify(`${this.unreadMessages.length} unread messages in #${this.channelName}`, '')
-      } else {
-        notify(
-          `New message in #${this.channelName}`,
-          `${payload.meta.from.name}: ${payload.content}`
-        )
-      }
-    }
-  }
-
   _onNewEntry (entry) {
     // TOOD: This is not called anymore; how to handle notification?
-    this.sendNotification(entry)
+    this._sendNotification(entry)
     this._updateEntries([entry])
   }
 
@@ -205,7 +173,7 @@ export default class ChannelStore {
     this.peers = peers
   }
 
-  @action.bound
+  @action
   _updateReplicationStatus (replicationStatus) {
     Object.assign(this._replicationStatus, replicationStatus)
   }
@@ -254,11 +222,47 @@ export default class ChannelStore {
     this.loadingNewMessages = false
   }
 
-  @action.bound
+  @action
   _loadState () {
     try {
       Object.assign(this._storableState, this._getStoredStates()[this.channelName] || {})
     } catch (err) {}
+  }
+
+  // Private instance methods
+
+  _getStoredStates () {
+    return JSON.parse(localStorage.getItem(this.storagekey)) || {}
+  }
+
+  _saveState () {
+    try {
+      const states = Object.assign(this._getStoredStates(), {
+        [this.channelName]: this._storableState
+      })
+      localStorage.setItem(this.storagekey, JSON.stringify(states))
+    } catch (err) {
+      logger.error(err)
+    }
+  }
+
+  _sendNotification (entry) {
+    const {
+      sessionStore: {
+        rootStore: { uiStore: currentChannelName }
+      }
+    } = this.network
+    const payload = entry.payload.value
+    if (document.hidden || this.channelName !== currentChannelName) {
+      if (this.unreadMessages.length > 1) {
+        notify(`${this.unreadMessages.length} unread messages in #${this.channelName}`, '')
+      } else {
+        notify(
+          `New message in #${this.channelName}`,
+          `${payload.meta.from.name}: ${payload.content}`
+        )
+      }
+    }
   }
 
   // Public instance actions
@@ -279,6 +283,8 @@ export default class ChannelStore {
     if (!message.unread) return
     this.entries.filter(e => e.hash === message.hash).forEach(this.markEntryAsRead)
   }
+
+  // Public instance methods
 
   sendMessage (text) {
     if (typeof text !== 'string' || text === '') return Promise.resolve()
@@ -313,25 +319,6 @@ export default class ChannelStore {
       reader.readAsArrayBuffer(f)
     }
   }
-
-  // Private instance methods
-
-  _getStoredStates () {
-    return JSON.parse(localStorage.getItem(this.storagekey)) || {}
-  }
-
-  _saveState () {
-    try {
-      const states = Object.assign(this._getStoredStates(), {
-        [this.channelName]: this._storableState
-      })
-      localStorage.setItem(this.storagekey, JSON.stringify(states))
-    } catch (err) {
-      logger.error(err)
-    }
-  }
-
-  // Public instance methods
 
   loadFile (hash, asStream) {
     return new Promise((resolve, reject) => {
