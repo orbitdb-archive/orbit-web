@@ -71,10 +71,10 @@ async function channelEvent (eventName, channelName, ...args) {
 
   if (['load.done', 'replicate.done'].indexOf(eventName) !== -1) {
     meta['entries'] = channel.feed.iterator({ limit: -1 }).collect()
-  }
-
-  if (eventName === 'write') {
+  } else if (eventName === 'write') {
     meta['entries'] = [args[2][0]]
+  } else if (eventName === 'peer.update') {
+    meta['peers'] = await channel.peers
   }
 
   this.postMessage({
@@ -172,4 +172,18 @@ function startOrbit (options) {
   })
 }
 
-onmessage = onMessage.bind(self || {})
+function refreshChannelPeers () {
+  if (this.orbit && this.orbit.channels) {
+    Object.keys(this.orbit.channels).forEach(channelName => {
+      channelEvent.call(this, 'peer.update', channelName)
+    })
+  }
+}
+
+// Get a reference just so we can bind onmessage and use 'call' on setinterval
+const worker = self || {}
+onmessage = onMessage.bind(worker)
+
+setInterval(() => {
+  refreshChannelPeers.call(worker)
+}, 1000)

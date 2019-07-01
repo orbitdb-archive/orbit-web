@@ -22,8 +22,6 @@ configure({ enforceActions: 'observed' })
 
 const logger = new Logger()
 
-const peerUpdateInterval = 1000 // ms
-
 export default class NetworkStore {
   worker = null
 
@@ -32,10 +30,6 @@ export default class NetworkStore {
     this.settingsStore = rootStore.settingsStore
 
     this.joinChannel = this.joinChannel.bind(this)
-
-    // this.channelPeerInterval = setInterval(() => {
-    //   this.channelsAsArray.forEach(c => c.updatePeers())
-    // }, peerUpdateInterval)
 
     this.worker = new NetworkWorker()
     this.worker.onmessage = this._onWorkerMessage.bind(this)
@@ -200,6 +194,9 @@ export default class NetworkStore {
         switch (data.name) {
           case 'error':
             channel._onError(...data.args)
+            break
+          case 'peer.update':
+            channel._onPeerUpdate(data.meta.peers)
             break
           case 'load.progress':
             channel._onLoadProgress(data.meta.replicationStatus)

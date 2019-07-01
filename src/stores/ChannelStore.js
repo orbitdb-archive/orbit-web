@@ -184,7 +184,7 @@ export default class ChannelStore {
     this._updateEntries([entry])
   }
 
-  @action.bound
+  @action
   _updateEntries (entries) {
     const oldHashes = this.entryHashes
     const { lastSeenTimestamp = 0 } = this._storableState
@@ -241,6 +241,10 @@ export default class ChannelStore {
     this._updateReplicationStatus(replicationStatus)
     this._updateEntries(entries)
     this._decrementSendingMessageCounter()
+  }
+
+  _onPeerUpdate (peers) {
+    this._updatePeers(peers)
   }
 
   @action
