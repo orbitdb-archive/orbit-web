@@ -2,12 +2,11 @@
 
 import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
+import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized'
 
 import MessageRow from '../components/MessageRow'
 import MessagesDateSeparator from '../components/MessagesDateSeparator'
-import { FirstMessage, LoadingMessages } from '../components/MessageTypes'
-
-import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized'
+import { LoadingOrFirstMessage } from '../components/MessageTypes'
 
 import 'react-virtualized/styles.css'
 
@@ -56,8 +55,7 @@ function MessageList ({
         rowIndex={index}
       >
         <div style={style}>
-          {index === 0 &&
-            (loading ? <LoadingMessages /> : <FirstMessage channelName={channelName} />)}
+          {index === 0 && LoadingOrFirstMessage({ loading, channelName })}
 
           {addDateSepator && <MessagesDateSeparator date={date} locale={language} />}
 
@@ -83,10 +81,8 @@ function MessageList ({
   /*
    * TODO:
    * - List needs to be at the bottom of the screen
-   * - Show something while loading
-   * - Show something if 'messages' is emtpy
    * - If user has scrolled up, do not force scroll to bottom on new messages
-   * - Indicate that there are something below (newer messages) when scrolled up
+   * - Indicate that there is something below (newer messages) when scrolled up
    */
   return (
     <AutoSizer onResize={refreshRowSizes}>
@@ -100,6 +96,7 @@ function MessageList ({
           rowHeight={rowHeightCache.rowHeight}
           rowRenderer={rowRenderer}
           scrollToIndex={messages.length - 1}
+          noRowsRenderer={LoadingOrFirstMessage.bind(null, { loading, channelName })}
         />
       )}
     </AutoSizer>

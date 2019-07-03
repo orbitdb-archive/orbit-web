@@ -263,12 +263,13 @@ input[type="button"],
   width: 100%;
   transform-style: preserve-3d;
 
+  background-color: rgb(35, 35, 35);
+
   .dateSeparator {
     display: flex;
     justify-content: flex-start;
     font-size: 0.7em;
     color: rgb(228, 228, 228);
-    background-color: rgb(35, 35, 35);
     border-top: 0.5em solid white;
     border-bottom: 0.5em solid white;
     border-color: rgb(35, 35, 35);
@@ -279,7 +280,6 @@ input[type="button"],
   .firstMessage {
     display: flex;
     justify-content: center;
-    background-color: rgb(35, 35, 35);
     color: rgb(160, 160, 160);
     font-weight: bold;
     font-style: italic;
@@ -293,7 +293,6 @@ input[type="button"],
   .loadingMessages {
     display: flex;
     justify-content: center;
-    background-color: rgb(35, 35, 35);
     color: rgb(160, 160, 160);
     font-weight: bold;
     font-style: italic;
@@ -339,6 +338,10 @@ input[type="button"],
 
   &.hasNewerMessages {
     border-bottom: 2px solid $second-color;
+  }
+
+  &:focus, :focus {
+    outline: none;
   }
 }
 
