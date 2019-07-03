@@ -41,7 +41,7 @@ function ChannelControls ({ channel }) {
     <Observer>
       {() => (
         <div className="Controls">
-          <Spinner loading={channel.loadingNewMessages || channel.sendingMessage} />
+          <Spinner loading={channel.loading || channel.replicating || channel.sendingMessage} />
           <SendMessage
             onSendMessage={sendMessage}
             theme={uiStore.theme}

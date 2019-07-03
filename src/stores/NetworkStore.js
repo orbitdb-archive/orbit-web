@@ -199,19 +199,22 @@ export default class NetworkStore {
             channel._onPeerUpdate(data.meta.peers)
             break
           case 'load.progress':
-            channel._onLoadProgress(data.meta.replicationStatus)
+            // args: [address, hash, entry, progress, total]
+            channel._onLoadProgress(data.args[3], data.args[4])
             break
           case 'replicate.progress':
-            channel._onReplicateProgress(data.meta.replicationStatus)
+            // args: [address, hash, entry, progress, have]
+            channel._onReplicateProgress(data.args[3])
             break
-          case 'load.done':
-            channel._onLoaded(data.meta.replicationStatus, data.meta.entries)
+          case 'ready': // load.done
+            channel._onLoaded(data.meta.entries)
             break
-          case 'replicate.done':
-            channel._onReplicated(data.meta.replicationStatus, data.meta.entries)
+          case 'replicated': // replicate.done
+            channel._onReplicated(data.meta.entries)
             break
           case 'write':
-            channel._onWrite(data.meta.replicationStatus, data.meta.entries)
+            // args: [dbname, hash, entry]
+            channel._onWrite(data.args[2][0])
             break
           default:
             break

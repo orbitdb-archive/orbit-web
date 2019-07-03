@@ -17,7 +17,6 @@ export default class ChannelStore {
     this.sendMessage = this.sendMessage.bind(this)
     this.sendFiles = this.sendFiles.bind(this)
     this.loadFile = this.loadFile.bind(this)
-    this.loadMore = this.loadMore.bind(this)
 
     this._loadState()
 
@@ -36,9 +35,6 @@ export default class ChannelStore {
   @observable
   _sendingMessageCounter = 0
 
-  @observable
-  _replicationStatus = {}
-
   // Public instance variables
 
   @observable
@@ -48,31 +44,16 @@ export default class ChannelStore {
   peers = []
 
   @observable
-  loadingHistory = false
+  loading = false
 
   @observable
-  loadingNewMessages = false
+  replicating = false
 
   // Public instance getters
 
   @computed
   get entryHashes () {
     return this.entries.map(e => e.hash)
-  }
-
-  @computed
-  get seenEntries () {
-    return this.entries.filter(e => e.seen)
-  }
-
-  @computed
-  get unseenEntries () {
-    return this.entries.filter(e => !e.seen)
-  }
-
-  @computed
-  get hasUnseenEntries () {
-    return this.unseenEntries.length > 0
   }
 
   @computed
@@ -85,11 +66,6 @@ export default class ChannelStore {
         unread: !entry.seen
       })
     )
-  }
-
-  @computed
-  get messageHashes () {
-    return this.messages.map(m => m.hash)
   }
 
   @computed
@@ -109,6 +85,7 @@ export default class ChannelStore {
 
   @computed
   get hasMentions () {
+    // TODO: Implement
     return false
   }
 
@@ -122,11 +99,6 @@ export default class ChannelStore {
     const username = this.network.sessionStore.username
     if (!username) throw new Error('No logged in user')
     return `orbit-chat.${username}.channel-states`
-  }
-
-  @computed
-  get hasMoreHistory () {
-    return this._replicationStatus.progress < this._replicationStatus.max
   }
 
   @computed
@@ -146,11 +118,11 @@ export default class ChannelStore {
     this._sendingMessageCounter += 1
   }
 
-  _onNewEntry (entry) {
-    // TOOD: This is not called anymore; how to handle notification?
-    this._sendNotification(entry)
-    this._updateEntries([entry])
-  }
+  // _onNewEntry (entry) {
+  //   // TODO: This is not called anymore; how to handle notification?
+  //   this._sendNotification(entry)
+  //   this._updateEntries([entry])
+  // }
 
   @action
   _updateEntries (entries) {
@@ -173,41 +145,31 @@ export default class ChannelStore {
     this.peers = peers
   }
 
-  @action
-  _updateReplicationStatus (replicationStatus) {
-    Object.assign(this._replicationStatus, replicationStatus)
-  }
-
   @action // Called while loading from local filesystem
-  _onLoadProgress (replicationStatus) {
-    this._updateReplicationStatus(replicationStatus)
-    this.loadingHistory = true
+  _onLoadProgress (progress, total) {
+    this.loading = true
   }
 
   @action // Called when done loading from local filesystem
-  _onLoaded (replicationStatus, entries) {
-    this._updateReplicationStatus(replicationStatus)
+  _onLoaded (entries) {
     this._updateEntries(entries)
-    this.loadingHistory = false
+    this.loading = false
   }
 
   @action // Called while loading from IPFS (receiving new messages)
-  _onReplicateProgress (replicationStatus) {
-    this._updateReplicationStatus(replicationStatus)
-    this.loadingNewMessages = true
+  _onReplicateProgress (progress) {
+    this.replicating = true
   }
 
   @action // Called when done loading from IPFS
-  _onReplicated (replicationStatus, entries) {
-    this._updateReplicationStatus(replicationStatus)
+  _onReplicated (entries) {
     this._updateEntries(entries)
-    this.loadingNewMessages = false
+    this.replicating = false
   }
 
   // Called when the user writes a message (text or file)
-  _onWrite (replicationStatus, entries) {
-    this._updateReplicationStatus(replicationStatus)
-    this._updateEntries(entries)
+  _onWrite (entry) {
+    this._updateEntries([entry])
     this._decrementSendingMessageCounter()
   }
 
@@ -218,8 +180,8 @@ export default class ChannelStore {
   @action
   _onError (err) {
     logger.error(this.channelName, err)
-    this.loadingHistory = false
-    this.loadingNewMessages = false
+    this.loading = false
+    this.replicating = false
   }
 
   @action
@@ -269,6 +231,8 @@ export default class ChannelStore {
 
   @action.bound
   markEntryAsRead (entry) {
+    if (!entry || entry.seen === true) return
+
     entry.seen = true
 
     // Update the last read timestamp
@@ -279,9 +243,9 @@ export default class ChannelStore {
   }
 
   @action.bound
-  markMessageAsRead (message) {
-    if (!message.unread) return
-    this.entries.filter(e => e.hash === message.hash).forEach(this.markEntryAsRead)
+  markEntryAsReadAtIndex (index) {
+    if (typeof index !== 'number') return
+    this.markEntryAsRead(this.entries[index])
   }
 
   // Public instance methods
@@ -339,11 +303,5 @@ export default class ChannelStore {
         })
       }
     })
-  }
-
-  loadMore () {
-    // TODO: Refactor the use array  indexes and orbit log iterator
-    // if (!this.loadingHistory && this.hasMoreHistory) return this.orbitChannel.loadMore(loadAmount)
-    // else return Promise.resolve()
   }
 }

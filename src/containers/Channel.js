@@ -69,7 +69,7 @@ function Channel ({ channelName }) {
 
   return channel ? (
     <div
-      className="Channel flipped"
+      className="Channel"
       onDragOver={event => {
         event.preventDefault()
         !dragActive && setDragActive(true)

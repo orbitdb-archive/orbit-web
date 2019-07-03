@@ -8,15 +8,7 @@ import Orbit from 'orbit_'
 import promiseQueue from '../utils/promise-queue'
 
 const ORBIT_EVENTS = ['connected', 'disconnected', 'joined', 'left', 'peers']
-const CHANNEL_EVENTS = [
-  'error',
-  // 'entry',
-  // 'write',
-  'load.progress',
-  'load.done',
-  'replicate.progress',
-  'replicate.done'
-]
+const CHANNEL_FEED_EVENTS = ['write', 'load.progress', 'replicate.progress', 'ready', 'replicated']
 
 function onMessage ({ data }) {
   if (!data.action || !(typeof data.action === 'string')) return
@@ -65,14 +57,11 @@ async function channelEvent (eventName, channelName, ...args) {
   const channel = this.orbit.channels[channelName]
 
   const meta = {
-    channelName: channelName,
-    replicationStatus: channel.replicationStatus
+    channelName: channelName
   }
 
-  if (['load.done', 'replicate.done'].indexOf(eventName) !== -1) {
+  if (['ready', 'replicated'].indexOf(eventName) !== -1) {
     meta['entries'] = channel.feed.iterator({ limit: -1 }).collect()
-  } else if (eventName === 'write') {
-    meta['entries'] = [args[2][0]]
   } else if (eventName === 'peer.update') {
     meta['peers'] = await channel.peers
   }
@@ -90,25 +79,22 @@ async function handleStart ({ options }) {
   await startOrbit.call(this, options)
 }
 
-async function handleStop ({ options }) {
+async function handleStop () {
   await this.orbit.disconnect()
   await this.ipfs.stop()
   delete this.orbit
   delete this.ipfs
 }
 
-async function handleJoinChannel ({ options }) {
-  const channel = await this.orbit.join(options.channelName)
+async function handleJoinChannel ({ options: { channelName } }) {
+  const channel = await this.orbit.join(channelName)
 
   channel.load()
 
   // Bind all relevant events
-  CHANNEL_EVENTS.forEach(eventName => {
-    channel.on(eventName, channelEvent.bind(this, eventName, options.channelName))
+  CHANNEL_FEED_EVENTS.forEach(eventName => {
+    channel.feed.events.on(eventName, channelEvent.bind(this, eventName, channelName))
   })
-
-  // Bind to "feed on write" directly since "channel on write" does not include the entry
-  channel.feed.events.on('write', channelEvent.bind(this, 'write', options.channelName))
 }
 
 function handleLeaveChannel ({ options }) {
