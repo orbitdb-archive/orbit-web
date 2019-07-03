@@ -1,6 +1,6 @@
 'use strict'
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized'
 
@@ -25,6 +25,8 @@ function MessageList ({
   useMonospaceFont,
   ...messageRowProps
 }) {
+  const [atBottom, setAtBottom] = useState(false)
+
   const list = useRef()
 
   // Monitor changes and invalidate CellMeasurerCache if changes occur
@@ -97,6 +99,11 @@ function MessageList ({
           rowRenderer={rowRenderer}
           scrollToIndex={messages.length - 1}
           noRowsRenderer={LoadingOrFirstMessage.bind(null, { loading, channelName })}
+          onScroll={({ clientHeight, scrollHeight, scrollTop }) => {
+            const scrollNotAtBottom = scrollHeight - clientHeight > scrollTop + 50
+            if (atBottom && scrollNotAtBottom) setAtBottom(false)
+            else if (!atBottom && !scrollNotAtBottom) setAtBottom(true)
+          }}
         />
       )}
     </AutoSizer>
