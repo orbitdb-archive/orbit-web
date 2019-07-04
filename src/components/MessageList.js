@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
-import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized'
+import { AutoSizer, CellMeasurer, List } from 'react-virtualized'
 
 import MessageRow from '../components/MessageRow'
 import MessagesDateSeparator from '../components/MessagesDateSeparator'
@@ -10,32 +10,63 @@ import { LoadingOrFirstMessage } from '../components/MessageTypes'
 
 import 'react-virtualized/styles.css'
 
-const rowHeightCache = new CellMeasurerCache({
-  defaultHeight: 21,
-  fixedWidth: true
-})
-
 function MessageList ({
   messages,
   channelName,
   language,
   onMessageInView,
+  onAtBottomChange,
+  rowHeightCache,
   loading,
+  replicating,
   useLargeMessage,
   useMonospaceFont,
   ...messageRowProps
 }) {
-  const [atBottom, setAtBottom] = useState(false)
+  const [atBottom, setAtBottom] = useState(true)
+  const [{ scrollTop }, setScroll] = useState({
+    scrollTop: 0
+  })
+  const [{ height: listHeight, width: listWidth }, setListSize] = useState({ height: 0, width: 0 })
 
   const list = useRef()
 
-  // Monitor changes and invalidate CellMeasurerCache if changes occur
-  useEffect(refreshRowSizes, [useLargeMessage, useMonospaceFont, messages.length])
+  useEffect(checkBottom, [scrollTop])
 
-  function refreshRowSizes () {
+  // Monitor changes and invalidate CellMeasurerCache if changes occur
+
+  useEffect(() => {
+    // Size of the rows changed
     rowHeightCache.clearAll()
-    list.current.forceUpdateGrid()
-    list.current.scrollToRow(-1)
+    list.current.recomputeRowHeights()
+  }, [useLargeMessage, useMonospaceFont])
+
+  useEffect(() => {
+    // Size of the whole list changed
+    rowHeightCache.clearAll()
+    list.current.recomputeRowHeights()
+  }, [listHeight, listWidth])
+
+  useEffect(() => {
+    // Indexing of the list might have changed
+    rowHeightCache.clearAll()
+  }, [loading, replicating])
+
+  function checkBottom () {
+    if (messages.length < 2) return
+    const lastMessageOffset = list.current.getOffsetForRow({
+      alignment: 'end',
+      index: messages.length - 2
+    })
+    const scrollAtBottom = scrollTop >= lastMessageOffset
+    if ((!scrollAtBottom && atBottom) || (scrollAtBottom && !atBottom)) {
+      toggleAtBottom()
+    }
+  }
+
+  function toggleAtBottom () {
+    setAtBottom(!atBottom)
+    if (typeof onAtBottomChange === 'function') onAtBottomChange(!atBottom)
   }
 
   function rowRenderer ({ index, key, isVisible, style, parent }) {
@@ -84,10 +115,9 @@ function MessageList ({
    * TODO:
    * - List needs to be at the bottom of the screen
    * - If user has scrolled up, do not force scroll to bottom on new messages
-   * - Indicate that there is something below (newer messages) when scrolled up
    */
   return (
-    <AutoSizer onResize={refreshRowSizes}>
+    <AutoSizer onResize={setListSize}>
       {({ height, width }) => (
         <List
           ref={list}
@@ -99,11 +129,7 @@ function MessageList ({
           rowRenderer={rowRenderer}
           scrollToIndex={messages.length - 1}
           noRowsRenderer={LoadingOrFirstMessage.bind(null, { loading, channelName })}
-          onScroll={({ clientHeight, scrollHeight, scrollTop }) => {
-            const scrollNotAtBottom = scrollHeight - clientHeight > scrollTop + 50
-            if (atBottom && scrollNotAtBottom) setAtBottom(false)
-            else if (!atBottom && !scrollNotAtBottom) setAtBottom(true)
-          }}
+          onScroll={setScroll}
         />
       )}
     </AutoSizer>
@@ -115,7 +141,10 @@ MessageList.propTypes = {
   channelName: PropTypes.string.isRequired,
   language: PropTypes.string.isRequired,
   onMessageInView: PropTypes.func.isRequired,
+  onAtBottomChange: PropTypes.func,
+  rowHeightCache: PropTypes.object.isRequired,
   loading: PropTypes.bool,
+  replicating: PropTypes.bool,
   useLargeMessage: PropTypes.bool,
   useMonospaceFont: PropTypes.bool
 }

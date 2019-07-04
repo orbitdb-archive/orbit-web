@@ -1,6 +1,6 @@
 'use strict'
 
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useObserver } from 'mobx-react-lite'
 import classNames from 'classnames'
@@ -13,6 +13,7 @@ import MessageList from '../components/MessageList'
 
 function ChannelMessages ({ channel }) {
   const { sessionStore, uiStore } = useContext(RootStoreContext)
+  const [atBottom, setAtBottom] = useState(true)
 
   function onMessageUserClick (evt, profile, identity) {
     evt.persist()
@@ -26,15 +27,18 @@ function ChannelMessages ({ channel }) {
         'size-normal': !uiStore.useLargeMessage,
         'size-large': uiStore.useLargeMessage,
         'font-normal': !uiStore.useMonospaceFont,
-        'font-monospace': uiStore.useMonospaceFont
+        'font-monospace': uiStore.useMonospaceFont,
+        hasNewerMessages: !atBottom
       })}
     >
       <MessageList
         messages={channel.messages}
         channelName={channel.channelName}
         loading={channel.loading}
+        replicating={channel.replicating}
         highlightWords={[sessionStore.username]}
         loadFile={channel.loadFile}
+        rowHeightCache={channel.rowHeightCache}
         useLargeMessage={uiStore.useLargeMessage}
         useMonospaceFont={uiStore.useMonospaceFont}
         colorifyUsernames={uiStore.colorifyUsernames}
@@ -43,6 +47,7 @@ function ChannelMessages ({ channel }) {
         emojiSet={uiStore.emojiSet}
         onMessageInView={channel.markEntryAsReadAtIndex}
         onMessageUserClick={onMessageUserClick}
+        onAtBottomChange={setAtBottom}
       />
     </div>
   ))

@@ -2,6 +2,8 @@
 
 import { action, computed, configure, observable, reaction, values } from 'mobx'
 
+import { CellMeasurerCache } from 'react-virtualized'
+
 import Logger from '../utils/logger'
 import notify from '../utils/notify'
 
@@ -17,6 +19,11 @@ export default class ChannelStore {
     this.sendMessage = this.sendMessage.bind(this)
     this.sendFiles = this.sendFiles.bind(this)
     this.loadFile = this.loadFile.bind(this)
+
+    this.rowHeightCache = new CellMeasurerCache({
+      defaultHeight: 21,
+      fixedWidth: true
+    })
 
     this._loadState()
 
@@ -147,24 +154,24 @@ export default class ChannelStore {
 
   @action // Called while loading from local filesystem
   _onLoadProgress (progress, total) {
-    this.loading = true
+    if (!this.loading) this.loading = true
   }
 
   @action // Called when done loading from local filesystem
   _onLoaded (entries) {
     this._updateEntries(entries)
-    this.loading = false
+    if (this.loading) this.loading = false
   }
 
   @action // Called while loading from IPFS (receiving new messages)
   _onReplicateProgress (progress) {
-    this.replicating = true
+    if (!this.replicating) this.replicating = true
   }
 
   @action // Called when done loading from IPFS
   _onReplicated (entries) {
     this._updateEntries(entries)
-    this.replicating = false
+    if (this.replicating) this.replicating = false
   }
 
   // Called when the user writes a message (text or file)
