@@ -32,8 +32,8 @@ export default class NetworkStore {
     this.joinChannel = this.joinChannel.bind(this)
 
     this.worker = new NetworkWorker()
-    this.worker.onmessage = this._onWorkerMessage.bind(this)
-    this.worker.onerror = this._onWorkerError.bind(this)
+    this.worker.addEventListener('message', this._onWorkerMessage.bind(this))
+    this.worker.addEventListener('error', this._onWorkerError.bind(this))
 
     this.worker.postMessage('') // Init the worker
 

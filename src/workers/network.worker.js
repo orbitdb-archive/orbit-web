@@ -32,10 +32,42 @@ function onMessage ({ data }) {
     case 'channel:send-file-message':
       handleSendFileMessage.call(this, data)
       break
+    case 'proxy:req':
+      handleProxyRequest.call(this, data)
+      break
     default:
       console.warn('Unknown action', data.action)
       break
   }
+}
+
+async function handleProxyRequest (data) {
+  switch (data.req) {
+    case 'filebuffer':
+      const array = await getFileBuffer(this.orbit, data.hash)
+      this.postMessage({ action: 'proxy:res', key: data.key, value: array }, [array.buffer])
+      break
+
+    default:
+      break
+  }
+}
+
+function getFileBuffer (orbit, hash) {
+  return new Promise((resolve, reject) => {
+    const stream = orbit.getFile(hash)
+    let array = new Uint8Array(0)
+    stream.on('error', reject)
+    stream.on('data', chunk => {
+      const tmp = new Uint8Array(array.length + chunk.length)
+      tmp.set(array)
+      tmp.set(chunk, array.length)
+      array = tmp
+    })
+    stream.on('end', () => {
+      resolve(array)
+    })
+  })
 }
 
 function orbitEvent (eventName, ...args) {

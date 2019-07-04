@@ -9,6 +9,24 @@ configure({ enforceActions: 'observed' })
 
 const logger = new Logger()
 
+function workerProxy (worker, hash) {
+  return new Promise(resolve => {
+    function listener ({ data }) {
+      if (data.action === 'proxy:res' && data.key === hash) {
+        worker.removeEventListener('message', listener)
+        resolve(data.value)
+      }
+    }
+    worker.addEventListener('message', listener)
+    worker.postMessage({
+      action: 'proxy:req',
+      req: 'filebuffer',
+      hash: hash,
+      key: hash
+    })
+  })
+}
+
 export default class ChannelStore {
   constructor ({ network, channelName }) {
     this.network = network
@@ -263,9 +281,8 @@ export default class ChannelStore {
     return Promise.resolve()
   }
 
-  sendFiles (files) {
-    for (let i = 0; i < files.length; i++) {
-      const f = files[i]
+  _sendFile (file) {
+    return new Promise(resolve => {
       const reader = new FileReader()
       reader.onload = event => {
         this.network.worker.postMessage({
@@ -273,35 +290,46 @@ export default class ChannelStore {
           options: {
             channelName: this.channelName,
             file: {
-              filename: f.name,
+              filename: file.name,
               buffer: event.target.result,
-              meta: { mimeType: f.type, size: f.size }
+              meta: { mimeType: file.type, size: file.size }
             }
           }
         })
+        resolve()
       }
-      reader.readAsArrayBuffer(f)
-    }
+      reader.readAsArrayBuffer(file)
+    })
   }
 
-  loadFile (hash, asStream) {
-    return new Promise((resolve, reject) => {
-      // TODO: Handle electron
-      const stream = this.network.orbit.getFile(hash)
-      if (asStream) resolve({ buffer: null, url: null, stream })
-      else {
-        let buffer = new Uint8Array(0)
-        stream.on('error', reject)
-        stream.on('data', chunk => {
-          const tmp = new Uint8Array(buffer.length + chunk.length)
-          tmp.set(buffer)
-          tmp.set(chunk, buffer.length)
-          buffer = tmp
-        })
-        stream.on('end', () => {
-          resolve({ buffer, url: null, stream: null })
-        })
-      }
-    })
+  sendFiles (files) {
+    const promises = []
+    for (let i = 0; i < files.length; i++) {
+      promises.push(this._sendFile(files[i]))
+    }
+    return Promise.all(promises)
+  }
+
+  async loadFile (hash, asStream) {
+    const array = await workerProxy(this.network.worker, hash)
+    return { buffer: array, url: null, stream: null }
+    // return new Promise((resolve, reject) => {
+    //   // TODO: Handle electron
+    //   const stream = this.network.orbit.getFile(hash)
+    //   if (asStream) resolve({ buffer: null, url: null, stream })
+    //   else {
+    //     let buffer = new Uint8Array(0)
+    //     stream.on('error', reject)
+    //     stream.on('data', chunk => {
+    //       const tmp = new Uint8Array(buffer.length + chunk.length)
+    //       tmp.set(buffer)
+    //       tmp.set(chunk, buffer.length)
+    //       buffer = tmp
+    //     })
+    //     stream.on('end', () => {
+    //       resolve({ buffer, url: null, stream: null })
+    //     })
+    //   }
+    // })
   }
 }
