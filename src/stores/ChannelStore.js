@@ -2,8 +2,6 @@
 
 import { action, computed, configure, observable, reaction, values } from 'mobx'
 
-import { CellMeasurerCache } from 'react-virtualized'
-
 import Logger from '../utils/logger'
 import notify from '../utils/notify'
 
@@ -19,11 +17,6 @@ export default class ChannelStore {
     this.sendMessage = this.sendMessage.bind(this)
     this.sendFiles = this.sendFiles.bind(this)
     this.loadFile = this.loadFile.bind(this)
-
-    this.rowHeightCache = new CellMeasurerCache({
-      defaultHeight: 21,
-      fixedWidth: true
-    })
 
     this._loadState()
 

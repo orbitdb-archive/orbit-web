@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
-import { AutoSizer, CellMeasurer, List } from 'react-virtualized'
+import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized'
 
 import MessageRow from '../components/MessageRow'
 import MessagesDateSeparator from '../components/MessagesDateSeparator'
@@ -10,13 +10,17 @@ import { LoadingOrFirstMessage } from '../components/MessageTypes'
 
 import 'react-virtualized/styles.css'
 
+const rowHeightCache = new CellMeasurerCache({
+  defaultHeight: 21,
+  fixedWidth: true
+})
+
 function MessageList ({
   messages,
   channelName,
   language,
   onMessageInView,
   onAtBottomChange,
-  rowHeightCache,
   loading,
   replicating,
   useLargeMessage,
@@ -52,7 +56,13 @@ function MessageList ({
     rowHeightCache.clearAll()
   }, [loading, replicating])
 
+  useEffect(() => {
+    // Channel changed
+    rowHeightCache.clearAll()
+  }, [channelName])
+
   function checkBottom () {
+    // TODO: Check if list actually is scrollable
     if (messages.length < 2) return
     const lastMessageOffset = list.current.getOffsetForRow({
       alignment: 'end',
@@ -142,7 +152,6 @@ MessageList.propTypes = {
   language: PropTypes.string.isRequired,
   onMessageInView: PropTypes.func.isRequired,
   onAtBottomChange: PropTypes.func,
-  rowHeightCache: PropTypes.object.isRequired,
   loading: PropTypes.bool,
   replicating: PropTypes.bool,
   useLargeMessage: PropTypes.bool,

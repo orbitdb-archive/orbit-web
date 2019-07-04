@@ -38,7 +38,6 @@ function ChannelMessages ({ channel }) {
         replicating={channel.replicating}
         highlightWords={[sessionStore.username]}
         loadFile={channel.loadFile}
-        rowHeightCache={channel.rowHeightCache}
         useLargeMessage={uiStore.useLargeMessage}
         useMonospaceFont={uiStore.useMonospaceFont}
         colorifyUsernames={uiStore.colorifyUsernames}
