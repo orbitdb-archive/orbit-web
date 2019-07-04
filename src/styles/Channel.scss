@@ -268,11 +268,9 @@ input[type="button"],
   .dateSeparator {
     display: flex;
     justify-content: flex-start;
+    margin: 4px 0 2px 0;
     font-size: 0.7em;
     color: rgb(228, 228, 228);
-    border-top: 0.5em solid white;
-    border-bottom: 0.5em solid white;
-    border-color: rgb(35, 35, 35);
     cursor: default;
     text-transform: capitalize;
   }
@@ -343,10 +341,6 @@ input[type="button"],
   &:focus, :focus {
     outline: none;
   }
-}
-
-.flopped {
-  flex: 1 1 100%;
 }
 
 .controlsAnimation-appear {

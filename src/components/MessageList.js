@@ -10,11 +10,6 @@ import { LoadingOrFirstMessage } from '../components/MessageTypes'
 
 import 'react-virtualized/styles.css'
 
-const rowHeightCache = new CellMeasurerCache({
-  defaultHeight: 21,
-  fixedWidth: true
-})
-
 function MessageList ({
   messages,
   channelName,
@@ -28,55 +23,64 @@ function MessageList ({
   ...messageRowProps
 }) {
   const [atBottom, setAtBottom] = useState(true)
-  const [{ scrollTop }, setScroll] = useState({
+  const [{ clientHeight, scrollHeight, scrollTop }, setScroll] = useState({
+    clientHeight: 0,
+    scrollHeight: 0,
     scrollTop: 0
   })
   const [{ height: listHeight, width: listWidth }, setListSize] = useState({ height: 0, width: 0 })
 
   const list = useRef()
 
-  useEffect(checkBottom, [scrollTop])
+  const rowHeightCache = useRef(
+    new CellMeasurerCache({
+      defaultHeight: 21,
+      fixedWidth: true
+    })
+  )
+
+  useEffect(checkBottom, [scrollTop, listHeight, listWidth])
 
   // Monitor changes and invalidate CellMeasurerCache if changes occur
 
   useEffect(() => {
     // Size of the rows changed
-    rowHeightCache.clearAll()
+    rowHeightCache.current.clearAll()
     list.current.recomputeRowHeights()
   }, [useLargeMessage, useMonospaceFont])
 
   useEffect(() => {
     // Size of the whole list changed
-    rowHeightCache.clearAll()
+    rowHeightCache.current.clearAll()
     list.current.recomputeRowHeights()
   }, [listHeight, listWidth])
 
   useEffect(() => {
     // Indexing of the list might have changed
-    rowHeightCache.clearAll()
+    rowHeightCache.current.clearAll()
   }, [loading, replicating])
 
   useEffect(() => {
     // Channel changed
-    rowHeightCache.clearAll()
+    rowHeightCache.current.clearAll()
   }, [channelName])
 
   function checkBottom () {
-    // TODO: Check if list actually is scrollable
-    if (messages.length < 2) return
+    const scrollable = scrollHeight > clientHeight
+    if (!scrollable || messages.length < 2) {
+      setAtBottom(true)
+      if (typeof onAtBottomChange === 'function') onAtBottomChange(true)
+      return
+    }
     const lastMessageOffset = list.current.getOffsetForRow({
       alignment: 'end',
       index: messages.length - 2
     })
     const scrollAtBottom = scrollTop >= lastMessageOffset
     if ((!scrollAtBottom && atBottom) || (scrollAtBottom && !atBottom)) {
-      toggleAtBottom()
+      setAtBottom(!atBottom)
+      if (typeof onAtBottomChange === 'function') onAtBottomChange(!atBottom)
     }
-  }
-
-  function toggleAtBottom () {
-    setAtBottom(!atBottom)
-    if (typeof onAtBottomChange === 'function') onAtBottomChange(!atBottom)
   }
 
   function rowRenderer ({ index, key, isVisible, style, parent }) {
@@ -91,7 +95,7 @@ function MessageList ({
 
     return (
       <CellMeasurer
-        cache={rowHeightCache}
+        cache={rowHeightCache.current}
         key={key}
         parent={parent}
         columnIndex={0}
@@ -134,8 +138,8 @@ function MessageList ({
           width={width}
           height={height}
           rowCount={messages.length}
-          deferredMeasurementCache={rowHeightCache}
-          rowHeight={rowHeightCache.rowHeight}
+          deferredMeasurementCache={rowHeightCache.current}
+          rowHeight={rowHeightCache.current.rowHeight}
           rowRenderer={rowRenderer}
           scrollToIndex={messages.length - 1}
           noRowsRenderer={LoadingOrFirstMessage.bind(null, { loading, channelName })}
