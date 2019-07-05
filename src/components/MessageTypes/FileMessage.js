@@ -40,14 +40,13 @@ function FileMessage ({ animationProps, hash, meta, ...rest }) {
         <a className="download" href={ipfsLink} download={name}>
           {t('channel.file.download')}
         </a>
-        <FilePreview
+        {showPreview && <FilePreview
           animationProps={animationProps}
           hash={hash}
           name={name}
           mimeType={mimeType}
-          show={showPreview}
           {...rest}
-        />
+        />}
       </CSSTransitionGroup>
     </div>
   )

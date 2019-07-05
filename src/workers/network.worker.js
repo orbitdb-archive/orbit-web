@@ -49,7 +49,12 @@ async function handleProxyRequest ({ req, options, key }) {
           const array = await getFileBuffer(this.orbit, options.hash)
           this.postMessage({ action: 'proxy:res', key, value: array }, [array.buffer])
         } else {
-          this.postMessage({ action: 'proxy:res', key, value: null })
+          this.postMessage({
+            action: 'proxy:res',
+            key,
+            value: null,
+            errorMsg: 'Streams are not supported yet'
+          })
         }
       } catch (error) {
         this.postMessage({ action: 'proxy:res', key, value: null, errorMsg: error.message })

@@ -101,18 +101,19 @@ function MessageList ({
         columnIndex={0}
         rowIndex={index}
       >
-        <div style={style}>
-          {index === 0 && LoadingOrFirstMessage({ loading, channelName })}
-
-          {addDateSepator && <MessagesDateSeparator date={date} locale={language} />}
-
-          <MessageRow
-            message={message}
-            useLargeMessage={useLargeMessage}
-            useMonospaceFont={useMonospaceFont}
-            {...messageRowProps}
-          />
-        </div>
+        {({ measure }) => (
+          <div style={style}>
+            {index === 0 && LoadingOrFirstMessage({ loading, channelName })}
+            {addDateSepator && <MessagesDateSeparator date={date} locale={language} />}
+            <MessageRow
+              message={message}
+              useLargeMessage={useLargeMessage}
+              useMonospaceFont={useMonospaceFont}
+              onSizeUpdate={measure}
+              {...messageRowProps}
+            />
+          </div>
+        )}
       </CellMeasurer>
     )
   }
