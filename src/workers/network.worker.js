@@ -41,11 +41,19 @@ function onMessage ({ data }) {
   }
 }
 
-async function handleProxyRequest (data) {
-  switch (data.req) {
-    case 'filebuffer':
-      const array = await getFileBuffer(this.orbit, data.hash)
-      this.postMessage({ action: 'proxy:res', key: data.key, value: array }, [array.buffer])
+async function handleProxyRequest ({ req, options, key }) {
+  switch (req) {
+    case 'ipfs-file':
+      try {
+        if (!options.asStream) {
+          const array = await getFileBuffer(this.orbit, options.hash)
+          this.postMessage({ action: 'proxy:res', key, value: array }, [array.buffer])
+        } else {
+          this.postMessage({ action: 'proxy:res', key, value: null })
+        }
+      } catch (error) {
+        this.postMessage({ action: 'proxy:res', key, value: null, errorMsg: error.message })
+      }
       break
 
     default:
@@ -54,17 +62,30 @@ async function handleProxyRequest (data) {
 }
 
 function getFileBuffer (orbit, hash) {
+  const timeoutError = new Error('Timeout while fetching file')
+  const timeout = 5 * 1000
   return new Promise((resolve, reject) => {
+    let timeoutTimer = setTimeout(() => {
+      reject(timeoutError)
+    }, timeout)
     const stream = orbit.getFile(hash)
     let array = new Uint8Array(0)
-    stream.on('error', reject)
+    stream.on('error', error => {
+      clearTimeout(timeoutTimer)
+      reject(error)
+    })
     stream.on('data', chunk => {
+      clearTimeout(timeoutTimer)
       const tmp = new Uint8Array(array.length + chunk.length)
       tmp.set(array)
       tmp.set(chunk, array.length)
       array = tmp
+      timeoutTimer = setTimeout(() => {
+        reject(timeoutError)
+      }, timeout)
     })
     stream.on('end', () => {
+      clearTimeout(timeoutTimer)
       resolve(array)
     })
   })

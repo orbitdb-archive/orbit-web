@@ -9,24 +9,6 @@ configure({ enforceActions: 'observed' })
 
 const logger = new Logger()
 
-function workerProxy (worker, hash) {
-  return new Promise(resolve => {
-    function listener ({ data }) {
-      if (data.action === 'proxy:res' && data.key === hash) {
-        worker.removeEventListener('message', listener)
-        resolve(data.value)
-      }
-    }
-    worker.addEventListener('message', listener)
-    worker.postMessage({
-      action: 'proxy:req',
-      req: 'filebuffer',
-      hash: hash,
-      key: hash
-    })
-  })
-}
-
 export default class ChannelStore {
   constructor ({ network, channelName }) {
     this.network = network
@@ -311,7 +293,7 @@ export default class ChannelStore {
   }
 
   async loadFile (hash, asStream) {
-    const array = await workerProxy(this.network.worker, hash)
+    const array = await this.network.workerProxy('ipfs-file', { hash, asStream })
     return { buffer: array, url: null, stream: null }
     // return new Promise((resolve, reject) => {
     //   // TODO: Handle electron

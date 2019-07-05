@@ -15,6 +15,7 @@ import {
 import ChannelStore from './ChannelStore'
 
 import Logger from '../utils/logger'
+import WorkerProxy from '../utils/worker-proxy'
 
 import NetworkWorker from '../workers/network.worker.js'
 
@@ -36,6 +37,7 @@ export default class NetworkStore {
     this.worker.addEventListener('error', this._onWorkerError.bind(this))
 
     this.worker.postMessage('') // Init the worker
+    this.workerProxy = new WorkerProxy(this.worker)
 
     // Stop if user logs out, start if not already online or not starting
     reaction(
