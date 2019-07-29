@@ -9,7 +9,7 @@ import createColor from '../../utils/create-color'
 function MessageUser ({ message, colorify, isCommand, onClick }) {
   const {
     userIdentity,
-    meta: { from: userProfile }
+    meta: { from: profile }
   } = message
 
   const color =
@@ -20,9 +20,10 @@ function MessageUser ({ message, colorify, isCommand, onClick }) {
       className={classNames('Message__User', { command: isCommand })}
       style={{ color }}
       onClick={evt => {
-        if (typeof onClick === 'function') onClick(evt, userProfile, userIdentity)
-      }}>
-      {userProfile ? userProfile.name : ''}
+        if (typeof onClick === 'function') onClick(evt, profile, userIdentity)
+      }}
+    >
+      {profile ? (typeof profile.name === 'string' ? profile.name : profile.name.id) : ''}
     </div>
   )
 }

@@ -24,7 +24,8 @@ function MessageUserProfilePanel () {
         uiStore.userProfilePanelIsOpen ? (
           <div
             className="MessageUserProfilePanel"
-            style={calculatePanelStyle(uiStore.userProfilePanelPosition, uiStore.windowDimensions)}>
+            style={calculatePanelStyle(uiStore.userProfilePanelPosition, uiStore.windowDimensions)}
+          >
             <BackgroundAnimation
               style={{ top: '-30px', left: '-70px', zIndex: '-1', display: 'block' }}
               size={256}
@@ -62,10 +63,17 @@ function renderUserCard (t, user) {
         component="div"
         transitionAppearTimeout={1500}
         transitionEnterTimeout={0}
-        transitionLeaveTimeout={0}>
+        transitionLeaveTimeout={0}
+      >
         <img className="picture" src={earthImg} />
       </CSSTransitionGroup>
-      <div className="name">{user.profile.name}</div>
+      <div className="name">
+        {user.profile.name
+          ? typeof user.profile.name === 'string'
+            ? user.profile.name
+            : user.profile.name.id
+          : ''}
+      </div>
       <div className="country">{country ? country + ', Earth' : 'Earth'}</div>
       <dl className="profileDataContainer">
         <dt>{t('userProfile.identityType')}:</dt>
