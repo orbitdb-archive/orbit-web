@@ -52,9 +52,6 @@ export default class UiStore {
   _currentChannelName = null
 
   @observable
-  _metamask = false
-
-  @observable
   _isControlPanelOpen = false
 
   @observable
