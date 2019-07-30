@@ -179,7 +179,9 @@ export default class ChannelStore {
   sendNotification (entry) {
     const {
       sessionStore: {
-        rootStore: { uiStore: currentChannelName }
+        rootStore: {
+          uiStore: { currentChannelName }
+        }
       }
     } = this.network
     const payload = entry.payload.value
