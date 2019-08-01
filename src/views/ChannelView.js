@@ -15,12 +15,13 @@ const Channel = LoadAsync({
 })
 const MessageUserProfilePanel = LoadAsync({
   loader: () =>
-    import(/* webpackChunkName: "MessageUserProfilePanel" */ '../containers/MessageUserProfilePanel')
+    import(
+      /* webpackChunkName: "MessageUserProfilePanel" */ '../containers/MessageUserProfilePanel'
+    )
 })
 
 function ChannelView (props) {
   const { networkStore } = useContext(RootStoreContext)
-
   return (
     <Observer>
       {() =>

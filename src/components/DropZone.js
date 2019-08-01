@@ -1,17 +1,17 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import '../styles/DropZone.scss'
+import '../styles/Curtain.scss'
 
 const DropZone = props => {
   const { onDrop, onDragLeave, label } = props
   return (
     <div
-      className="dropzone"
+      className="curtain"
       onDrop={onDrop}
       onDragLeave={onDragLeave}
     >
-      <div className="droplabel">{label}</div>
+      <div className="curtainlabel">{label}</div>
     </div>
   )
 }

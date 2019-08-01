@@ -1,6 +1,6 @@
 @import "Colors";
 
-.dropzone {
+.curtain {
   box-sizing: border-box;
   position: absolute;
   top: 0;
@@ -22,7 +22,12 @@
   border: 2px dotted $main-color;
   white-space: nowrap;
   overflow: hidden;
-  .droplabel {
+  .curtainlabel {
+    max-width: 100%;
     pointer-events: none;
+    word-wrap: break-word;
+    white-space: normal;
+    text-align: center;
+    font-size: 32px;
   }
 }

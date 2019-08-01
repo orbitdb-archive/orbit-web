@@ -9,8 +9,10 @@ import { useTranslation } from 'react-i18next'
 import RootStoreContext from '../context/RootStoreContext'
 
 import ChannelLink from './ChannelLink'
+import Curtain from '../components/Curtain'
 
 import '../styles/ChannelHeader.scss'
+import '../styles/Curtain.scss'
 
 function ChannelHeader ({ match }) {
   const { networkStore, uiStore } = useContext(RootStoreContext)
@@ -35,26 +37,30 @@ function ChannelHeader ({ match }) {
 
   return (
     <Observer>
-      {() => (
-        <div className="Header" onClick={onHeaderClick}>
-          <div className="ChannelName">
-            <div className="currentChannel">
-              {currentChannelName ? `#${currentChannelName}` : overrideName}
+      {() =>
+        networkStore.isOnline ? (
+          <div className="Header" onClick={onHeaderClick}>
+            <div className="ChannelName">
+              <div className="currentChannel">
+                {currentChannelName ? `#${currentChannelName}` : overrideName}
+              </div>
+              {networkStore.channelsAsArray
+                .filter(c => c.channelName !== currentChannelName)
+                .sort((a, b) => a.channelName.localeCompare(b.channelName))
+                .map(c => (
+                  <ChannelLink
+                    key={c.channelName}
+                    channel={c}
+                    theme={{ ...uiStore.theme }}
+                    onClick={onChannelClick}
+                  />
+                ))}
             </div>
-            {networkStore.channelsAsArray
-              .filter(c => c.channelName !== currentChannelName)
-              .sort((a, b) => a.channelName.localeCompare(b.channelName))
-              .map(c => (
-                <ChannelLink
-                  key={c.channelName}
-                  channel={c}
-                  theme={{ ...uiStore.theme }}
-                  onClick={onChannelClick}
-                />
-              ))}
           </div>
-        </div>
-      )}
+        ) : (
+          <Curtain label={t('login.metamask.info')} />
+        )
+      }
     </Observer>
   )
 }

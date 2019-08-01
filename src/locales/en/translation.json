@@ -38,7 +38,8 @@
     "pressEnterToLogin": "Press ENTER to login",
     "metamask": {
       "disabled": "Log in with Metamask",
-      "enabled": "Metamask Connected"
+      "enabled": "Metamask Connected",
+      "info": "Connect the created OrbitDB account to your Ethereum address by signing the message."
     }
   },
   "loading": "Loading",

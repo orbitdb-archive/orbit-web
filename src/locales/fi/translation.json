@@ -38,7 +38,8 @@
     "pressEnterToLogin": "Paina ENTER kirjautuaksesi",
     "metamask": {
       "disabled": "Kirjaudu sisään Metamaskilla",
-      "enabled": "Sulje Metamask-yhteys"
+      "enabled": "Sulje Metamask-yhteys",
+      "info": "Liitä luotu OrbitDB-tunnus Ethereum-tiliisi allekirjoittamalla viesti."
     }
   },
   "loading": "Ladataan",
