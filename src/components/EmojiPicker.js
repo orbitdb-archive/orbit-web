@@ -38,23 +38,27 @@ class EmojiPicker extends React.Component {
 
     switch (e.key) {
       case 'ArrowRight':
-        this.setState({ selected: this.calculateLeftRightIndex(true) }, this.onChange)
+        this.setState({ selected: this.calculateLeftRightIndex(true) })
         handled = true
         break
       case 'ArrowLeft':
-        this.setState({ selected: this.calculateLeftRightIndex(false) }, this.onChange)
+        this.setState({ selected: this.calculateLeftRightIndex(false) })
         handled = true
         break
       case 'ArrowDown':
-        this.setState({ selected: this.calculateUpDownIndex(true) }, this.onChange)
+        this.setState({ selected: this.calculateUpDownIndex(true) })
         handled = true
         break
       case 'ArrowUp':
-        this.setState({ selected: this.calculateUpDownIndex(false) }, this.onChange)
+        this.setState({ selected: this.calculateUpDownIndex(false) })
         handled = true
         break
       case 'Tab':
-        this.onChange()
+        this.onChange(true)
+        handled = true
+        break
+      case 'Enter':
+        this.onChange(true)
         handled = true
         break
       default:
@@ -111,12 +115,12 @@ class EmojiPicker extends React.Component {
     }
   }
 
-  onChange () {
+  onChange (done) {
     try {
       const emoji = this.props.emojis[this.state.selected]
-      return this.props.onChange(emoji)
+      return this.props.onChange(emoji, done)
     } catch (e) {
-      return this.props.onChange(null)
+      return this.props.onChange(null, done)
     }
   }
 
@@ -135,7 +139,8 @@ class EmojiPicker extends React.Component {
             <li
               key={emoji.id}
               className={selected === idx ? 'selected' : ''}
-              onClick={e => this.onClick(e, idx)}>
+              onClick={e => this.onClick(e, idx)}
+            >
               <Emoji emoji={emoji} size={emojiSize} set={emojiSet} />
             </li>
           )

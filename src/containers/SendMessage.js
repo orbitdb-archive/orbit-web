@@ -74,17 +74,14 @@ class SendMessage extends React.Component {
     }
   }
 
-  onSelectEmoji (emoji) {
+  onSelectEmoji (emoji, done = false) {
     if (!emoji) return
 
-    const n1 = this.state.inputValue.lastIndexOf(':')
-    const n2 = this.state.inputValue.lastIndexOf(':', n1 - 1)
-    const inputValue =
-      n1 !== this.state.inputValue.length - 1
-        ? this.state.inputValue.slice(0, n1) + emoji.colons
-        : this.state.inputValue.slice(0, n2) + emoji.colons
+    const i = this.state.inputValue.lastIndexOf(':')
 
-    this.setState({ inputValue }, () => {
+    const inputValue = this.state.inputValue.slice(0, i) + emoji.colons
+
+    this.setState({ inputValue, emojiPickerActive: !done }, () => {
       this.inputField.current.focus()
     })
   }
