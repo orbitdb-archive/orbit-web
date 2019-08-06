@@ -111,7 +111,12 @@ function MessageList ({
               message={message}
               useLargeMessage={useLargeMessage}
               useMonospaceFont={useMonospaceFont}
-              onSizeUpdate={measure}
+              onSizeUpdate={(e, clear) => {
+                if (!clear) measure()
+                else {
+                  rowHeightCache.current.clear(index)
+                }
+              }}
               {...messageRowProps}
             />
           </div>

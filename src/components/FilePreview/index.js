@@ -83,15 +83,6 @@ function FilePreview ({ animationProps, hash, loadFile, name, mimeType, onSizeUp
     [hash] // Only run effect if 'hash' or 'show' change
   )
 
-  useEffect(() => {
-    onSizeUpdate()
-    return () => {
-      // setTimeout(func, 0) will put the call to the end of the callstack and allow us
-      // to call 'onSizeUpdate' after everything else
-      setTimeout(onSizeUpdate, 0)
-    }
-  }, [])
-
   return (
     <div className="FilePreview">
       <CSSTransitionGroup {...animationProps}>
