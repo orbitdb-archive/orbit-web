@@ -72,7 +72,10 @@ function FilePreview ({ animationProps, hash, loadFile, name, mimeType, onSizeUp
         })
         .catch(e => {
           logger.error(e)
-          if (isMounted) setStatusMessage(t('channel.file.unableToDisplay'))
+          if (isMounted) {
+            setStatusMessage(t('channel.file.unableToDisplay'))
+            setTimeout(onSizeUpdate, 0)
+          }
         })
 
       return () => {
