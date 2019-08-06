@@ -11,18 +11,18 @@ import '../../styles/TextMessage.scss'
 function TextMessage ({ text, animationProps, emojiSet, highlightWords, useEmojis, isCommand }) {
   text = isCommand ? text.substring(4, text.length) : text
 
-  let content = textProcessor.tokenize(text)
+  let tokenized = textProcessor.tokenize(text)
 
-  content = textProcessor.ipfsfy(content, { useAutolink: true })
-  content = textProcessor.autolink(content)
-  content = textProcessor.highlight(content, { className: 'highlight', highlightWords })
-  content = useEmojis ? textProcessor.emojify(content, { set: emojiSet }) : content
+  tokenized = textProcessor.ipfsfy(tokenized, { useAutolink: true })
+  tokenized = textProcessor.autolink(tokenized)
+  tokenized = textProcessor.highlight(tokenized, { className: 'highlight', highlightWords })
+  tokenized = useEmojis ? textProcessor.emojify(tokenized, { set: emojiSet }) : tokenized
 
-  const rendered = textProcessor.render(content)
+  const content = textProcessor.render(tokenized)
 
   return (
     <div className="TextMessage">
-      <CSSTransitionGroup {...animationProps}>{rendered}</CSSTransitionGroup>
+      <CSSTransitionGroup {...animationProps}>{content}</CSSTransitionGroup>
     </div>
   )
 }

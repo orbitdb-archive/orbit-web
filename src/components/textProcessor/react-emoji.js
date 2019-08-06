@@ -9,28 +9,26 @@ const pattern = /(:[^:\s]+:?)/gim
 
 // TODO: emoticons are not rendering properly
 
-// Returns an array of React elements
-function reactEmoji (input, { size = 16, set = 'emojione', ...rest }, wordIndex) {
-  return input.split(' ').map((word, i1) => {
-    if (word[0] !== ':' || word.length === 1) return word
-    const props = Object.assign(
-      {
-        size,
-        set,
-        fallback: (emoji, props) => props.emoji // Return whatever was given as input
-      },
-      { ...rest }
-    )
-    const fragmentKey = `${word}-${wordIndex}-${i1}`
-    const emojis = word.match(pattern)
-    return (
-      <React.Fragment key={fragmentKey}>
-        {emojis.map((emoji, i2) => (
-          <Emoji emoji={emoji} {...props} key={`${fragmentKey}-${i2}`} />
-        ))}{' '}
-      </React.Fragment>
-    )
-  })
+// Returns a React element or a string
+function reactEmoji (word, { size = 16, set = 'emojione', ...rest }, wordIndex) {
+  if (word[0] !== ':' || word.length === 1) return word
+  const props = Object.assign(
+    {
+      size,
+      set,
+      fallback: (emoji, fallbackProps) => fallbackProps.emoji // Return whatever was given as input
+    },
+    { ...rest }
+  )
+  const fragmentKey = `${word}-${wordIndex}`
+  const emojis = word.match(pattern)
+  return (
+    <React.Fragment key={fragmentKey}>
+      {emojis.map((emoji, i) => (
+        <Emoji emoji={emoji} {...props} key={`${fragmentKey}-${i}`} />
+      ))}
+    </React.Fragment>
+  )
 }
 
 export default reactEmoji

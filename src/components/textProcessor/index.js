@@ -26,11 +26,11 @@ function render (children, { tag = 'div', ...props } = {}) {
   return React.createElement(
     tag,
     props,
-    children.reduce((result, c, idx) => {
+    children.reduce((result, element, idx) => {
       // Add white spaces
-      if (!c || c === '') return [...result, ' ']
-      if (idx === children.length - 1) return [...result, c]
-      return [...result, c, ' ']
+      if (!element || element === '') return [...result, ' '] // Remove empty or null elements
+      if (idx === children.length - 1) return [...result, element] // Do not add space after last
+      return [...result, element, ' '] // Add space element after current element
     }, [])
   )
 }
