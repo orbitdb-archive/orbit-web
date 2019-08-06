@@ -90,8 +90,10 @@ function MessageList ({
     const message = messages[index]
     const prevMessage = messages[index - 1]
     const prevDate = prevMessage && new Date(prevMessage.meta.ts)
-    const date = prevDate && new Date(message.meta.ts)
-    const addDateSepator = date && prevDate && date.getDate() !== prevDate.getDate()
+    const date = new Date(message.meta.ts)
+    // Add separator when this is the first message or the dates between messages differ
+    const addDateSepator =
+      date && (!prevDate || (prevDate && date.getDate() !== prevDate.getDate()))
 
     return (
       <CellMeasurer
