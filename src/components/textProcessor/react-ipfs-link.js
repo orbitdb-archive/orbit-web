@@ -12,12 +12,12 @@ function reactIpfsLink (
 ) {
   return input.split(' ').map((word, i) => {
     const firstCheck = word.length === 46 && word.startsWith('Qm')
-    const innerHtml = word + ' '
+    const innerHtml = word
     if (!firstCheck) return innerHtml
     try {
       base58.decode(word)
       const href = baseIpfsUrl + word
-      if (useAutolink) return href + ' ' // Autolinker will handle the creation of an 'a' tag
+      if (useAutolink) return href // Autolinker will handle the creation of an 'a' tag
       props.key = `${href}-${wordIndex}-${i}`
       return React.createElement('a', Object.assign({ href }, props), innerHtml)
     } catch (e) {

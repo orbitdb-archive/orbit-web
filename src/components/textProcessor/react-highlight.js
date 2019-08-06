@@ -14,7 +14,7 @@ function reactHighlight (input, options, wordIndex) {
       word.startsWith(highlightWords + ':') ||
       word.startsWith('@' + highlightWords) ||
       word.startsWith(highlightWords + ',')
-    const innerHtml = word + ' '
+    const innerHtml = word
     props.key = `${word}-${wordIndex}-${i}`
     return match ? React.createElement('span', Object.assign({}, props), innerHtml) : innerHtml
   })

@@ -12,7 +12,7 @@ const pattern = /(:[^:\s]+:?)/gim
 // Returns an array of React elements
 function reactEmoji (input, { size = 16, set = 'emojione', ...rest }, wordIndex) {
   return input.split(' ').map((word, i1) => {
-    if (word[0] !== ':' || word.length === 1) return word + ' '
+    if (word[0] !== ':' || word.length === 1) return word
     const props = Object.assign(
       {
         size,

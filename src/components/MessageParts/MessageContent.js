@@ -6,12 +6,12 @@ import classNames from 'classnames'
 
 import { FileMessage, TextMessage } from '../MessageTypes'
 
-function MessageContent ({ isCommand, message, ...rest }) {
+function MessageContent ({ message, isCommand, ...rest }) {
   let content
 
   switch (message.meta.type) {
     case 'text':
-      content = <TextMessage text={message.content} {...rest} />
+      content = <TextMessage text={message.content} isCommand={isCommand} {...rest} />
       break
     case 'file':
       content = <FileMessage hash={message.content} meta={message.meta} {...rest} />
