@@ -86,6 +86,22 @@ function FilePreview ({ animationProps, hash, loadFile, name, mimeType, onSizeUp
     [hash] // Only run effect if 'hash' or 'show' change
   )
 
+  useEffect(() => {
+    onSizeUpdate()
+    return () => {
+      setTimeout(() => {
+        try {
+          onSizeUpdate()
+        } catch (e) {
+          // This will throw an "Invariant Violation" error if the parent
+          // component unmounted first (e.g. scrolling out of viewport)
+          if (e.message === 'Unable to find node on an unmounted component.') return
+          throw e
+        }
+      }, 0)
+    }
+  }, [])
+
   return (
     <div className="FilePreview">
       <CSSTransitionGroup {...animationProps}>

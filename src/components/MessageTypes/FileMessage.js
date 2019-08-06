@@ -22,18 +22,12 @@ function FileMessage ({ animationProps, hash, meta, ...filePreviewProps }) {
       return
     }
     setShowPreview(!showPreview)
-
-    // Only call 'onSizeUpdate' when 'showPreview' was true (toggling from true to false)
-    // 'onLoad' of different file type components will handle the updating when a preview becomes
-    // visible
-    if (showPreview) {
-      setTimeout(filePreviewProps.onSizeUpdate, 0)
-    }
   }
 
   useEffect(() => {
     return () => {
       if (showPreview) {
+        // Clear the size cache for this row
         filePreviewProps.onSizeUpdate(null, true)
       }
     }
