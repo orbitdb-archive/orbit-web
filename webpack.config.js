@@ -124,7 +124,7 @@ module.exports = (env, argv) => {
   }
 
   if (!isDevServer) {
-    config.plugins = config.plugins.concat([new CleanWebpackPlugin(['dist'])])
+    config.plugins = config.plugins.concat([new CleanWebpackPlugin()])
   }
 
   return config
