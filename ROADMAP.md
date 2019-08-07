@@ -32,8 +32,8 @@ Our short-to-medium-term roadmap items, in order of descending priority.
 | &#9745; | load more messages    | [@latenssi](https://github.com/latenssi) | automatically load more messages as user scrolls up in the channels history                                                   |
 | &#9744; | notifications         | [@latenssi](https://github.com/latenssi) | send notification to a user when somebody mentions her in the chat (e.g. "&commat;somebody hi!")                              |
 | &#9745; | drag and drop files   | [@latenssi](https://github.com/latenssi) | support drag and drop of files                                                                                                |
-| &#9744; | render spaces         | [@latenssi](https://github.com/latenssi) | currently "test&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;test" renders as "test test" in chat               |
-| &#9744; | /me missing space     | [@latenssi](https://github.com/latenssi) | currently "/me doing something" renders as "mynicknamedoing something" in chat                                                |
+| &#9745; | render spaces         | [@latenssi](https://github.com/latenssi) | currently "test&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;test" renders as "test test" in chat               |
+| &#9745; | /me missing space     | [@latenssi](https://github.com/latenssi) | currently "/me doing something" renders as "mynicknamedoing something" in chat                                                |
 | &#9744; | browser compatibility | [@latenssi](https://github.com/latenssi) | some users have reported that the app is not wokring on Firefox on linux                                                      |
 | &#9745; | ProfilePanel position | [@latenssi](https://github.com/latenssi) | fix MessageUserProfilePanel vertical positioning, currently it can overflow from the top of the view                          |
 | &#9745; | mobile version        | [@latenssi](https://github.com/latenssi) | make the app more progressive (PWA)                                                                                           |
