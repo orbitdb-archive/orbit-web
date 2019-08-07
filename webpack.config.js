@@ -2,7 +2,7 @@
 
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const CleanWebpackPlugin = require('clean-webpack-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 
 const config = {
   entry: ['@babel/polyfill', './src/index.js'],
@@ -124,7 +124,7 @@ module.exports = (env, argv) => {
   }
 
   if (!isDevServer) {
-    config.plugins = config.plugins.concat([new CleanWebpackPlugin(['dist'])])
+    config.plugins = config.plugins.concat([new CleanWebpackPlugin()])
   }
 
   return config
