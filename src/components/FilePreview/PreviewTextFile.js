@@ -7,27 +7,25 @@ import Highlight from '../Highlight'
 
 import { getFileExtension } from '../../utils/file-helpers'
 
-function PreviewTextFile ({ blob, filename, ...rest }) {
+function PreviewTextFile ({ blob, filename, onLoad, ...rest }) {
   const [fileContent, setfileContent] = useState(null)
 
-  useEffect(
-    () => {
-      const fileReader = new FileReader()
-      fileReader.onload = ({ target: { result } }) => {
-        setfileContent(
-          <Highlight extension={getFileExtension(filename)} {...rest}>
-            {result}
-          </Highlight>
-        )
-      }
-      fileReader.onerror = () => {
-        fileReader.abort()
-        throw new Error('Unable to read file')
-      }
-      fileReader.readAsText(blob, 'utf-8')
-    },
-    [filename]
-  )
+  useEffect(() => {
+    const fileReader = new FileReader()
+    fileReader.onload = ({ target: { result } }) => {
+      setfileContent(
+        <Highlight extension={getFileExtension(filename)} {...rest}>
+          {result}
+        </Highlight>
+      )
+      onLoad()
+    }
+    fileReader.onerror = () => {
+      fileReader.abort()
+      throw new Error('Unable to read file')
+    }
+    fileReader.readAsText(blob, 'utf-8')
+  }, [filename])
 
   return fileContent || null
 }

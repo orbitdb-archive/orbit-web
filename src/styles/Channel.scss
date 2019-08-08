@@ -3,10 +3,21 @@
 
 $controls-height: 2.8em;
 
+.ChannelView {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  color: #fff;
+  display: flex;
+  overflow: auto;
+}
+
 .Channel {
   width: 100%;
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
   overflow: hidden;
   transform-style: preserve-3d;
 
@@ -50,19 +61,6 @@ $controls-height: 2.8em;
   }
 }
 
-.ChannelView {
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  margin: 0;
-  color: #fff;
-  display: flex;
-  overflow: auto;
-}
-
-.flipped {
-  justify-content: flex-end;
-}
 
 .dimmed {
   opacity: 0.5;
@@ -261,20 +259,18 @@ input[type="button"],
   display: block;
   position: relative;
   box-sizing: border-box;
+  height: 100%;
   width: 100%;
   transform-style: preserve-3d;
-  overflow: hidden;
-  overflow-y: scroll;
+
+  background-color: rgb(35, 35, 35);
 
   .dateSeparator {
     display: flex;
     justify-content: flex-start;
+    margin: 4px 0 2px 0;
     font-size: 0.7em;
     color: rgb(228, 228, 228);
-    background-color: rgb(35, 35, 35);
-    border-top: 0.5em solid white;
-    border-bottom: 0.5em solid white;
-    border-color: rgb(35, 35, 35);
     cursor: default;
     text-transform: capitalize;
   }
@@ -282,7 +278,6 @@ input[type="button"],
   .firstMessage {
     display: flex;
     justify-content: center;
-    background-color: rgb(35, 35, 35);
     color: rgb(160, 160, 160);
     font-weight: bold;
     font-style: italic;
@@ -291,23 +286,18 @@ input[type="button"],
     user-select: none;
     cursor: default;
 
-    &.hasMoreHistory {
-      cursor: pointer;
+  }
 
-      &::before {
-        content: "^";
-        margin-right: 4px;
-      }
-
-      &::after {
-        content: "^";
-        margin-left: 4px;
-      }
-
-      &:hover {
-        background-color: #303030;
-      }
-    }
+  .loadingMessages {
+    display: flex;
+    justify-content: center;
+    color: rgb(160, 160, 160);
+    font-weight: bold;
+    font-style: italic;
+    font-size: 0.7em;
+    padding: 0.5em;
+    user-select: none;
+    cursor: default;
   }
 
   .messagesEnd {
@@ -347,10 +337,10 @@ input[type="button"],
   &.hasNewerMessages {
     border-bottom: 2px solid $second-color;
   }
-}
 
-.flopped {
-  flex: 1 1 100%;
+  &:focus, :focus {
+    outline: none;
+  }
 }
 
 .controlsAnimation-appear {

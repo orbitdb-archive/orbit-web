@@ -1,6 +1,6 @@
 'use strict'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { CSSTransitionGroup } from 'react-transition-group'
 import { useTranslation } from 'react-i18next'
@@ -11,18 +11,33 @@ import { getHumanReadableSize, isAudio, isText, isImage, isVideo } from '../../u
 
 import '../../styles/FileMessage.scss'
 
-function FileMessage ({ animationProps, hash, meta, ...rest }) {
+function FileMessage ({ animationProps, hash, meta, ...filePreviewProps }) {
   const [t] = useTranslation()
   const [showPreview, setShowPreview] = useState(false)
 
   const { name, size, mimeType } = meta
 
-  async function handleNameClick () {
-    if (!showPreview && (!isImage(name) && !isText(name) && !isAudio(name) && !isVideo(name))) {
+  function handleNameClick () {
+    if (!isImage(name) && !isText(name) && !isAudio(name) && !isVideo(name)) {
       return
     }
     setShowPreview(!showPreview)
+
+    // Only call 'onSizeUpdate' when 'showPreview' was true (toggling from true to false)
+    // 'onLoad' of different file type components will handle the updating when a preview becomes
+    // visible
+    if (showPreview) {
+      setTimeout(filePreviewProps.onSizeUpdate, 0)
+    }
   }
+
+  useEffect(() => {
+    return () => {
+      if (showPreview) {
+        filePreviewProps.onSizeUpdate(null, true)
+      }
+    }
+  }, [showPreview])
 
   const ipfsLink =
     (window.gatewayAddress ? 'http://' + window.gatewayAddress : 'https://ipfs.io/ipfs/') + hash
@@ -40,14 +55,15 @@ function FileMessage ({ animationProps, hash, meta, ...rest }) {
         <a className="download" href={ipfsLink} download={name}>
           {t('channel.file.download')}
         </a>
-        <FilePreview
-          animationProps={animationProps}
-          hash={hash}
-          name={name}
-          mimeType={mimeType}
-          show={showPreview}
-          {...rest}
-        />
+        {showPreview && (
+          <FilePreview
+            animationProps={animationProps}
+            hash={hash}
+            name={name}
+            mimeType={mimeType}
+            {...filePreviewProps}
+          />
+        )}
       </CSSTransitionGroup>
     </div>
   )

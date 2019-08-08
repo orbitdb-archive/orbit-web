@@ -21,10 +21,11 @@ Our short-to-medium-term roadmap items, in order of descending priority.
 | &#9745; | add alpha disclaimer  | [@latenssi](https://github.com/latenssi) | add a disclaimer that this is alpha version, things will break and chats will disappear etc.                                  |
 | &#9745; | check documentation   | [@latenssi](https://github.com/latenssi) | make sure documentation is up to date before merging the new [version](https://github.com/orbitdb/orbit-chat) in to orbit-web |
 | &#9745; | merge                 | [@latenssi](https://github.com/latenssi) | merge the new [version](https://github.com/orbitdb/orbit-chat) in to orbit-web as master branch                               |
-| &#9744; | high memory usage     | [@latenssi](https://github.com/latenssi) | currently the memory usage of the app is very high, check what is causing it                                                  |
-| &#9744; | high cpu usage        | [@latenssi](https://github.com/latenssi) | currently the cpu usage of the app is very high, check what is causing it                                                     |
-| &#9744; | performance profiling | [@latenssi](https://github.com/latenssi) | check if something can be optimized                                                                                           |
-| &#9744; | 60 fps level          | [@latenssi](https://github.com/latenssi) | check if we are meeting a "60 fps level" of smoothnes                                                                         |
+| &#9745; | high memory usage     | [@latenssi](https://github.com/latenssi) | currently the memory usage of the app is very high, check what is causing it                                                  |
+| &#9745; | high cpu usage        | [@latenssi](https://github.com/latenssi) | currently the cpu usage of the app is very high, check what is causing it                                                     |
+| &#9745; | performance profiling | [@latenssi](https://github.com/latenssi) | check if something can be optimized                                                                                           |
+| &#9745; | 60 fps level          | [@latenssi](https://github.com/latenssi) | check if we are meeting a "60 fps level" of smoothnes                                                                         |
+| &#9744; | file streaming        | [@latenssi](https://github.com/latenssi) | allow streaming of files (videos) from web worker                                                                             |
 | &#9744; | deploying             | [@latenssi](https://github.com/latenssi) | figure out an automated deployment strategy (deploying to IPFS is preferred)                                                  |
 | &#9744; | domain                | [@latenssi](https://github.com/latenssi) | point orbit.chat domain to this repos deployment (wherever it is)                                                             |
 | &#9744; | basic automated tests | [@latenssi](https://github.com/latenssi) | start implementing automated tests, keep it simple and lean                                                                   |
@@ -36,6 +37,6 @@ Our short-to-medium-term roadmap items, in order of descending priority.
 | &#9744; | browser compatibility | [@latenssi](https://github.com/latenssi) | some users have reported that the app is not wokring on Firefox on linux                                                      |
 | &#9745; | ProfilePanel position | [@latenssi](https://github.com/latenssi) | fix MessageUserProfilePanel vertical positioning, currently it can overflow from the top of the view                          |
 | &#9745; | mobile version        | [@latenssi](https://github.com/latenssi) | make the app more progressive (PWA)                                                                                           |
-| &#9744; | run ipfs in a worker  | [@latenssi](https://github.com/latenssi) | run ipfs in a service worker to mitigate the slowdowns caused by signature checks etc.                                        |
+| &#9745; | run ipfs in a worker  | [@latenssi](https://github.com/latenssi) | run ipfs in a service worker to mitigate the slowdowns caused by signature checks etc.                                        |
 | &#9744; | private channels      | [@latenssi](https://github.com/latenssi) | write only for selected people, everyone can read (read can not be limited because of current techical limitations)           |
 | &#9744; | chat pinner           | [@latenssi](https://github.com/latenssi) | a node which pins a chat so even if everybody leaves, it will keep the chat history in case somebody joins (e.g. IRC bot)     |

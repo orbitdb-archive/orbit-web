@@ -1,8 +1,7 @@
 'use strict'
 
-import { action, computed, configure, observable, reaction, runInAction, values } from 'mobx'
+import { action, computed, configure, observable, reaction, values } from 'mobx'
 
-import { throttleFunc } from '../utils/throttle'
 import Logger from '../utils/logger'
 import notify from '../utils/notify'
 
@@ -10,37 +9,19 @@ configure({ enforceActions: 'observed' })
 
 const logger = new Logger()
 
-const loadAmount = 10 // How many entries are loaded per load call
-
 export default class ChannelStore {
-  constructor ({ network, orbitChannel }) {
+  constructor ({ network, channelName }) {
     this.network = network
-    this.orbitChannel = orbitChannel
+    this.channelName = channelName
 
-    this.loadFile = this.loadFile.bind(this)
-    this.processSendQueue = throttleFunc(this._processSendQueue.bind(this))
-    this.updatePeers = throttleFunc(this._updatePeers.bind(this))
-
-    this.loadMore = this.loadMore.bind(this)
     this.sendMessage = this.sendMessage.bind(this)
     this.sendFiles = this.sendFiles.bind(this)
-
-    this._saveState = this._saveState.bind(this)
-
-    this.orbitChannel.on('error', this._onError.bind(this))
-    this.orbitChannel.on('entry', this._onNewEntry.bind(this))
-    this.orbitChannel.on('write', this._onWrite.bind(this))
-    this.orbitChannel.on('load.progress', this._onLoadProgress.bind(this))
-    this.orbitChannel.on('load.done', this._onLoaded.bind(this))
-    this.orbitChannel.on('replicate.progress', this._onReplicateProgress.bind(this))
-    this.orbitChannel.on('replicate.done', this._onReplicated.bind(this))
+    this.loadFile = this.loadFile.bind(this)
 
     this._loadState()
 
-    this.orbitChannel.load(loadAmount)
-
     // Save channel state on changes
-    reaction(() => values(this._storableState), this._saveState)
+    reaction(() => values(this._storableState), this._saveState.bind(this))
   }
 
   // Private instance variables
@@ -54,9 +35,6 @@ export default class ChannelStore {
   @observable
   _sendingMessageCounter = 0
 
-  @observable
-  _replicationStatus = {}
-
   // Public instance variables
 
   @observable
@@ -66,43 +44,16 @@ export default class ChannelStore {
   peers = []
 
   @observable
-  loadingHistory = false
+  loading = false
 
   @observable
-  loadingNewMessages = false
+  replicating = false
 
   // Public instance getters
-
-  get channelName () {
-    return this.orbitChannel.channelName
-  }
-
-  // TODO: object.name is reserved so remove code which uses this
-  get name () {
-    console.warn(
-      'Deprecation warning: "channel.name" is deprecated, use channel.channelName instead'
-    )
-    return this.channelName
-  }
 
   @computed
   get entryHashes () {
     return this.entries.map(e => e.hash)
-  }
-
-  @computed
-  get seenEntries () {
-    return this.entries.filter(e => e.seen)
-  }
-
-  @computed
-  get unseenEntries () {
-    return this.entries.filter(e => !e.seen)
-  }
-
-  @computed
-  get hasUnseenEntries () {
-    return this.unseenEntries.length > 0
   }
 
   @computed
@@ -115,11 +66,6 @@ export default class ChannelStore {
         unread: !entry.seen
       })
     )
-  }
-
-  @computed
-  get messageHashes () {
-    return this.messages.map(m => m.hash)
   }
 
   @computed
@@ -139,6 +85,7 @@ export default class ChannelStore {
 
   @computed
   get hasMentions () {
+    // TODO: Implement
     return false
   }
 
@@ -155,28 +102,113 @@ export default class ChannelStore {
   }
 
   @computed
-  get hasMoreHistory () {
-    return this._replicationStatus.progress < this._replicationStatus.max
-  }
-
-  @computed
   get userCount () {
     return this.peers.length + 1
   }
 
   // Private instance actions
 
-  @action.bound
+  @action
   _decrementSendingMessageCounter () {
     this._sendingMessageCounter = Math.max(0, this._sendingMessageCounter - 1)
   }
 
-  @action.bound
+  @action
   _incrementSendingMessageCounter () {
     this._sendingMessageCounter += 1
   }
 
-  sendNotification (entry) {
+  // _onNewEntry (entry) {
+  //   // TODO: This is not called anymore; how to handle notification?
+  //   this._sendNotification(entry)
+  //   this._updateEntries([entry])
+  // }
+
+  @action
+  _updateEntries (entries) {
+    const oldHashes = this.entryHashes
+    const { lastSeenTimestamp = 0 } = this._storableState
+
+    const newEntries = entries
+      // Filter out entries we already have
+      .filter(e => !oldHashes.includes(e.hash))
+      // Set entries as seen
+      .map(e => Object.assign(e, { seen: e.payload.value.meta.ts <= lastSeenTimestamp }))
+
+    this.entries = this.entries
+      .concat(newEntries)
+      .sort((a, b) => a.payload.value.meta.ts - b.payload.value.meta.ts)
+  }
+
+  @action
+  _updatePeers (peers) {
+    this.peers = peers
+  }
+
+  @action // Called while loading from local filesystem
+  _onLoadProgress (progress, total) {
+    if (!this.loading) this.loading = true
+  }
+
+  @action // Called when done loading from local filesystem
+  _onLoaded (entries) {
+    this._updateEntries(entries)
+    if (this.loading) this.loading = false
+  }
+
+  @action // Called while loading from IPFS (receiving new messages)
+  _onReplicateProgress (progress) {
+    if (!this.replicating) this.replicating = true
+  }
+
+  @action // Called when done loading from IPFS
+  _onReplicated (entries) {
+    this._updateEntries(entries)
+    if (this.replicating) this.replicating = false
+  }
+
+  // Called when the user writes a message (text or file)
+  _onWrite (entry) {
+    this._updateEntries([entry])
+    this._decrementSendingMessageCounter()
+  }
+
+  _onPeerUpdate (peers) {
+    this._updatePeers(peers)
+  }
+
+  @action
+  _onError (err) {
+    logger.error(this.channelName, err)
+    this.loading = false
+    this.replicating = false
+  }
+
+  @action
+  _loadState () {
+    try {
+      Object.assign(this._storableState, this._getStoredStates()[this.channelName] || {})
+    } catch (err) {}
+  }
+
+  // Private instance methods
+
+  _getStoredStates () {
+    return JSON.parse(localStorage.getItem(this.storagekey)) || {}
+  }
+
+  _saveState () {
+    try {
+      const states = Object.assign(this._getStoredStates(), {
+        [this.channelName]: this._storableState
+      })
+      localStorage.setItem(this.storagekey, JSON.stringify(states))
+    } catch (err) {
+      logger.error(err)
+    }
+  }
+
+  _sendNotification (entry) {
     const {
       sessionStore: {
         rootStore: { uiStore: currentChannelName }
@@ -195,87 +227,12 @@ export default class ChannelStore {
     }
   }
 
-  _onNewEntry (entry) {
-    this.sendNotification(entry)
-    this._updateEntries([entry])
-  }
-
-  @action.bound
-  _updateEntries (entries) {
-    const oldHashes = this.entryHashes
-    const { lastSeenTimestamp = 0 } = this._storableState
-
-    const newEntries = entries
-      // Filter out entries we already have
-      .filter(e => !oldHashes.includes(e.hash))
-      // Set entries as seen
-      .map(e => Object.assign(e, { seen: e.payload.value.meta.ts <= lastSeenTimestamp }))
-
-    this.entries = this.entries
-      .concat(newEntries)
-      .sort((a, b) => a.payload.value.meta.ts - b.payload.value.meta.ts)
-  }
-
-  @action
-  async _updatePeers () {
-    const peers = await this._getPeers()
-    runInAction(() => {
-      this.peers = peers
-    })
-  }
-
-  @action.bound
-  _updateReplicationStatus () {
-    Object.assign(this._replicationStatus, this.orbitChannel.replicationStatus)
-  }
-
-  @action // Called while loading from local filesystem
-  _onLoadProgress () {
-    this._updateReplicationStatus()
-    this.loadingHistory = true
-  }
-
-  @action // Called when done loading from local filesystem
-  _onLoaded () {
-    this._updateReplicationStatus()
-    this.loadingHistory = false
-  }
-
-  @action // Called while loading from IPFS (receiving new messages)
-  _onReplicateProgress () {
-    this._updateReplicationStatus()
-    this.loadingNewMessages = true
-  }
-
-  @action // Called when done loading from IPFS
-  _onReplicated () {
-    this._updateReplicationStatus()
-    this.loadingNewMessages = false
-  }
-
-  // Called when the user writes a message (text or file)
-  _onWrite () {
-    this._decrementSendingMessageCounter()
-  }
-
-  @action
-  _onError (err) {
-    logger.error(this.channelName, err)
-    this.loadingHistory = false
-    this.loadingNewMessages = false
-  }
-
-  @action.bound
-  _loadState () {
-    try {
-      Object.assign(this._storableState, this._getStoredStates()[this.channelName] || {})
-    } catch (err) {}
-  }
-
   // Public instance actions
 
   @action.bound
   markEntryAsRead (entry) {
+    if (!entry || entry.seen === true) return
+
     entry.seen = true
 
     // Update the last read timestamp
@@ -286,123 +243,75 @@ export default class ChannelStore {
   }
 
   @action.bound
-  markMessageAsRead (message) {
-    if (!message.unread) return
-    this.entries.filter(e => e.hash === message.hash).forEach(this.markEntryAsRead)
+  markEntryAsReadAtIndex (index) {
+    if (typeof index !== 'number') return
+    this.markEntryAsRead(this.entries[index])
   }
+
+  // Public instance methods
 
   sendMessage (text) {
     if (typeof text !== 'string' || text === '') return Promise.resolve()
 
     this._incrementSendingMessageCounter()
 
-    return new Promise((resolve, reject) => {
-      this._sendQueue.push({ text, resolve, reject })
+    this.network.worker.postMessage({
+      action: 'channel:send-text-message',
+      options: { channelName: this.channelName, message: text }
+    })
+
+    return Promise.resolve()
+  }
+
+  _sendFile (file) {
+    return new Promise(resolve => {
+      const reader = new FileReader()
+      reader.onload = event => {
+        this.network.worker.postMessage({
+          action: 'channel:send-file-message',
+          options: {
+            channelName: this.channelName,
+            file: {
+              filename: file.name,
+              buffer: event.target.result,
+              meta: { mimeType: file.type, size: file.size }
+            }
+          }
+        })
+        resolve()
+      }
+      reader.readAsArrayBuffer(file)
     })
   }
 
   sendFiles (files) {
     const promises = []
     for (let i = 0; i < files.length; i++) {
-      promises.push(
-        new Promise((resolve, reject) => {
-          this._incrementSendingMessageCounter()
-          const f = files[i]
-          const reader = new FileReader()
-          reader.onload = event => {
-            this._sendQueue.push({
-              file: {
-                filename: f.name,
-                buffer: event.target.result,
-                meta: { mimeType: f.type, size: f.size }
-              },
-              resolve,
-              reject
-            })
-          }
-          reader.readAsArrayBuffer(f)
-        })
-      )
+      promises.push(this._sendFile(files[i]))
     }
-
     return Promise.all(promises)
   }
 
-  // Private instance methods
-
-  _getPeers () {
-    return this.orbitChannel.peers
-  }
-
-  _getStoredStates () {
-    return JSON.parse(localStorage.getItem(this.storagekey)) || {}
-  }
-
-  _saveState () {
-    try {
-      const states = Object.assign(this._getStoredStates(), {
-        [this.channelName]: this._storableState
-      })
-      localStorage.setItem(this.storagekey, JSON.stringify(states))
-    } catch (err) {
-      logger.error(err)
-    }
-  }
-
-  @action
-  _processSendQueue () {
-    if (this._sendQueue.length === 0 || this._sending) return
-
-    this._sending = true
-
-    const task = this._sendQueue.shift()
-
-    let promise
-
-    if (task.text) {
-      promise = this.orbitChannel.sendMessage(task.text)
-    } else if (task.file) {
-      promise = this.orbitChannel.sendFile(task.file)
-    }
-
-    if (promise && promise.then) {
-      // Wrap the tasks reject function so we can decrement the '_sendingMessageCounter'
-      const wrappedReject = (...args) => {
-        this._decrementSendingMessageCounter()
-        task.reject(...args)
-      }
-
-      promise.then(task.resolve, wrappedReject).finally(() => {
-        this._sending = false
-      })
-    } else this._sending = false
-  }
-
-  // Public instance methods
-
-  loadFile (hash, asStream) {
-    return new Promise((resolve, reject) => {
-      // TODO: Handle electron
-      const stream = this.network.orbit.getFile(hash)
-      if (asStream) resolve({ buffer: null, url: null, stream })
-      else {
-        let buffer = new Uint8Array(0)
-        stream.on('error', reject)
-        stream.on('data', chunk => {
-          const tmp = new Uint8Array(buffer.length + chunk.length)
-          tmp.set(buffer)
-          tmp.set(chunk, buffer.length)
-          buffer = tmp
-        })
-        stream.on('end', () => {
-          resolve({ buffer, url: null, stream: null })
-        })
-      }
-    })
-  }
-
-  loadMore () {
-    if (!this.loadingHistory && this.hasMoreHistory) return this.orbitChannel.loadMore(loadAmount)
-    else return Promise.resolve()
+  async loadFile (hash, asStream) {
+    const array = await this.network.workerProxy('ipfs-file', { hash, asStream }, hash)
+    return { buffer: array, url: null, stream: null }
+    // return new Promise((resolve, reject) => {
+    //   // TODO: Handle electron
+    //   const stream = this.network.orbit.getFile(hash)
+    //   if (asStream) resolve({ buffer: null, url: null, stream })
+    //   else {
+    //     let buffer = new Uint8Array(0)
+    //     stream.on('error', reject)
+    //     stream.on('data', chunk => {
+    //       const tmp = new Uint8Array(buffer.length + chunk.length)
+    //       tmp.set(buffer)
+    //       tmp.set(chunk, buffer.length)
+    //       buffer = tmp
+    //     })
+    //     stream.on('end', () => {
+    //       resolve({ buffer, url: null, stream: null })
+    //     })
+    //   }
+    // })
   }
 }
