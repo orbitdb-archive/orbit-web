@@ -59,11 +59,37 @@ export default class ChannelStore {
   @computed
   get messages () {
     // Format entries to better suit a chat channel
-    return this.entries.map(entry =>
-      Object.assign(JSON.parse(JSON.stringify(entry.payload.value)), {
+
+    const formatMeta = meta => Object.assign(meta, { from: formatFrom(meta.from) })
+
+    const formatFrom = from => {
+      return {
+        name: formatName(from),
+        image: from.image,
+        location: from.location
+      }
+    }
+
+    const formatName = from => {
+      if ('name' in from) {
+        if (checkName(from.name)) return from.name
+        else if ('id' in from.name && checkName(from.name.id)) return from.name.id
+      }
+      return 'anonymous'
+    }
+
+    const checkName = name => {
+      return typeof name === 'string' && name.length > 0
+    }
+
+    return this.entries
+      .map(e => JSON.parse(JSON.stringify(e))) // Make sure we are working with a copy
+      .map(entry =>
+        Object.assign(entry.payload.value, {
         hash: entry.hash,
         userIdentity: entry.identity,
-        unread: !entry.seen
+          unread: !entry.seen,
+          meta: formatMeta(entry.payload.value.meta)
       })
     )
   }
