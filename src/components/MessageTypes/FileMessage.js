@@ -1,8 +1,7 @@
 'use strict'
 
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
-import { CSSTransitionGroup } from 'react-transition-group'
 import { useTranslation } from 'react-i18next'
 
 import FilePreview from '../FilePreview'
@@ -11,34 +10,30 @@ import { getHumanReadableSize, isAudio, isText, isImage, isVideo } from '../../u
 
 import '../../styles/FileMessage.scss'
 
-function FileMessage ({ animationProps, hash, meta, ...filePreviewProps }) {
+function FileMessage ({
+  messageHash,
+  fileHash,
+  meta,
+  filepreviewOpen,
+  toggleFilepreview,
+  ...filePreviewProps
+}) {
   const [t] = useTranslation()
-  const [showPreview, setShowPreview] = useState(false)
 
   const { name, size, mimeType } = meta
 
   function handleNameClick () {
-    if (!isImage(name) && !isText(name) && !isAudio(name) && !isVideo(name)) {
-      return
-    }
-    setShowPreview(!showPreview)
+    if (!isImage(name) && !isText(name) && !isAudio(name) && !isVideo(name)) return
+    toggleFilepreview(messageHash)
+    setTimeout(filePreviewProps.onSizeUpdate, 0)
   }
 
-  useEffect(() => {
-    return () => {
-      if (showPreview) {
-        // Clear the size cache for this row
-        filePreviewProps.onSizeUpdate(null, true)
-      }
-    }
-  }, [showPreview])
-
   const ipfsLink =
-    (window.gatewayAddress ? 'http://' + window.gatewayAddress : 'https://ipfs.io/ipfs/') + hash
+    (window.gatewayAddress ? 'http://' + window.gatewayAddress : 'https://ipfs.io/ipfs/') + fileHash
 
   return (
     <div className="FileMessage">
-      <CSSTransitionGroup {...animationProps}>
+      <div>
         <span className="name" onClick={handleNameClick}>
           {name}
         </span>
@@ -49,28 +44,26 @@ function FileMessage ({ animationProps, hash, meta, ...filePreviewProps }) {
         <a className="download" href={ipfsLink} download={name}>
           {t('channel.file.download')}
         </a>
-        {showPreview && (
-          <FilePreview
-            animationProps={animationProps}
-            hash={hash}
-            name={name}
-            mimeType={mimeType}
-            {...filePreviewProps}
-          />
+        {filepreviewOpen && (
+          <FilePreview hash={fileHash} name={name} mimeType={mimeType} {...filePreviewProps} />
         )}
-      </CSSTransitionGroup>
+      </div>
     </div>
   )
 }
 
 FileMessage.propTypes = {
-  animationProps: PropTypes.object.isRequired,
-  hash: PropTypes.string.isRequired,
+  messageHash: PropTypes.string.isRequired,
+  fileHash: PropTypes.string.isRequired,
   meta: PropTypes.shape({
     name: PropTypes.string.isRequired,
     size: PropTypes.number.isRequired,
     mimeType: PropTypes.string.isRequired
-  }).isRequired
+  }).isRequired,
+  filepreviewOpen: PropTypes.bool.isRequired,
+  toggleFilepreview: PropTypes.func.isRequired
 }
+
+FileMessage.defaultProps = {}
 
 export default FileMessage

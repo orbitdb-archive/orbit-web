@@ -141,15 +141,10 @@ $timestamp-color:  rgba(240, 240, 240, 0.6);
 }
 
 .messageAnimation-appear {
-  animation-name: fadeIn;
-  animation-duration: .3s;
-  animation-fill-mode: both;
-  animation-timing-function: ease-in;
+  opacity: 0.01;
 }
 
-.messageAnimation-enter {
-  animation-name: fadeIn;
-  animation-duration: .2s;
-  animation-fill-mode: both;
-  animation-timing-function: ease-in;
+.messageAnimation-appear.messageAnimation-appear-active  {
+  opacity: 1;
+  transition: opacity .3s ease-in;
 }

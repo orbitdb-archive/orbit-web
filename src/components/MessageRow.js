@@ -34,16 +34,6 @@ function MessageRow ({
       message={message}
       isCommand={isCommand}
       highlightWords={highlightWords}
-      animationProps={{
-        transitionName: 'messageAnimation',
-        transitionAppear: true,
-        transitionEnter: true,
-        transitionLeave: false,
-        transitionAppearTimeout: 200,
-        transitionEnterTimeout: 1000,
-        component: 'div',
-        className: 'content'
-      }}
       {...messageContentProps}
     />
   )

@@ -18,6 +18,7 @@ function PreviewTextFile ({ blob, filename, onLoad, ...rest }) {
           {result}
         </Highlight>
       )
+      setTimeout(onLoad, 0)
     }
     fileReader.onerror = () => {
       fileReader.abort()
@@ -25,10 +26,6 @@ function PreviewTextFile ({ blob, filename, onLoad, ...rest }) {
     }
     fileReader.readAsText(blob, 'utf-8')
   }, [filename])
-
-  useEffect(() => {
-    setTimeout(onLoad, 0)
-  }, [fileContent])
 
   return fileContent || null
 }

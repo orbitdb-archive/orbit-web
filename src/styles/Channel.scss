@@ -334,9 +334,13 @@ input[type="button"],
     }
   }
 
-  &.hasNewerMessages {
+  &.notAtBottom {
     border-bottom: 2px solid $second-color;
   }
+
+  &.hasNewerOlderMessages {}
+
+  &.hasNewerUnreadMessages {}
 
   &:focus, :focus {
     outline: none;

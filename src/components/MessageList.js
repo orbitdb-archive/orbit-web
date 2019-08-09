@@ -23,12 +23,9 @@ function MessageList ({
   ...messageRowProps
 }) {
   const [atBottom, setAtBottom] = useState(true)
-  const [{ clientHeight, scrollHeight, scrollTop }, setScroll] = useState({
-    clientHeight: 0,
-    scrollHeight: 0,
-    scrollTop: 0
-  })
   const [{ height: listHeight, width: listWidth }, setListSize] = useState({ height: 0, width: 0 })
+  const [openFilepreviews, setOpenFilepreviews] = useState([])
+  const [lastOpenedPreviewIndex, setLastOpenedPreviewIndex] = useState(null)
 
   const list = useRef()
 
@@ -38,8 +35,6 @@ function MessageList ({
       fixedWidth: true
     })
   )
-
-  useEffect(checkBottom, [scrollTop, listHeight, listWidth])
 
   // Monitor changes and invalidate CellMeasurerCache if changes occur
 
@@ -63,23 +58,38 @@ function MessageList ({
   useEffect(() => {
     // Channel changed
     rowHeightCache.current.clearAll()
+    setTimeout(() => {
+      // Scroll to bottom
+      list.current.scrollToRow(messages.length - 1)
+    }, 0)
   }, [channelName])
 
-  function checkBottom () {
-    const scrollable = scrollHeight > clientHeight
-    if (!scrollable || messages.length < 2) {
-      setAtBottom(true)
-      if (typeof onAtBottomChange === 'function') onAtBottomChange(true)
-      return
-    }
-    const lastMessageOffset = list.current.getOffsetForRow({
-      alignment: 'end',
-      index: messages.length - 2
-    })
-    const scrollAtBottom = scrollTop >= lastMessageOffset
+  useEffect(() => {
+    if (atBottom) list.current.scrollToRow(messages.length - 1)
+  }, [messages.length])
+
+  function checkBottom ({ stopIndex }) {
+    const scrollAtBottom = stopIndex === messages.length - 1
     if ((!scrollAtBottom && atBottom) || (scrollAtBottom && !atBottom)) {
       setAtBottom(!atBottom)
       if (typeof onAtBottomChange === 'function') onAtBottomChange(!atBottom)
+    }
+  }
+
+  function toggleFilepreview (messageIndex, messageHash) {
+    const newArr = [...openFilepreviews]
+    const idx = newArr.indexOf(messageHash)
+    if (idx > -1) newArr.splice(idx, 1)
+    else newArr.push(messageHash)
+    setOpenFilepreviews(newArr)
+    setLastOpenedPreviewIndex(messageIndex)
+  }
+
+  function onFilePreviewLoaded (measure, scrollTo) {
+    measure()
+    if (scrollTo && lastOpenedPreviewIndex) {
+      list.current.scrollToRow(lastOpenedPreviewIndex)
+      setLastOpenedPreviewIndex(null)
     }
   }
 
@@ -111,12 +121,10 @@ function MessageList ({
               message={message}
               useLargeMessage={useLargeMessage}
               useMonospaceFont={useMonospaceFont}
-              onSizeUpdate={(e, clear) => {
-                if (!clear) measure()
-                else {
-                  rowHeightCache.current.clear(index)
-                }
-              }}
+              onSizeUpdate={measure}
+              filepreviewOpen={openFilepreviews.indexOf(message.hash) > -1}
+              toggleFilepreview={toggleFilepreview.bind(null, index)}
+              onFilePreviewLoaded={onFilePreviewLoaded.bind(null, measure)}
               {...messageRowProps}
             />
           </div>
@@ -133,11 +141,6 @@ function MessageList ({
     parent: PropTypes.node.isRequired
   }
 
-  /*
-   * TODO:
-   * - List needs to be at the bottom of the screen
-   * - If user has scrolled up, do not force scroll to bottom on new messages
-   */
   return (
     <AutoSizer onResize={setListSize}>
       {({ height, width }) => (
@@ -149,9 +152,8 @@ function MessageList ({
           deferredMeasurementCache={rowHeightCache.current}
           rowHeight={rowHeightCache.current.rowHeight}
           rowRenderer={rowRenderer}
-          scrollToIndex={messages.length - 1}
+          onRowsRendered={checkBottom}
           noRowsRenderer={LoadingOrFirstMessage.bind(null, { loading, channelName })}
-          onScroll={setScroll}
         />
       )}
     </AutoSizer>

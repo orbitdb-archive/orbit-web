@@ -28,7 +28,7 @@ function ChannelMessages ({ channel }) {
         'size-large': uiStore.useLargeMessage,
         'font-normal': !uiStore.useMonospaceFont,
         'font-monospace': uiStore.useMonospaceFont,
-        hasNewerMessages: !atBottom
+        notAtBottom: !atBottom
       })}
     >
       <MessageList

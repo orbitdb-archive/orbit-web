@@ -2,13 +2,12 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { CSSTransitionGroup } from 'react-transition-group'
 
 import textProcessor from '../textProcessor'
 
 import '../../styles/TextMessage.scss'
 
-function TextMessage ({ text, animationProps, emojiSet, highlightWords, useEmojis, isCommand }) {
+function TextMessage ({ text, emojiSet, highlightWords, useEmojis, isCommand }) {
   text = isCommand ? text.substring(4, text.length) : text
 
   let tokenized = textProcessor.tokenize(text)
@@ -20,16 +19,11 @@ function TextMessage ({ text, animationProps, emojiSet, highlightWords, useEmoji
 
   const content = textProcessor.render(tokenized)
 
-  return (
-    <div className="TextMessage">
-      <CSSTransitionGroup {...animationProps}>{content}</CSSTransitionGroup>
-    </div>
-  )
+  return <div className="TextMessage">{content}</div>
 }
 
 TextMessage.propTypes = {
   text: PropTypes.string.isRequired,
-  animationProps: PropTypes.object.isRequired,
   emojiSet: PropTypes.string.isRequired,
   highlightWords: PropTypes.array,
   useEmojis: PropTypes.bool,

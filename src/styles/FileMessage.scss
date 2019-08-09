@@ -149,3 +149,12 @@ $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
     color: rgba(240, 244, 240, 0.1);
   }
 }
+
+.filepreviewAnimation-appear {
+  opacity: 0.01;
+}
+
+.filepreviewAnimation-appear.filepreviewAnimation-appear-active  {
+  opacity: 1;
+  transition: opacity .25s ease-in;
+}
