@@ -1,12 +1,14 @@
 'use strict'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized'
 
 import MessageRow from '../components/MessageRow'
 import MessagesDateSeparator from '../components/MessagesDateSeparator'
 import { LoadingOrFirstMessage } from '../components/MessageTypes'
+
+import { debounce } from '../utils/throttle'
 
 import 'react-virtualized/styles.css'
 
@@ -23,50 +25,55 @@ function MessageList ({
   ...messageRowProps
 }) {
   const [atBottom, setAtBottom] = useState(true)
-  const [{ height: listHeight, width: listWidth }, setListSize] = useState({ height: 0, width: 0 })
   const [openFilepreviews, setOpenFilepreviews] = useState([])
   const [lastOpenedPreviewIndex, setLastOpenedPreviewIndex] = useState(null)
 
   const list = useRef()
 
-  const rowHeightCache = useRef(
-    new CellMeasurerCache({
-      defaultHeight: 21,
-      fixedWidth: true
-    })
+  const rowHeightCache = useMemo(
+    () =>
+      new CellMeasurerCache({
+        defaultHeight: useLargeMessage ? 46 : 20,
+        fixedWidth: true
+      }),
+    [useLargeMessage, channelName]
   )
 
-  // Monitor changes and invalidate CellMeasurerCache if changes occur
+  const onListSizeChange = useCallback(
+    debounce(() => {
+      rowHeightCache.clearAll()
+      list.current.recomputeRowHeights()
+    }, 100),
+    [rowHeightCache, list.current]
+  )
 
-  useEffect(() => {
-    // Size of the rows changed
-    rowHeightCache.current.clearAll()
-    list.current.recomputeRowHeights()
-  }, [useLargeMessage, useMonospaceFont])
-
-  useEffect(() => {
-    // Size of the whole list changed
-    rowHeightCache.current.clearAll()
-    list.current.recomputeRowHeights()
-  }, [listHeight, listWidth])
-
-  useEffect(() => {
-    // Indexing of the list might have changed
-    rowHeightCache.current.clearAll()
-  }, [loading, replicating])
-
-  useEffect(() => {
-    // Channel changed
-    rowHeightCache.current.clearAll()
+  const onChannelChange = useCallback(() => {
+    setOpenFilepreviews([])
+    setLastOpenedPreviewIndex(null)
     setTimeout(() => {
-      // Scroll to bottom
-      list.current.scrollToRow(messages.length - 1)
+      list.current.scrollToRow(-1)
     }, 0)
-  }, [channelName])
+  }, [list.current])
 
-  useEffect(() => {
-    if (atBottom) list.current.scrollToRow(messages.length - 1)
-  }, [messages.length])
+  function onNewMessage () {
+    if (atBottom) list.current.scrollToRow(-1)
+  }
+
+  function onRowsRendered ({ stopIndex }) {
+    checkBottom({ stopIndex })
+  }
+
+  function onFilePreviewLoaded (measure, scrollTo) {
+    measure()
+    if (scrollTo && lastOpenedPreviewIndex) {
+      list.current.scrollToRow(lastOpenedPreviewIndex)
+      setLastOpenedPreviewIndex(null)
+    }
+  }
+
+  useEffect(onListSizeChange, [useLargeMessage, useMonospaceFont, loading, replicating])
+  useEffect(onChannelChange, [channelName])
+  useEffect(onNewMessage, [messages.length])
 
   function checkBottom ({ stopIndex }) {
     const scrollAtBottom = stopIndex === messages.length - 1
@@ -79,18 +86,15 @@ function MessageList ({
   function toggleFilepreview (messageIndex, messageHash) {
     const newArr = [...openFilepreviews]
     const idx = newArr.indexOf(messageHash)
-    if (idx > -1) newArr.splice(idx, 1)
-    else newArr.push(messageHash)
-    setOpenFilepreviews(newArr)
-    setLastOpenedPreviewIndex(messageIndex)
-  }
-
-  function onFilePreviewLoaded (measure, scrollTo) {
-    measure()
-    if (scrollTo && lastOpenedPreviewIndex) {
-      list.current.scrollToRow(lastOpenedPreviewIndex)
-      setLastOpenedPreviewIndex(null)
+    if (idx > -1) {
+      // Close
+      newArr.splice(idx, 1)
+    } else {
+      // Open
+      newArr.push(messageHash)
+      setLastOpenedPreviewIndex(messageIndex)
     }
+    setOpenFilepreviews(newArr)
   }
 
   function rowRenderer ({ index, key, isVisible, style, parent }) {
@@ -107,7 +111,7 @@ function MessageList ({
 
     return (
       <CellMeasurer
-        cache={rowHeightCache.current}
+        cache={rowHeightCache}
         key={key}
         parent={parent}
         columnIndex={0}
@@ -142,17 +146,17 @@ function MessageList ({
   }
 
   return (
-    <AutoSizer onResize={setListSize}>
+    <AutoSizer onResize={onListSizeChange}>
       {({ height, width }) => (
         <List
           ref={list}
           width={width}
           height={height}
           rowCount={messages.length}
-          deferredMeasurementCache={rowHeightCache.current}
-          rowHeight={rowHeightCache.current.rowHeight}
+          deferredMeasurementCache={rowHeightCache}
+          rowHeight={rowHeightCache.rowHeight}
           rowRenderer={rowRenderer}
-          onRowsRendered={checkBottom}
+          onRowsRendered={onRowsRendered}
           noRowsRenderer={LoadingOrFirstMessage.bind(null, { loading, channelName })}
         />
       )}
