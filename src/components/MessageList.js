@@ -18,16 +18,18 @@ function MessageList ({
   language,
   onMessageInView,
   onAtBottomChange,
+  atBottom,
   loading,
   replicating,
   useLargeMessage,
   useMonospaceFont,
   ...messageRowProps
 }) {
-  const [atBottom, setAtBottom] = useState(true)
+  const [listWidth, setListWidth] = useState(0)
   const [openFilepreviews, setOpenFilepreviews] = useState([])
   const [lastOpenedPreviewIndex, setLastOpenedPreviewIndex] = useState(null)
 
+  const _onAtBottomChange = typeof onAtBottomChange === 'function' ? onAtBottomChange : () => {}
   const list = useRef()
 
   const rowHeightCache = useMemo(
@@ -79,8 +81,7 @@ function MessageList ({
   function checkBottom ({ stopIndex }) {
     const scrollAtBottom = stopIndex === messages.length - 1
     if ((!scrollAtBottom && atBottom) || (scrollAtBottom && !atBottom)) {
-      setAtBottom(!atBottom)
-      if (typeof onAtBottomChange === 'function') onAtBottomChange(!atBottom)
+      _onAtBottomChange(!atBottom)
     }
   }
 
@@ -171,6 +172,7 @@ MessageList.propTypes = {
   language: PropTypes.string.isRequired,
   onMessageInView: PropTypes.func.isRequired,
   onAtBottomChange: PropTypes.func,
+  atBottom: PropTypes.bool.isRequired,
   loading: PropTypes.bool,
   replicating: PropTypes.bool,
   useLargeMessage: PropTypes.bool,

@@ -47,6 +47,7 @@ function ChannelMessages ({ channel }) {
         onMessageInView={channel.markEntryAsReadAtIndex}
         onMessageUserClick={onMessageUserClick}
         onAtBottomChange={setAtBottom}
+        atBottom={atBottom}
       />
     </div>
   ))
