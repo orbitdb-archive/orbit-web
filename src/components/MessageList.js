@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized'
+import classNames from 'classnames'
 
 import MessageRow from '../components/MessageRow'
 import MessagesDateSeparator from '../components/MessagesDateSeparator'
@@ -17,20 +18,16 @@ function MessageList ({
   channelName,
   language,
   onMessageInView,
-  onAtBottomChange,
-  atBottom,
   loading,
   replicating,
   useLargeMessage,
   useMonospaceFont,
   ...messageRowProps
 }) {
+  const [atBottom, setAtBottom] = useState(true)
   const [listWidth, setListWidth] = useState(0)
   const [openFilepreviews, setOpenFilepreviews] = useState([])
   const [lastOpenedPreviewIndex, setLastOpenedPreviewIndex] = useState(null)
-
-  const _onAtBottomChange = typeof onAtBottomChange === 'function' ? onAtBottomChange : () => {}
-  const _onMessageInView = typeof onMessageInView === 'function' ? onMessageInView : () => {}
 
   const list = useRef()
 
@@ -43,20 +40,31 @@ function MessageList ({
     [useLargeMessage, channelName]
   )
 
-  const onListSizeChange = useCallback(
+  const holdBottom = useCallback(() => {
+    if (list.current && atBottom) list.current.scrollToRow(-1)
+  }, [list.current, atBottom])
+
+  const refreshListSize = useCallback(
     debounce(() => {
-      if (messages.length === 0) return
       rowHeightCache.clearAll()
-      list.current.measureAllRows()
-      list.current.forceUpdateGrid()
-      if (atBottom) list.current.scrollToRow(-1)
-    }, 50),
-    [rowHeightCache, list.current, messages.length, atBottom]
+      if (list.current) {
+        list.current.measureAllRows()
+        list.current.forceUpdateGrid()
+      }
+      holdBottom()
+    }, 100),
+    [holdBottom, rowHeightCache, list.current]
   )
 
-  function onNewMessage () {
-    if (messages.length === 0 && !atBottom) _onAtBottomChange(true)
-    if (atBottom) list.current.scrollToRow(-1)
+  const onListSizeChange = useCallback(() => {
+    if (messages.length === 0) return
+    refreshListSize()
+    setTimeout(holdBottom, 0) // Holds bottom when entering a channel
+  }, [messages.length, refreshListSize, holdBottom])
+
+  function onMessagesChange () {
+    if (messages.length === 0 && !atBottom) setAtBottom(true)
+    holdBottom()
   }
 
   function onRowsRendered ({ stopIndex }) {
@@ -66,18 +74,21 @@ function MessageList ({
   function onFilePreviewLoaded (measure, scrollTo) {
     measure()
     if (scrollTo && lastOpenedPreviewIndex) {
-      list.current.scrollToRow(lastOpenedPreviewIndex)
+      if (list.current) list.current.scrollToRow(lastOpenedPreviewIndex)
       setLastOpenedPreviewIndex(null)
     }
   }
 
   useEffect(onListSizeChange, [useLargeMessage, useMonospaceFont, loading, replicating])
-  useEffect(onNewMessage, [messages.length])
+  useEffect(onMessagesChange, [messages.length])
 
   function checkBottom ({ stopIndex }) {
     const scrollAtBottom = stopIndex === messages.length - 1
-    if ((!scrollAtBottom && atBottom) || (scrollAtBottom && !atBottom)) {
-      _onAtBottomChange(!atBottom)
+    if (
+      !(loading || replicating) &&
+      ((!scrollAtBottom && atBottom) || (scrollAtBottom && !atBottom))
+    ) {
+      setAtBottom(!atBottom)
     }
   }
 
@@ -96,7 +107,7 @@ function MessageList ({
   }
 
   function rowRenderer ({ index, key, isVisible, style, parent }) {
-    if (isVisible) _onMessageInView(index)
+    if (isVisible) onMessageInView(index)
 
     // Parse dates so we know if we must add a date separator
     const message = messages[index]
@@ -150,6 +161,7 @@ function MessageList ({
         if (width !== listWidth) setListWidth(width)
         return (
           <List
+            className={classNames('MessageList', { notAtBottom: !atBottom })}
             ref={list}
             width={width}
             height={height}
@@ -171,8 +183,6 @@ MessageList.propTypes = {
   channelName: PropTypes.string.isRequired,
   language: PropTypes.string.isRequired,
   onMessageInView: PropTypes.func.isRequired,
-  onAtBottomChange: PropTypes.func,
-  atBottom: PropTypes.bool.isRequired,
   loading: PropTypes.bool,
   replicating: PropTypes.bool,
   useLargeMessage: PropTypes.bool,
