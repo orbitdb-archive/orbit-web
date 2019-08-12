@@ -30,6 +30,8 @@ function MessageList ({
   const [lastOpenedPreviewIndex, setLastOpenedPreviewIndex] = useState(null)
 
   const _onAtBottomChange = typeof onAtBottomChange === 'function' ? onAtBottomChange : () => {}
+  const _onMessageInView = typeof onMessageInView === 'function' ? onMessageInView : () => {}
+
   const list = useRef()
 
   const rowHeightCache = useMemo(
@@ -43,22 +45,17 @@ function MessageList ({
 
   const onListSizeChange = useCallback(
     debounce(() => {
+      if (messages.length === 0) return
       rowHeightCache.clearAll()
       list.current.measureAllRows()
       list.current.forceUpdateGrid()
-    }, 100),
-    [rowHeightCache, list.current]
+      if (atBottom) list.current.scrollToRow(-1)
+    }, 50),
+    [rowHeightCache, list.current, messages.length, atBottom]
   )
 
-  const onChannelChange = useCallback(() => {
-    setOpenFilepreviews([])
-    setLastOpenedPreviewIndex(null)
-    setTimeout(() => {
-      list.current.scrollToRow(-1)
-    }, 0)
-  }, [list.current])
-
   function onNewMessage () {
+    if (messages.length === 0 && !atBottom) _onAtBottomChange(true)
     if (atBottom) list.current.scrollToRow(-1)
   }
 
@@ -75,7 +72,6 @@ function MessageList ({
   }
 
   useEffect(onListSizeChange, [useLargeMessage, useMonospaceFont, loading, replicating])
-  useEffect(onChannelChange, [channelName])
   useEffect(onNewMessage, [messages.length])
 
   function checkBottom ({ stopIndex }) {
@@ -100,7 +96,7 @@ function MessageList ({
   }
 
   function rowRenderer ({ index, key, isVisible, style, parent }) {
-    if (isVisible && typeof onMessageInView === 'function') onMessageInView(index)
+    if (isVisible) _onMessageInView(index)
 
     // Parse dates so we know if we must add a date separator
     const message = messages[index]
@@ -118,9 +114,10 @@ function MessageList ({
         parent={parent}
         columnIndex={0}
         rowIndex={index}
+        width={listWidth}
       >
         {({ measure }) => (
-          <div style={style}>
+          <div style={style} key={key}>
             {index === 0 && LoadingOrFirstMessage({ loading, channelName })}
             {addDateSepator && <MessagesDateSeparator date={date} locale={language} />}
             <MessageRow
@@ -149,19 +146,22 @@ function MessageList ({
 
   return (
     <AutoSizer onResize={onListSizeChange}>
-      {({ height, width }) => (
-        <List
-          ref={list}
-          width={width}
-          height={height}
-          rowCount={messages.length}
-          deferredMeasurementCache={rowHeightCache}
-          rowHeight={rowHeightCache.rowHeight}
-          rowRenderer={rowRenderer}
-          onRowsRendered={onRowsRendered}
-          noRowsRenderer={LoadingOrFirstMessage.bind(null, { loading, channelName })}
-        />
-      )}
+      {({ height, width }) => {
+        if (width !== listWidth) setListWidth(width)
+        return (
+          <List
+            ref={list}
+            width={width}
+            height={height}
+            rowCount={messages.length}
+            deferredMeasurementCache={rowHeightCache}
+            rowHeight={rowHeightCache.rowHeight}
+            rowRenderer={rowRenderer}
+            onRowsRendered={onRowsRendered}
+            noRowsRenderer={LoadingOrFirstMessage.bind(null, { loading, channelName })}
+          />
+        )
+      }}
     </AutoSizer>
   )
 }

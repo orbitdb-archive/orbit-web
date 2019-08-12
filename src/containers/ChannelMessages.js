@@ -32,6 +32,7 @@ function ChannelMessages ({ channel }) {
       })}
     >
       <MessageList
+        key={channel.channelName}
         messages={channel.messages}
         channelName={channel.channelName}
         loading={channel.loading}
