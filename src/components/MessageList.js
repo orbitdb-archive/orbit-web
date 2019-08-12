@@ -42,7 +42,8 @@ function MessageList ({
   const onListSizeChange = useCallback(
     debounce(() => {
       rowHeightCache.clearAll()
-      list.current.recomputeRowHeights()
+      list.current.measureAllRows()
+      list.current.forceUpdateGrid()
     }, 100),
     [rowHeightCache, list.current]
   )
