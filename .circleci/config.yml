@@ -6,8 +6,18 @@ jobs:
     steps:
       - checkout
       - run:
-          name: install puppeteer
+          name: Install puppeteer dependencies
           command: "sh .circleci/setup.sh"
-      - run: npm install
-      - run: npm run build
-      - run: npm test
+      - run:
+          name: Install project dependencies
+          command: npm ci
+      - run:
+          name: Build project
+          command: npm run build
+      - run:
+          name: HTTP server
+          command: npm run serve
+          background: true
+      - run:
+          name: Run tests
+          command: npm test
