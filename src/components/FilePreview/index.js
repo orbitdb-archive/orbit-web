@@ -1,6 +1,6 @@
 'use strict'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { CSSTransitionGroup } from 'react-transition-group'
 import { useTranslation } from 'react-i18next'
@@ -9,6 +9,8 @@ import PreviewAudioFile from './PreviewAudioFile'
 import PreviewImageFile from './PreviewImageFile'
 import PreviewTextFile from './PreviewTextFile'
 import PreviewVideoFile from './PreviewVideoFile'
+
+import Suspense from '../Suspense'
 
 import Logger from '../../utils/logger'
 import { isAudio, isImage, isVideo, toArrayBuffer } from '../../utils/file-helpers'
@@ -54,53 +56,90 @@ async function loadPreviewContent (loadFunc, hash, name, mimeType, onLoad) {
   }
 }
 
-function FilePreview ({ animationProps, hash, loadFile, name, mimeType, onSizeUpdate }) {
+function FilePreview ({ hash, loadFile, name, mimeType, onFilePreviewLoaded }) {
   const [t] = useTranslation()
   const [previewContent, setPreviewContent] = useState(null)
-  const [statusMessage, setStatusMessage] = useState(t('channel.file.previewLoading'))
-  let isMounted // track whether component is mounted
+  const [previewLoading, setPreviewLoading] = useState(true)
+  const isMounted = useRef() // track whether component is mounted
+
+  const onFileLoaded = () => {
+    if (isMounted.current) onFilePreviewLoaded(true)
+  }
+
+  const onSizeChange = () => {
+    if (isMounted.current) onFilePreviewLoaded(false)
+  }
 
   useEffect(
     () => {
-      isMounted = true
+      isMounted.current = true
+      setPreviewLoading(true)
 
-      loadPreviewContent(loadFile, hash, name, mimeType, onSizeUpdate)
+      loadPreviewContent(loadFile, hash, name, mimeType, onFileLoaded)
         .then(html => {
-          if (isMounted) {
+          if (isMounted.current) {
             setPreviewContent(html)
+            setPreviewLoading(false)
           }
         })
         .catch(e => {
           logger.error(e)
-          if (isMounted) {
-            setStatusMessage(t('channel.file.unableToDisplay'))
-            setTimeout(onSizeUpdate, 0)
+          if (isMounted.current) {
+            setPreviewLoading(false)
+            onSizeChange()
           }
         })
 
       return () => {
         // clean up, called when react dismounts this component
-        isMounted = false
+        isMounted.current = false
       }
     },
-    [hash] // Only run effect if 'hash' or 'show' change
+    [hash] // Only run effect if 'hash' changes
+  )
+
+  const animationProps = {
+    transitionName: 'filepreviewAnimation',
+    transitionAppear: true,
+    transitionEnter: false,
+    transitionLeave: false,
+    transitionAppearTimeout: 250,
+    transitionEnterTimeout: 0,
+    transitionLeaveTimeout: 0,
+    component: 'div'
+  }
+
+  const loadingElement = (
+    <CSSTransitionGroup className="FilePreview" {...animationProps}>
+      <span className="previewStatus smallText">{t('channel.file.previewLoading')}</span>
+    </CSSTransitionGroup>
+  )
+
+  const errorElement = (
+    <CSSTransitionGroup className="FilePreview" {...animationProps}>
+      <span className="previewStatus smallText">{t('channel.file.unableToDisplay')}</span>
+    </CSSTransitionGroup>
+  )
+
+  const previewElement = (
+    <CSSTransitionGroup className="FilePreview" {...animationProps}>
+      <span className="preview smallText">{previewContent}</span>
+    </CSSTransitionGroup>
   )
 
   return (
-    <div className="FilePreview">
-      <CSSTransitionGroup {...animationProps}>
-        {previewContent ? (
-          <span className="preview smallText">{previewContent}</span>
-        ) : (
-          <span className="previewStatus smallText">{statusMessage}</span>
-        )}
-      </CSSTransitionGroup>
-    </div>
+    <Suspense
+      fallback={loadingElement}
+      callback={onSizeChange}
+      delay={250}
+      loading={previewLoading}
+    >
+      {previewContent ? previewElement : errorElement}
+    </Suspense>
   )
 }
 
 FilePreview.propTypes = {
-  animationProps: PropTypes.object.isRequired,
   hash: PropTypes.string.isRequired,
   loadFile: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,

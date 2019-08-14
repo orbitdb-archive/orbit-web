@@ -1,12 +1,15 @@
 'use strict'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized'
+import classNames from 'classnames'
 
 import MessageRow from '../components/MessageRow'
 import MessagesDateSeparator from '../components/MessagesDateSeparator'
 import { LoadingOrFirstMessage } from '../components/MessageTypes'
+
+import { debounce } from '../utils/throttle'
 
 import 'react-virtualized/styles.css'
 
@@ -15,7 +18,6 @@ function MessageList ({
   channelName,
   language,
   onMessageInView,
-  onAtBottomChange,
   loading,
   replicating,
   useLargeMessage,
@@ -23,68 +25,89 @@ function MessageList ({
   ...messageRowProps
 }) {
   const [atBottom, setAtBottom] = useState(true)
-  const [{ clientHeight, scrollHeight, scrollTop }, setScroll] = useState({
-    clientHeight: 0,
-    scrollHeight: 0,
-    scrollTop: 0
-  })
-  const [{ height: listHeight, width: listWidth }, setListSize] = useState({ height: 0, width: 0 })
+  const [listWidth, setListWidth] = useState(0)
+  const [openFilepreviews, setOpenFilepreviews] = useState([])
+  const [lastOpenedPreviewIndex, setLastOpenedPreviewIndex] = useState(null)
 
   const list = useRef()
 
-  const rowHeightCache = useRef(
-    new CellMeasurerCache({
-      defaultHeight: 21,
-      fixedWidth: true
-    })
+  const rowHeightCache = useMemo(
+    () =>
+      new CellMeasurerCache({
+        defaultHeight: useLargeMessage ? 46 : 20,
+        fixedWidth: true
+      }),
+    [useLargeMessage, channelName]
   )
 
-  useEffect(checkBottom, [scrollTop, listHeight, listWidth])
+  const holdBottom = useCallback(() => {
+    if (list.current && atBottom) list.current.scrollToRow(-1)
+  }, [list.current, atBottom])
 
-  // Monitor changes and invalidate CellMeasurerCache if changes occur
+  const refreshListSize = useCallback(
+    debounce(() => {
+      rowHeightCache.clearAll()
+      if (list.current) {
+        list.current.measureAllRows()
+        list.current.forceUpdateGrid()
+      }
+      holdBottom()
+    }, 100),
+    [holdBottom, rowHeightCache, list.current]
+  )
 
-  useEffect(() => {
-    // Size of the rows changed
-    rowHeightCache.current.clearAll()
-    list.current.recomputeRowHeights()
-  }, [useLargeMessage, useMonospaceFont])
+  const onListSizeChange = useCallback(() => {
+    if (messages.length === 0) return
+    refreshListSize()
+    setTimeout(holdBottom, 0) // Holds bottom when entering a channel
+  }, [messages.length, refreshListSize, holdBottom])
 
-  useEffect(() => {
-    // Size of the whole list changed
-    rowHeightCache.current.clearAll()
-    list.current.recomputeRowHeights()
-  }, [listHeight, listWidth])
+  function onMessagesChange () {
+    if (messages.length === 0 && !atBottom) setAtBottom(true)
+    holdBottom()
+  }
 
-  useEffect(() => {
-    // Indexing of the list might have changed
-    rowHeightCache.current.clearAll()
-  }, [loading, replicating])
+  function onRowsRendered ({ stopIndex }) {
+    checkBottom({ stopIndex })
+  }
 
-  useEffect(() => {
-    // Channel changed
-    rowHeightCache.current.clearAll()
-  }, [channelName])
-
-  function checkBottom () {
-    const scrollable = scrollHeight > clientHeight
-    if (!scrollable || messages.length < 2) {
-      setAtBottom(true)
-      if (typeof onAtBottomChange === 'function') onAtBottomChange(true)
-      return
-    }
-    const lastMessageOffset = list.current.getOffsetForRow({
-      alignment: 'end',
-      index: messages.length - 2
-    })
-    const scrollAtBottom = scrollTop >= lastMessageOffset
-    if ((!scrollAtBottom && atBottom) || (scrollAtBottom && !atBottom)) {
-      setAtBottom(!atBottom)
-      if (typeof onAtBottomChange === 'function') onAtBottomChange(!atBottom)
+  function onFilePreviewLoaded (measure, scrollTo) {
+    measure()
+    if (scrollTo && lastOpenedPreviewIndex) {
+      if (list.current) list.current.scrollToRow(lastOpenedPreviewIndex)
+      setLastOpenedPreviewIndex(null)
     }
   }
 
+  useEffect(onListSizeChange, [useLargeMessage, useMonospaceFont, loading, replicating])
+  useEffect(onMessagesChange, [messages.length])
+
+  function checkBottom ({ stopIndex }) {
+    const scrollAtBottom = stopIndex === messages.length - 1
+    if (
+      !(loading || replicating) &&
+      ((!scrollAtBottom && atBottom) || (scrollAtBottom && !atBottom))
+    ) {
+      setAtBottom(!atBottom)
+    }
+  }
+
+  function toggleFilepreview (messageIndex, messageHash) {
+    const newArr = [...openFilepreviews]
+    const idx = newArr.indexOf(messageHash)
+    if (idx > -1) {
+      // Close
+      newArr.splice(idx, 1)
+    } else {
+      // Open
+      newArr.push(messageHash)
+      setLastOpenedPreviewIndex(messageIndex)
+    }
+    setOpenFilepreviews(newArr)
+  }
+
   function rowRenderer ({ index, key, isVisible, style, parent }) {
-    if (isVisible && typeof onMessageInView === 'function') onMessageInView(index)
+    if (isVisible) onMessageInView(index)
 
     // Parse dates so we know if we must add a date separator
     const message = messages[index]
@@ -97,26 +120,25 @@ function MessageList ({
 
     return (
       <CellMeasurer
-        cache={rowHeightCache.current}
+        cache={rowHeightCache}
         key={key}
         parent={parent}
         columnIndex={0}
         rowIndex={index}
+        width={listWidth}
       >
         {({ measure }) => (
-          <div style={style}>
+          <div style={style} key={key}>
             {index === 0 && LoadingOrFirstMessage({ loading, channelName })}
             {addDateSepator && <MessagesDateSeparator date={date} locale={language} />}
             <MessageRow
               message={message}
               useLargeMessage={useLargeMessage}
               useMonospaceFont={useMonospaceFont}
-              onSizeUpdate={(e, clear) => {
-                if (!clear) measure()
-                else {
-                  rowHeightCache.current.clear(index)
-                }
-              }}
+              onSizeUpdate={measure}
+              filepreviewOpen={openFilepreviews.indexOf(message.hash) > -1}
+              toggleFilepreview={toggleFilepreview.bind(null, index)}
+              onFilePreviewLoaded={onFilePreviewLoaded.bind(null, measure)}
               {...messageRowProps}
             />
           </div>
@@ -133,27 +155,25 @@ function MessageList ({
     parent: PropTypes.node.isRequired
   }
 
-  /*
-   * TODO:
-   * - List needs to be at the bottom of the screen
-   * - If user has scrolled up, do not force scroll to bottom on new messages
-   */
   return (
-    <AutoSizer onResize={setListSize}>
-      {({ height, width }) => (
-        <List
-          ref={list}
-          width={width}
-          height={height}
-          rowCount={messages.length}
-          deferredMeasurementCache={rowHeightCache.current}
-          rowHeight={rowHeightCache.current.rowHeight}
-          rowRenderer={rowRenderer}
-          scrollToIndex={messages.length - 1}
-          noRowsRenderer={LoadingOrFirstMessage.bind(null, { loading, channelName })}
-          onScroll={setScroll}
-        />
-      )}
+    <AutoSizer onResize={onListSizeChange}>
+      {({ height, width }) => {
+        if (width !== listWidth) setListWidth(width)
+        return (
+          <List
+            className={classNames('MessageList', { notAtBottom: !atBottom })}
+            ref={list}
+            width={width}
+            height={height}
+            rowCount={messages.length}
+            deferredMeasurementCache={rowHeightCache}
+            rowHeight={rowHeightCache.rowHeight}
+            rowRenderer={rowRenderer}
+            onRowsRendered={onRowsRendered}
+            noRowsRenderer={LoadingOrFirstMessage.bind(null, { loading, channelName })}
+          />
+        )
+      }}
     </AutoSizer>
   )
 }
@@ -163,7 +183,6 @@ MessageList.propTypes = {
   channelName: PropTypes.string.isRequired,
   language: PropTypes.string.isRequired,
   onMessageInView: PropTypes.func.isRequired,
-  onAtBottomChange: PropTypes.func,
   loading: PropTypes.bool,
   replicating: PropTypes.bool,
   useLargeMessage: PropTypes.bool,

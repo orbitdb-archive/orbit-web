@@ -11,7 +11,11 @@
     "jest": true
   },
   "globals": {
-    "ipcRenderer": true
+    "ipcRenderer": true,
+    "page": true,
+    "browser": true,
+    "context": true,
+    "jestPuppeteer": true
   },
   "rules": {
     "max-len": [

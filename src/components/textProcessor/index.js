@@ -18,8 +18,21 @@ function process (strFunc, input, options = {}, wordIndex = 0) {
   } else return input
 }
 
+function tokenize (input) {
+  return input.split(' ')
+}
+
 function render (children, { tag = 'div', ...props } = {}) {
-  return React.createElement(tag, props, children)
+  return React.createElement(
+    tag,
+    props,
+    children.reduce((result, element, idx) => {
+      // Add white spaces
+      if (!element || element === '') return [...result, ' '] // Remove empty or null elements
+      if (idx === children.length - 1) return [...result, element] // Do not add space after last
+      return [...result, element, ' '] // Add space element after current element
+    }, [])
+  )
 }
 
 export default {
@@ -27,5 +40,6 @@ export default {
   emojify: process.bind(null, reactEmoji),
   highlight: process.bind(null, reactHighlight),
   ipfsfy: process.bind(null, reactIpfsLink),
+  tokenize,
   render
 }

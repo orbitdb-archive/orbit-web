@@ -2,39 +2,38 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { CSSTransitionGroup } from 'react-transition-group'
 
 import textProcessor from '../textProcessor'
 
 import '../../styles/TextMessage.scss'
 
-function TextMessage ({ animationProps, emojiSet, highlightWords, text, useEmojis }) {
-  let content = text.startsWith('/me ') ? text.substring(4, text.length) : text
+function TextMessage ({ text, emojiSet, highlightWords, useEmojis, isCommand }) {
+  text = isCommand ? text.substring(4, text.length) : text
 
-  content = textProcessor.ipfsfy(content, { useAutolink: true })
-  content = textProcessor.autolink(content)
-  content = textProcessor.highlight(content, { className: 'highlight', highlightWords })
-  content = useEmojis ? textProcessor.emojify(content, { set: emojiSet }) : content
+  let tokenized = textProcessor.tokenize(text)
 
-  content = textProcessor.render(content)
+  tokenized = textProcessor.ipfsfy(tokenized, { useAutolink: true })
+  tokenized = textProcessor.autolink(tokenized)
+  tokenized = textProcessor.highlight(tokenized, { className: 'highlight', highlightWords })
+  tokenized = useEmojis ? textProcessor.emojify(tokenized, { set: emojiSet }) : tokenized
 
-  return (
-    <div className="TextMessage">
-      <CSSTransitionGroup {...animationProps}>{content}</CSSTransitionGroup>
-    </div>
-  )
+  const content = textProcessor.render(tokenized)
+
+  return <div className="TextMessage">{content}</div>
 }
 
 TextMessage.propTypes = {
-  animationProps: PropTypes.object.isRequired,
+  text: PropTypes.string.isRequired,
   emojiSet: PropTypes.string.isRequired,
   highlightWords: PropTypes.array,
-  text: PropTypes.string.isRequired,
-  useEmojis: PropTypes.bool.isRequired
+  useEmojis: PropTypes.bool,
+  isCommand: PropTypes.bool
 }
 
 TextMessage.defaultProps = {
-  highlightWords: []
+  highlightWords: [],
+  useEmojis: true,
+  isCommand: false
 }
 
 export default TextMessage

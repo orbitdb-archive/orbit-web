@@ -334,12 +334,21 @@ input[type="button"],
     }
   }
 
-  &.hasNewerMessages {
-    border-bottom: 2px solid $second-color;
-  }
-
   &:focus, :focus {
     outline: none;
+  }
+
+  .MessageList {
+    // padding-bottom: 2px;
+
+    &.notAtBottom {
+      border-bottom: 2px solid $second-color;
+      // padding-bottom: 0;
+    }
+
+    &.hasOlderUnreadMessages {}
+
+    &.hasNewerUnreadMessages {}
   }
 }
 

@@ -21,7 +21,6 @@ $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
   }
 
   .preview {
-    width: 100vw;
     margin-top: 0.5em;
     margin-bottom: 0.5em;
     margin-left: 0.2em;
@@ -37,7 +36,6 @@ $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
 
     overflow: hidden;
     display: flex;
-    max-height: 30em;
     box-sizing: content-box;
 
     img, audio, video {
@@ -60,6 +58,7 @@ $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
     overflow-x: auto;
     overflow-y: auto;
     width: 100%;
+    white-space: pre-wrap;
 
     .hljs {
       background: none;
@@ -149,4 +148,13 @@ $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
   a {
     color: rgba(240, 244, 240, 0.1);
   }
+}
+
+.filepreviewAnimation-appear {
+  opacity: 0.01;
+}
+
+.filepreviewAnimation-appear.filepreviewAnimation-appear-active  {
+  opacity: 1;
+  transition: opacity .25s ease-in;
 }
