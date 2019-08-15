@@ -202,17 +202,17 @@ export default class NetworkStore {
             break
           case 'load.progress':
             // args: [address, hash, entry, progress, total]
-            channel._onLoadProgress(data.args[3], data.args[4])
+            channel._onLoadProgress(data.args[2])
             break
           case 'replicate.progress':
             // args: [address, hash, entry, progress, have]
-            channel._onReplicateProgress(data.args[3])
+            channel._onReplicateProgress(data.args[2])
             break
           case 'ready': // load.done
-            channel._onLoaded(data.meta.entries)
+            channel._onLoaded()
             break
           case 'replicated': // replicate.done
-            channel._onReplicated(data.meta.entries)
+            channel._onReplicated()
             break
           case 'write':
             // args: [dbname, hash, entry]

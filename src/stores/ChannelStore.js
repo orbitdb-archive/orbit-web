@@ -1,6 +1,7 @@
 'use strict'
 
 import { action, computed, configure, observable, reaction, values } from 'mobx'
+import debounce from 'lodash.debounce'
 
 import Logger from '../utils/logger'
 import notify from '../utils/notify'
@@ -30,6 +31,7 @@ export default class ChannelStore {
   _storableState = {}
 
   _sendQueue = []
+
   _sending = false
 
   @observable
@@ -86,12 +88,12 @@ export default class ChannelStore {
       .map(e => JSON.parse(JSON.stringify(e))) // Make sure we are working with a copy
       .map(entry =>
         Object.assign(entry.payload.value, {
-        hash: entry.hash,
-        userIdentity: entry.identity,
+          hash: entry.hash,
+          userIdentity: entry.identity,
           unread: !entry.seen,
           meta: formatMeta(entry.payload.value.meta)
-      })
-    )
+        })
+      )
   }
 
   @computed
@@ -144,14 +146,10 @@ export default class ChannelStore {
     this._sendingMessageCounter += 1
   }
 
-  // _onNewEntry (entry) {
-  //   // TODO: This is not called anymore; how to handle notification?
-  //   this._sendNotification(entry)
-  //   this._updateEntries([entry])
-  // }
-
   @action
   _updateEntries (entries) {
+    if (!entries || entries.length === 0) return
+
     const oldHashes = this.entryHashes
     const { lastSeenTimestamp = 0 } = this._storableState
 
@@ -172,25 +170,45 @@ export default class ChannelStore {
   }
 
   @action // Called while loading from local filesystem
-  _onLoadProgress (progress, total) {
+  _onLoadProgress (entry) {
     if (!this.loading) this.loading = true
+    this._onEntry(entry)
   }
 
   @action // Called when done loading from local filesystem
-  _onLoaded (entries) {
-    this._updateEntries(entries)
+  _onLoaded () {
     if (this.loading) this.loading = false
   }
 
   @action // Called while loading from IPFS (receiving new messages)
-  _onReplicateProgress (progress) {
+  _onReplicateProgress (entry) {
     if (!this.replicating) this.replicating = true
+    this._onEntry(entry)
   }
 
   @action // Called when done loading from IPFS
-  _onReplicated (entries) {
-    this._updateEntries(entries)
+  _onReplicated () {
     if (this.replicating) this.replicating = false
+  }
+
+  _onEntry (entry) {
+    if (!entry) return
+    // this._sendNotification(entry)
+
+    // We need to cache the updates to not freeze the browser
+    this._entrycache = this._entrycache || []
+    this._entrycache.push(entry)
+    this._debouncedUpdate =
+      this._debouncedUpdate ||
+      debounce(
+        () => {
+          this._updateEntries(this._entrycache)
+          this._entrycache = []
+        },
+        250,
+        { maxWait: 1000 }
+      )
+    this._debouncedUpdate()
   }
 
   // Called when the user writes a message (text or file)
