@@ -33,9 +33,9 @@
     "prefer-const": "error"
   },
   "settings": {
-    "polyfills": ["promises", "promise-finally"],
+    "polyfills": ["Promise", "Object.assign"],
     "react": {
-      "version": "16.5"
+      "version": "16.8"
     }
   }
 }

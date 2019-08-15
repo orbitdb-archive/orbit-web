@@ -86,9 +86,8 @@ function MessageList ({
     checkBottom({ stopIndex })
   }
 
-  function onFilePreviewLoaded (measure, scrollTo) {
-    measure()
-    if (scrollTo && lastOpenedPreviewIndex) {
+  function onFilePreviewLoaded () {
+    if (lastOpenedPreviewIndex) {
       if (list.current) list.current.scrollToRow(lastOpenedPreviewIndex)
       setLastOpenedPreviewIndex(null)
     }
@@ -150,7 +149,10 @@ function MessageList ({
               onSizeUpdate={measure}
               filepreviewOpen={openFilepreviews.indexOf(message.hash) > -1}
               toggleFilepreview={toggleFilepreview.bind(null, index)}
-              onFilePreviewLoaded={onFilePreviewLoaded.bind(null, measure)}
+              onFilePreviewLoaded={() => {
+                measure()
+                onFilePreviewLoaded()
+              }}
               {...messageRowProps}
             />
           </div>

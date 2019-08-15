@@ -1,6 +1,6 @@
 'use strict'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useCallback, useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { CSSTransitionGroup } from 'react-transition-group'
 import { useTranslation } from 'react-i18next'
@@ -56,26 +56,26 @@ async function loadPreviewContent (loadFunc, hash, name, mimeType, onLoad) {
   }
 }
 
-function FilePreview ({ hash, loadFile, name, mimeType, onFilePreviewLoaded }) {
+function FilePreview ({ hash, loadFile, name, mimeType, onSizeUpdate, onFilePreviewLoaded }) {
   const [t] = useTranslation()
   const [previewContent, setPreviewContent] = useState(null)
   const [previewLoading, setPreviewLoading] = useState(true)
   const isMounted = useRef() // track whether component is mounted
 
-  const onFileLoaded = () => {
-    if (isMounted.current) onFilePreviewLoaded(true)
-  }
+  const _onLoad = useCallback(() => {
+    if (isMounted.current) onFilePreviewLoaded()
+  }, [isMounted.current])
 
-  const onSizeChange = () => {
-    if (isMounted.current) onFilePreviewLoaded(false)
-  }
+  const _onSizeUpdate = useCallback(() => {
+    if (isMounted.current) onSizeUpdate()
+  }, [isMounted.current])
 
   useEffect(
     () => {
       isMounted.current = true
       setPreviewLoading(true)
 
-      loadPreviewContent(loadFile, hash, name, mimeType, onFileLoaded)
+      loadPreviewContent(loadFile, hash, name, mimeType, _onLoad)
         .then(html => {
           if (isMounted.current) {
             setPreviewContent(html)
@@ -86,7 +86,7 @@ function FilePreview ({ hash, loadFile, name, mimeType, onFilePreviewLoaded }) {
           logger.error(e)
           if (isMounted.current) {
             setPreviewLoading(false)
-            onSizeChange()
+            _onSizeUpdate()
           }
         })
 
@@ -130,7 +130,7 @@ function FilePreview ({ hash, loadFile, name, mimeType, onFilePreviewLoaded }) {
   return (
     <Suspense
       fallback={loadingElement}
-      callback={onSizeChange}
+      callback={_onSizeUpdate}
       delay={250}
       loading={previewLoading}
     >
@@ -144,7 +144,8 @@ FilePreview.propTypes = {
   loadFile: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,
   mimeType: PropTypes.string.isRequired,
-  onSizeUpdate: PropTypes.func.isRequired
+  onSizeUpdate: PropTypes.func.isRequired,
+  onFilePreviewLoaded: PropTypes.func.isRequired
 }
 
 export default FilePreview

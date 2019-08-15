@@ -30,7 +30,8 @@ function LoginForm ({ theme, onSubmit, setUsernameInputRef }) {
         className="inputs"
         transitionAppearTimeout={5000}
         transitionEnterTimeout={5000}
-        transitionLeaveTimeout={5000}>
+        transitionLeaveTimeout={5000}
+      >
         <div className="usernameRow" onClick={() => usernameInputRef.current.focus()}>
           <input
             ref={usernameInputRef}
