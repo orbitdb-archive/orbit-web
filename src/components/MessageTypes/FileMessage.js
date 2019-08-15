@@ -1,6 +1,6 @@
 'use strict'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
 
@@ -25,8 +25,15 @@ function FileMessage ({
   function handleNameClick () {
     if (!isImage(name) && !isText(name) && !isAudio(name) && !isVideo(name)) return
     toggleFilepreview(messageHash)
-    setTimeout(filePreviewProps.onSizeUpdate, 0)
   }
+
+  useEffect(() => {
+    let timer
+    if (!filepreviewOpen) timer = setTimeout(filePreviewProps.onSizeUpdate, 0)
+    return () => {
+      if (timer) clearTimeout(timer)
+    }
+  }, [filepreviewOpen])
 
   const ipfsLink =
     (window.gatewayAddress ? 'http://' + window.gatewayAddress : 'https://ipfs.io/ipfs/') + fileHash
