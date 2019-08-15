@@ -337,7 +337,11 @@ export default class ChannelStore {
   }
 
   async loadFile (hash, asStream) {
-    const array = await this.network.workerProxy('ipfs-file', { hash, asStream }, hash)
+    const array = await this.network.workerProxy(
+      'ipfs-file',
+      { hash, asStream, timeout: 20 * 1000 },
+      hash
+    )
     return { buffer: array, url: null, stream: null }
     // return new Promise((resolve, reject) => {
     //   // TODO: Handle electron
