@@ -4,12 +4,11 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized'
 import classNames from 'classnames'
+import debounce from 'lodash.debounce'
 
 import MessageRow from '../components/MessageRow'
 import MessagesDateSeparator from '../components/MessagesDateSeparator'
 import { LoadingOrFirstMessage } from '../components/MessageTypes'
-
-import { debounce } from '../utils/throttle'
 
 import 'react-virtualized/styles.css'
 
@@ -40,32 +39,48 @@ function MessageList ({
     [useLargeMessage, channelName]
   )
 
-  const holdBottom = useCallback(() => {
-    if (list.current && atBottom) list.current.scrollToRow(-1)
-  }, [list.current, atBottom])
+  const holdBottom = useCallback(
+    _atBottom => {
+      if (list.current && _atBottom) list.current.scrollToRow(-1)
+    },
+    [list.current]
+  )
 
   const refreshListSize = useCallback(
-    debounce(() => {
-      rowHeightCache.clearAll()
-      if (list.current) {
-        list.current.measureAllRows()
-        list.current.forceUpdateGrid()
-      }
-      holdBottom()
-    }, 100),
+    debounce(
+      _atBottom => {
+        rowHeightCache.clearAll()
+        if (list.current) {
+          list.current.measureAllRows()
+          list.current.forceUpdateGrid()
+        }
+        // Holds bottom when list indexing or size has changed
+        holdBottom(_atBottom)
+      },
+      17,
+      { maxWait: 1000 }
+    ),
     [holdBottom, rowHeightCache, list.current]
   )
 
-  const onListSizeChange = useCallback(() => {
-    if (messages.length === 0) return
-    refreshListSize()
-    setTimeout(holdBottom, 0) // Holds bottom when entering a channel
-  }, [messages.length, refreshListSize, holdBottom])
-
-  function onMessagesChange () {
-    if (messages.length === 0 && !atBottom) setAtBottom(true)
-    holdBottom()
+  function onListSizeChange () {
+    // console.log('onListSizeChange', messages.length)
+    if (messages.length === 0) {
+      if (!atBottom) setAtBottom(true)
+      return
+    }
+    refreshListSize(atBottom)
+    holdBottom(atBottom) // Holds bottom when new messages are rendered
+    setTimeout(() => holdBottom(atBottom), 0) // Holds bottom when entering a channel
   }
+
+  useEffect(onListSizeChange, [
+    useLargeMessage,
+    useMonospaceFont,
+    loading,
+    replicating,
+    messages.length
+  ])
 
   function onRowsRendered ({ stopIndex }) {
     checkBottom({ stopIndex })
@@ -78,9 +93,6 @@ function MessageList ({
       setLastOpenedPreviewIndex(null)
     }
   }
-
-  useEffect(onListSizeChange, [useLargeMessage, useMonospaceFont, loading, replicating])
-  useEffect(onMessagesChange, [messages.length])
 
   function checkBottom ({ stopIndex }) {
     const scrollAtBottom = stopIndex === messages.length - 1

@@ -118,9 +118,7 @@ async function channelEvent (eventName, channelName, ...args) {
     channelName: channelName
   }
 
-  if (['ready', 'replicated'].indexOf(eventName) !== -1) {
-    meta['entries'] = channel.feed.iterator({ limit: -1 }).collect()
-  } else if (eventName === 'peer.update') {
+  if (eventName === 'peer.update') {
     meta['peers'] = await channel.peers
   }
 
