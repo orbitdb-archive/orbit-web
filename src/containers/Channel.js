@@ -60,11 +60,7 @@ function Channel ({ channelName }) {
       }
     }
 
-    try {
-      await channel.sendFiles(files)
-    } catch (err) {
-      throw err
-    }
+    await channel.sendFiles(files)
   }
 
   return channel ? (

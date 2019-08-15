@@ -1,5 +1,5 @@
 /* eslint-disable no-new */
-import { debounce } from './throttle'
+import debounce from 'lodash.debounce'
 
 export function askPermission () {
   Notification.requestPermission()
@@ -18,4 +18,4 @@ const notify = (title, body) => {
   }
 }
 
-export default debounce(notify, 5000, true)
+export default debounce(notify, 5000)
