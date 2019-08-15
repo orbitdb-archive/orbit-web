@@ -46,7 +46,7 @@ async function handleProxyRequest ({ req, options, key }) {
     case 'ipfs-file':
       try {
         if (!options.asStream) {
-          const array = await getFileBuffer(this.orbit, options.hash)
+          const array = await getFileBuffer(this.orbit, options.hash, options)
           this.postMessage({ action: 'proxy:res', key, value: array }, [array.buffer])
         } else {
           this.postMessage({
@@ -66,9 +66,9 @@ async function handleProxyRequest ({ req, options, key }) {
   }
 }
 
-function getFileBuffer (orbit, hash) {
+function getFileBuffer (orbit, hash, options = {}) {
   const timeoutError = new Error('Timeout while fetching file')
-  const timeout = 5 * 1000
+  const timeout = options.timeout || 5 * 1000
   return new Promise((resolve, reject) => {
     let timeoutTimer = setTimeout(() => {
       reject(timeoutError)
