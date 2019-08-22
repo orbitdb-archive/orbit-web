@@ -191,7 +191,7 @@ function MessageList ({
             <div
               className={classNames('unreadIndicator', {
                 hidden: !loading && (atBottom || !hasUnreadMessages),
-                loading: loading || replicating
+                loading: loading
               })}
             >
               <div className="progressBar" />
