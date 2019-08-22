@@ -1,6 +1,6 @@
 'use strict'
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized'
 import classNames from 'classnames'
@@ -19,6 +19,7 @@ function MessageList ({
   onMessageInView,
   loading,
   replicating,
+  hasUnreadMessages,
   useLargeMessage,
   useMonospaceFont,
   ...messageRowProps
@@ -174,18 +175,28 @@ function MessageList ({
       {({ height, width }) => {
         if (width !== listWidth) setListWidth(width)
         return (
-          <List
-            className={classNames('MessageList', { notAtBottom: !atBottom })}
-            ref={list}
-            width={width}
-            height={height}
-            rowCount={messages.length}
-            deferredMeasurementCache={rowHeightCache}
-            rowHeight={rowHeightCache.rowHeight}
-            rowRenderer={rowRenderer}
-            onRowsRendered={onRowsRendered}
-            noRowsRenderer={LoadingOrFirstMessage.bind(null, { loading, channelName })}
-          />
+          <Fragment>
+            <List
+              className="MessageList"
+              ref={list}
+              width={width}
+              height={height}
+              rowCount={messages.length}
+              deferredMeasurementCache={rowHeightCache}
+              rowHeight={rowHeightCache.rowHeight}
+              rowRenderer={rowRenderer}
+              onRowsRendered={onRowsRendered}
+              noRowsRenderer={LoadingOrFirstMessage.bind(null, { loading, channelName })}
+            />
+            <div
+              className={classNames('unreadIndicator', {
+                hidden: !loading && (atBottom || !hasUnreadMessages),
+                loading: loading || replicating
+              })}
+            >
+              <div className="progressBar" />
+            </div>
+          </Fragment>
         )
       }}
     </AutoSizer>
@@ -199,6 +210,7 @@ MessageList.propTypes = {
   onMessageInView: PropTypes.func.isRequired,
   loading: PropTypes.bool,
   replicating: PropTypes.bool,
+  hasUnreadMessages: PropTypes.bool,
   useLargeMessage: PropTypes.bool,
   useMonospaceFont: PropTypes.bool
 }

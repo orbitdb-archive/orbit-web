@@ -35,6 +35,7 @@ function ChannelMessages ({ channel }) {
         channelName={channel.channelName}
         loading={channel.loading}
         replicating={channel.replicating}
+        hasUnreadMessages={channel.hasUnreadMessages}
         highlightWords={[sessionStore.username]}
         loadFile={channel.loadFile}
         useLargeMessage={uiStore.useLargeMessage}
