@@ -9,19 +9,18 @@ $controls-height: 2.8em;
   padding: 0;
   margin: 0;
   color: #fff;
-  display: flex;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .Channel {
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+  height: 100%;
   overflow: hidden;
-  transform-style: preserve-3d;
-
   background-color: rgb(32, 32, 32);
+
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-end;
 
   .center {
     display: flex;
@@ -214,8 +213,6 @@ input[type="button"],
   align-items: center;
   max-height: $controls-height;
   min-height: $controls-height;
-  border-top: 1px solid $bar-border-color;
-  border-bottom: 1px solid $bar-border-color;
 
   color: rgb(128, 128, 128);
 
@@ -255,14 +252,14 @@ input[type="button"],
 }
 
 .Messages {
-  display: block;
   position: relative;
   box-sizing: border-box;
-  height: 100%;
-  width: 100%;
-  transform-style: preserve-3d;
+
+  overflow: hidden;
 
   background-color: rgb(35, 35, 35);
+
+  flex: 1 1 auto;
 
   .dateSeparator {
     display: flex;
@@ -284,18 +281,10 @@ input[type="button"],
     padding: 0.5em;
     user-select: none;
     cursor: default;
-  }
 
-  .loadingMessages {
-    display: flex;
-    justify-content: center;
-    color: rgb(160, 160, 160);
-    font-weight: bold;
-    font-style: italic;
-    font-size: 0.7em;
-    padding: 0.5em;
-    user-select: none;
-    cursor: default;
+    &.loadMore {
+      cursor: pointer;
+    }
   }
 
   .messagesEnd {
@@ -350,11 +339,11 @@ input[type="button"],
     bottom: 0;
     height: 2px;
     width: 100%;
-    background: $second-color;
+    background: $main-color;
     &:before {
       content: '';
       position: absolute;
-      background-color: rgba($second-color, 1);
+      background-color: $main-color-highligth;
       top: 0;
       left:0;
       bottom: 0;
@@ -364,7 +353,7 @@ input[type="button"],
     &:after {
       content: '';
       position: absolute;
-      background-color: rgba($second-color, 1);;
+      background-color: $main-color-highligth;
       top: 0;
       left:0;
       bottom: 0;
@@ -372,6 +361,19 @@ input[type="button"],
       animation: indeterminate-short 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
       animation-delay: 1.15s;
     }
+  }
+
+  .MessageList {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+
+    max-height: 100%;
+    overflow: hidden;
+    overflow-y: scroll;
+
+    display: flex;
+    flex-direction: column-reverse;
   }
 }
 

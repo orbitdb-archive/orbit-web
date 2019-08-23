@@ -33,9 +33,11 @@ function ChannelMessages ({ channel }) {
         key={channel.channelName}
         messages={channel.messages}
         channelName={channel.channelName}
-        loading={channel.loading}
-        replicating={channel.replicating}
+        loading={channel.loading || channel.replicating}
         hasUnreadMessages={channel.hasUnreadMessages}
+        entryCount={channel.entries.length}
+        loadMore={channel.increaseMessageOffset}
+        resetOffset={channel.resetMessageOffset}
         highlightWords={[sessionStore.username]}
         loadFile={channel.loadFile}
         useLargeMessage={uiStore.useLargeMessage}
@@ -44,7 +46,7 @@ function ChannelMessages ({ channel }) {
         language={uiStore.language}
         useEmojis={uiStore.useEmojis}
         emojiSet={uiStore.emojiSet}
-        onMessageInView={channel.markEntryAsReadAtIndex}
+        markMessageRead={channel.markEntryAsReadWithHash}
         onMessageUserClick={onMessageUserClick}
       />
     </div>

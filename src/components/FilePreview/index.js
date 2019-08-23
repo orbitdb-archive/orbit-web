@@ -63,12 +63,12 @@ function FilePreview ({ hash, loadFile, name, mimeType, onSizeUpdate, onFilePrev
   const isMounted = useRef() // track whether component is mounted
 
   const _onLoad = useCallback(() => {
-    if (isMounted.current) onFilePreviewLoaded()
-  }, [isMounted.current])
+    if (isMounted.current && typeof onFilePreviewLoaded === 'function') onFilePreviewLoaded()
+  }, [isMounted.current, onFilePreviewLoaded])
 
   const _onSizeUpdate = useCallback(() => {
-    if (isMounted.current) onSizeUpdate()
-  }, [isMounted.current])
+    if (isMounted.current && typeof onSizeUpdate === 'function') onSizeUpdate()
+  }, [isMounted.current, onSizeUpdate])
 
   useEffect(
     () => {
@@ -144,8 +144,8 @@ FilePreview.propTypes = {
   loadFile: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,
   mimeType: PropTypes.string.isRequired,
-  onSizeUpdate: PropTypes.func.isRequired,
-  onFilePreviewLoaded: PropTypes.func.isRequired
+  onSizeUpdate: PropTypes.func,
+  onFilePreviewLoaded: PropTypes.func
 }
 
 export default FilePreview

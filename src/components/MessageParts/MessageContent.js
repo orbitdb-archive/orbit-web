@@ -7,14 +7,7 @@ import { CSSTransitionGroup } from 'react-transition-group'
 
 import { FileMessage, TextMessage } from '../MessageTypes'
 
-function MessageContent ({
-  message,
-  isCommand,
-  loadFile,
-  filepreviewOpen,
-  toggleFilepreview,
-  ...rest
-}) {
+function MessageContent ({ message, isCommand, loadFile, ...rest }) {
   let content
 
   switch (message.meta.type) {
@@ -31,8 +24,6 @@ function MessageContent ({
           fileHash={message.content}
           meta={message.meta}
           loadFile={loadFile}
-          filepreviewOpen={filepreviewOpen}
-          toggleFilepreview={toggleFilepreview}
           {...rest}
         />
       )
@@ -67,14 +58,11 @@ function MessageContent ({
 MessageContent.propTypes = {
   message: PropTypes.object.isRequired,
   isCommand: PropTypes.bool,
-  filepreviewOpen: PropTypes.bool,
-  toggleFilepreview: PropTypes.func.isRequired,
   loadFile: PropTypes.func.isRequired
 }
 
 MessageContent.defaultProps = {
-  isCommand: false,
-  filepreviewOpen: false
+  isCommand: false
 }
 
 export default MessageContent
