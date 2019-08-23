@@ -6,6 +6,8 @@ import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtuali
 import classNames from 'classnames'
 import debounce from 'lodash.debounce'
 
+import Suspense from '../components/Suspense'
+
 import MessageRow from '../components/MessageRow'
 import MessagesDateSeparator from '../components/MessagesDateSeparator'
 import { LoadingOrFirstMessage } from '../components/MessageTypes'
@@ -170,6 +172,12 @@ function MessageList ({
     parent: PropTypes.node.isRequired
   }
 
+  const statusIndicator = (
+    <div className="unreadIndicator loading">
+      <div className="progressBar" />
+    </div>
+  )
+
   return (
     <AutoSizer onResize={onListSizeChange}>
       {({ height, width }) => {
@@ -188,14 +196,15 @@ function MessageList ({
               onRowsRendered={onRowsRendered}
               noRowsRenderer={LoadingOrFirstMessage.bind(null, { loading, channelName })}
             />
-            <div
-              className={classNames('unreadIndicator', {
-                hidden: !loading && (atBottom || !hasUnreadMessages),
-                loading: loading
-              })}
-            >
-              <div className="progressBar" />
-            </div>
+            <Suspense fallback={statusIndicator} delay={500} loading={loading || replicating}>
+              <div
+                className={classNames('unreadIndicator', {
+                  hidden: !loading && !replicating && (atBottom || !hasUnreadMessages)
+                })}
+              >
+                <div className="progressBar" />
+              </div>
+            </Suspense>
           </Fragment>
         )
       }}
