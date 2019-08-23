@@ -1,7 +1,10 @@
-@import 'Animations';
-@import 'Colors';
+@import "Animations";
+@import "Colors";
 
-textarea, input { outline: none; }
+textarea,
+input {
+  outline: none;
+}
 
 ::placeholder {
   color: $placeholder-color;
@@ -29,14 +32,22 @@ $channel-name-min-height: 1.5em;
 
 .headerAnimation-appear {
   animation: fadeInDown;
-  animation-duration: .2s;
+  animation-duration: 0.2s;
   animation-fill-mode: both;
   animation-timing-function: ease-out;
 }
 
 .joinChannelAnimation-appear {
   animation: fadeIn;
-  animation-duration: .5s;
+  animation-duration: 0.5s;
   animation-fill-mode: both;
   animation-timing-function: ease-in;
+}
+
+.spinner {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
