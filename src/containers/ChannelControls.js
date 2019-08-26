@@ -9,7 +9,6 @@ import Logger from '../utils/logger'
 import RootStoreContext from '../context/RootStoreContext'
 
 import FileUploadButton from '../components/FileUploadButton'
-import Spinner from '../components/Spinner'
 
 import ChannelStatus from './ChannelStatus'
 import SendMessage from './SendMessage'
@@ -41,7 +40,6 @@ function ChannelControls ({ channel }) {
     <Observer>
       {() => (
         <div className="Controls">
-          <Spinner loading={channel.loading || channel.replicating || channel.sendingMessage} />
           <SendMessage
             onSendMessage={sendMessage}
             theme={uiStore.theme}

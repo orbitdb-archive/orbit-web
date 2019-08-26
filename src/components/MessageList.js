@@ -1,10 +1,12 @@
 'use strict'
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized'
 import classNames from 'classnames'
 import debounce from 'lodash.debounce'
+
+import Suspense from '../components/Suspense'
 
 import MessageRow from '../components/MessageRow'
 import MessagesDateSeparator from '../components/MessagesDateSeparator'
@@ -19,6 +21,7 @@ function MessageList ({
   onMessageInView,
   loading,
   replicating,
+  hasUnreadMessages,
   useLargeMessage,
   useMonospaceFont,
   ...messageRowProps
@@ -174,18 +177,29 @@ function MessageList ({
       {({ height, width }) => {
         if (width !== listWidth) setListWidth(width)
         return (
-          <List
-            className={classNames('MessageList', { notAtBottom: !atBottom })}
-            ref={list}
-            width={width}
-            height={height}
-            rowCount={messages.length}
-            deferredMeasurementCache={rowHeightCache}
-            rowHeight={rowHeightCache.rowHeight}
-            rowRenderer={rowRenderer}
-            onRowsRendered={onRowsRendered}
-            noRowsRenderer={LoadingOrFirstMessage.bind(null, { loading, channelName })}
-          />
+          <Fragment>
+            <List
+              className="MessageList"
+              ref={list}
+              width={width}
+              height={height}
+              rowCount={messages.length}
+              deferredMeasurementCache={rowHeightCache}
+              rowHeight={rowHeightCache.rowHeight}
+              rowRenderer={rowRenderer}
+              onRowsRendered={onRowsRendered}
+              noRowsRenderer={LoadingOrFirstMessage.bind(null, { loading, channelName })}
+            />
+            <Suspense
+              key={`status-indicator-${messages.length}`}
+              fallback={<div className="progressBar" />}
+              delay={500}
+              loading={loading || replicating}
+              passThrough={true}
+            >
+              {!atBottom && hasUnreadMessages ? <div className="unreadIndicator" /> : null}
+            </Suspense>
+          </Fragment>
         )
       }}
     </AutoSizer>
@@ -199,6 +213,7 @@ MessageList.propTypes = {
   onMessageInView: PropTypes.func.isRequired,
   loading: PropTypes.bool,
   replicating: PropTypes.bool,
+  hasUnreadMessages: PropTypes.bool,
   useLargeMessage: PropTypes.bool,
   useMonospaceFont: PropTypes.bool
 }
