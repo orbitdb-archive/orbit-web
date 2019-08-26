@@ -28,7 +28,13 @@ function Suspense (props) {
     if (props.loading && typeof props.callback === 'function') props.callback()
   }, props.delay)
 
-  return !props.loading ? props.children : displayFallback ? props.fallback : null
+  return !props.loading
+    ? props.children
+    : displayFallback
+      ? props.fallback
+      : props.passThrough
+        ? props.children
+        : null
 }
 
 export default Suspense

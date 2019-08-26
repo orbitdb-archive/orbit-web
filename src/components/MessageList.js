@@ -172,12 +172,6 @@ function MessageList ({
     parent: PropTypes.node.isRequired
   }
 
-  const statusIndicator = (
-    <div className="unreadIndicator loading">
-      <div className="progressBar" />
-    </div>
-  )
-
   return (
     <AutoSizer onResize={onListSizeChange}>
       {({ height, width }) => {
@@ -196,14 +190,14 @@ function MessageList ({
               onRowsRendered={onRowsRendered}
               noRowsRenderer={LoadingOrFirstMessage.bind(null, { loading, channelName })}
             />
-            <Suspense fallback={statusIndicator} delay={500} loading={loading || replicating}>
-              <div
-                className={classNames('unreadIndicator', {
-                  hidden: !loading && !replicating && (atBottom || !hasUnreadMessages)
-                })}
-              >
-                <div className="progressBar" />
-              </div>
+            <Suspense
+              key={`status-indicator-${messages.length}`}
+              fallback={<div className="progressBar" />}
+              delay={500}
+              loading={loading || replicating}
+              passThrough={true}
+            >
+              {!atBottom && hasUnreadMessages ? <div className="unreadIndicator" /> : null}
             </Suspense>
           </Fragment>
         )
