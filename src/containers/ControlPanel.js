@@ -190,12 +190,12 @@ class ControlPanel extends React.Component {
           style={{ ...uiStore.theme }}
           key="settingsIcon"
         />
-        <div
+        {/* <div
           className="icon flaticon-sharing7"
           // onClick={this.props.onOpenSwarmView}
           style={{ ...uiStore.theme }}
           key="swarmIcon"
-        />
+        /> */}
         <div
           className="icon flaticon-prohibition35"
           onClick={() => sessionStore.logout()}
