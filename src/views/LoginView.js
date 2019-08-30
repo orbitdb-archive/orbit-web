@@ -29,6 +29,7 @@ const logger = new Logger()
 
 class LoginView extends React.Component {
   static contextType = RootStoreContext
+
   static propTypes = {
     location: PropTypes.object.isRequired,
     t: PropTypes.func.isRequired
@@ -96,14 +97,14 @@ class LoginView extends React.Component {
         <div className="Version">
           {t('version')}: {version}
         </div>
-        <button
+        {/* <button
           type="button"
           className="ConfigurationButton submitButton"
           style={{ ...uiStore.theme }}
           onClick={this.onConfigure}
         >
           {t('configuration')}
-        </button>
+        </button> */}
         <BackgroundAnimation
           size={480}
           theme={{ ...uiStore.theme }}
