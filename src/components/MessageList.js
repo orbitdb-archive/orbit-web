@@ -1,221 +1,144 @@
 'use strict'
 
-import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized'
 import classNames from 'classnames'
 import debounce from 'lodash.debounce'
 
-import Suspense from '../components/Suspense'
+import MessageRow from './MessageRow'
+import MessagesDateSeparator from './MessagesDateSeparator'
+import { FirstMessage, LoadingMessages, LoadMore } from './MessageTypes'
+import DelayRender from './DelayRender'
 
-import MessageRow from '../components/MessageRow'
-import MessagesDateSeparator from '../components/MessagesDateSeparator'
-import { LoadingOrFirstMessage } from '../components/MessageTypes'
-
-import 'react-virtualized/styles.css'
+import { isRectInside } from '../utils/rect'
+import { useVisibility, useRefCallback } from '../utils/hooks'
 
 function MessageList ({
   messages,
   channelName,
-  language,
-  onMessageInView,
   loading,
-  replicating,
   hasUnreadMessages,
-  useLargeMessage,
-  useMonospaceFont,
+  entryCount,
+  loadMore,
+  resetOffset,
   ...messageRowProps
 }) {
-  const [atBottom, setAtBottom] = useState(true)
-  const [listWidth, setListWidth] = useState(0)
-  const [openFilepreviews, setOpenFilepreviews] = useState([])
-  const [lastOpenedPreviewIndex, setLastOpenedPreviewIndex] = useState(null)
+  const [setListRef, listElement] = useRefCallback()
+  const [setTopRef, topElement] = useRefCallback()
+  const [setBotRef, botElement] = useRefCallback()
 
-  const list = useRef()
+  const [atTop, setAtTop] = useState(false)
+  const [atBottom, setAtBottom] = useState(false)
 
-  const rowHeightCache = useMemo(
-    () =>
-      new CellMeasurerCache({
-        defaultHeight: useLargeMessage ? 46 : 20,
-        fixedWidth: true
-      }),
-    [useLargeMessage, channelName]
-  )
+  const topMargin = 20
+  const botMargin = 20
 
-  const holdBottom = useCallback(
-    _atBottom => {
-      if (list.current && _atBottom) list.current.scrollToRow(-1)
-    },
-    [list.current]
-  )
+  function checkBoundaries () {
+    if (!listElement || !topElement || !botElement) return
+    const listRect = listElement.getBoundingClientRect()
+    const topRect = topElement.getBoundingClientRect()
+    const botRect = botElement.getBoundingClientRect()
 
-  const refreshListSize = useCallback(
-    debounce(
-      _atBottom => {
-        rowHeightCache.clearAll()
-        if (list.current) {
-          list.current.measureAllRows()
-          list.current.forceUpdateGrid()
-        }
-        // Holds bottom when list indexing or size has changed
-        holdBottom(_atBottom)
-      },
-      17,
-      { maxWait: 1000 }
-    ),
-    [holdBottom, rowHeightCache, list.current]
-  )
+    const topVisible = isRectInside(listRect, topRect, { topMargin })
+    const botVisible = isRectInside(listRect, botRect, { botMargin })
 
-  function onListSizeChange () {
-    // console.log('onListSizeChange', messages.length)
-    if (messages.length === 0) {
-      if (!atBottom) setAtBottom(true)
-      return
-    }
-    refreshListSize(atBottom)
-    holdBottom(atBottom) // Holds bottom when new messages are rendered
-    setTimeout(() => holdBottom(atBottom), 0) // Holds bottom when entering a channel
+    setAtTop(topVisible)
+    setAtBottom(botVisible)
+
+    if (topVisible && botVisible) loadMore()
   }
 
-  useEffect(onListSizeChange, [
-    useLargeMessage,
-    useMonospaceFont,
-    loading,
-    replicating,
-    messages.length
+  useEffect(() => {
+    checkBoundaries()
+  }, [messages.length])
+
+  useEffect(() => {
+    resetOffset()
+  }, [channelName])
+
+  const checkBoundariesDebounced = useCallback(debounce(checkBoundaries, 40, { leading: true }), [
+    listElement,
+    topElement,
+    botElement
   ])
 
-  function onRowsRendered ({ stopIndex }) {
-    checkBottom({ stopIndex })
-  }
-
-  function onFilePreviewLoaded () {
-    if (lastOpenedPreviewIndex) {
-      if (list.current) list.current.scrollToRow(lastOpenedPreviewIndex)
-      setLastOpenedPreviewIndex(null)
-    }
-  }
-
-  function checkBottom ({ stopIndex }) {
-    const scrollAtBottom = stopIndex === messages.length - 1
-    if (
-      !(loading || replicating) &&
-      ((!scrollAtBottom && atBottom) || (scrollAtBottom && !atBottom))
-    ) {
-      setAtBottom(!atBottom)
-    }
-  }
-
-  function toggleFilepreview (messageIndex, messageHash) {
-    const newArr = [...openFilepreviews]
-    const idx = newArr.indexOf(messageHash)
-    if (idx > -1) {
-      // Close
-      newArr.splice(idx, 1)
-    } else {
-      // Open
-      newArr.push(messageHash)
-      setLastOpenedPreviewIndex(messageIndex)
-    }
-    setOpenFilepreviews(newArr)
-  }
-
-  function rowRenderer ({ index, key, isVisible, style, parent }) {
-    if (isVisible) onMessageInView(index)
-
-    // Parse dates so we know if we must add a date separator
-    const message = messages[index]
-    const prevMessage = messages[index - 1]
-    const prevDate = prevMessage && new Date(prevMessage.meta.ts)
-    const date = new Date(message.meta.ts)
-    // Add separator when this is the first message or the dates between messages differ
-    const addDateSepator =
-      date && (!prevDate || (prevDate && date.getDate() !== prevDate.getDate()))
-
-    return (
-      <CellMeasurer
-        cache={rowHeightCache}
-        key={key}
-        parent={parent}
-        columnIndex={0}
-        rowIndex={index}
-        width={listWidth}
-      >
-        {({ measure }) => (
-          <div style={style} key={key}>
-            {index === 0 && LoadingOrFirstMessage({ loading, channelName })}
-            {addDateSepator && <MessagesDateSeparator date={date} locale={language} />}
-            <MessageRow
-              message={message}
-              useLargeMessage={useLargeMessage}
-              useMonospaceFont={useMonospaceFont}
-              onSizeUpdate={measure}
-              filepreviewOpen={openFilepreviews.indexOf(message.hash) > -1}
-              toggleFilepreview={toggleFilepreview.bind(null, index)}
-              onFilePreviewLoaded={() => {
-                measure()
-                onFilePreviewLoaded()
-              }}
-              {...messageRowProps}
-            />
-          </div>
-        )}
-      </CellMeasurer>
-    )
-  }
-
-  rowRenderer.propTypes = {
-    index: PropTypes.number.isRequired,
-    key: PropTypes.string.isRequired,
-    isVisible: PropTypes.bool.isRequired,
-    style: PropTypes.object.isRequired,
-    parent: PropTypes.node.isRequired
-  }
-
+  // NOTE: MessageList is reversed by CSS!
   return (
-    <AutoSizer onResize={onListSizeChange}>
-      {({ height, width }) => {
-        if (width !== listWidth) setListWidth(width)
-        return (
-          <Fragment>
-            <List
-              className="MessageList"
-              ref={list}
-              width={width}
-              height={height}
-              rowCount={messages.length}
-              deferredMeasurementCache={rowHeightCache}
-              rowHeight={rowHeightCache.rowHeight}
-              rowRenderer={rowRenderer}
-              onRowsRendered={onRowsRendered}
-              noRowsRenderer={LoadingOrFirstMessage.bind(null, { loading, channelName })}
-            />
-            <Suspense
-              key={`status-indicator-${messages.length}`}
-              fallback={<div className="progressBar" />}
-              delay={500}
-              loading={loading || replicating}
-              passThrough={true}
-            >
-              {!atBottom && hasUnreadMessages ? <div className="unreadIndicator" /> : null}
-            </Suspense>
-          </Fragment>
-        )
-      }}
-    </AutoSizer>
+    <React.Fragment>
+      <div
+        ref={setListRef}
+        onScroll={checkBoundariesDebounced}
+        className={classNames('MessageList')}
+      >
+        <span ref={setBotRef} />
+        {messages.map((m, index) => (
+          <MessageListRow
+            key={`message-${m.hash}`}
+            parentElement={listElement}
+            message={m}
+            prevMessage={messages[index + 1]}
+            {...messageRowProps}
+          />
+        ))}
+        <span ref={setTopRef} />
+        {loading ? (
+          <LoadingMessages />
+        ) : atTop && messages.length < entryCount ? (
+          <LoadMore parentElement={listElement} onActivate={loadMore} />
+        ) : (
+          <FirstMessage channelName={channelName} />
+        )}
+      </div>
+      {!atBottom && hasUnreadMessages ? <div className="unreadIndicator" /> : null}
+      <DelayRender visible={loading}>
+        <div className="progressBar" />
+      </DelayRender>
+    </React.Fragment>
   )
 }
 
 MessageList.propTypes = {
   messages: PropTypes.array.isRequired,
   channelName: PropTypes.string.isRequired,
-  language: PropTypes.string.isRequired,
-  onMessageInView: PropTypes.func.isRequired,
-  loading: PropTypes.bool,
-  replicating: PropTypes.bool,
-  hasUnreadMessages: PropTypes.bool,
-  useLargeMessage: PropTypes.bool,
-  useMonospaceFont: PropTypes.bool
+  loading: PropTypes.bool.isRequired,
+  hasUnreadMessages: PropTypes.bool.isRequired,
+  entryCount: PropTypes.number.isRequired,
+  loadMore: PropTypes.func.isRequired,
+  resetOffset: PropTypes.func.isRequired
+}
+
+function MessageListRow ({
+  parentElement,
+  message,
+  prevMessage,
+  language,
+  markMessageRead,
+  ...rest
+}) {
+  const [setRef, isVisible] = useVisibility(parentElement)
+
+  // Parse dates so we know if we must add a date separator
+  const prevDate = prevMessage && new Date(prevMessage.meta.ts)
+  const date = new Date(message.meta.ts)
+  // Add separator when this is the first message or the dates between messages differ
+  const addDateSepator = date && (!prevDate || (prevDate && date.getDate() !== prevDate.getDate()))
+
+  if (isVisible && !message.read) markMessageRead(message.hash)
+
+  return (
+    <div ref={setRef}>
+      {addDateSepator && <MessagesDateSeparator date={date} locale={language} />}
+      <MessageRow message={message} {...rest} />
+    </div>
+  )
+}
+
+MessageListRow.propTypes = {
+  parentElement: PropTypes.instanceOf(Element),
+  message: PropTypes.object.isRequired,
+  prevMessage: PropTypes.object,
+  language: PropTypes.string,
+  markMessageRead: PropTypes.func.isRequired
 }
 
 export default MessageList

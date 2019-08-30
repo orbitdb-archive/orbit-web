@@ -7,7 +7,7 @@ function LoadingMessages ({ ...rest }) {
   const [t] = useTranslation()
 
   return (
-    <div className="loadingMessages" {...rest}>
+    <div className="firstMessage" {...rest}>
       {t('channel.loadingHistory')}
     </div>
   )

@@ -10,6 +10,30 @@ configure({ enforceActions: 'observed' })
 
 const logger = new Logger()
 
+const formatMeta = meta => Object.assign(meta, { from: formatFrom(meta.from) })
+
+const formatFrom = from => {
+  return {
+    name: formatName(from),
+    image: from.image,
+    location: from.location
+  }
+}
+
+const formatName = from => {
+  if ('name' in from) {
+    if (checkName(from.name)) return from.name
+    else if ('id' in from.name && checkName(from.name.id)) return from.name.id
+  }
+  return 'anonymous'
+}
+
+const checkName = name => {
+  return typeof name === 'string' && name.length > 0
+}
+
+const defaultMessageOffset = 64
+
 export default class ChannelStore {
   constructor ({ network, channelName }) {
     this.network = network
@@ -38,9 +62,8 @@ export default class ChannelStore {
   _sendingMessageCounter = 0
 
   // Public instance variables
-
   @observable
-  entries = []
+  entriesMap = {}
 
   @observable
   peers = []
@@ -51,64 +74,42 @@ export default class ChannelStore {
   @observable
   replicating = false
 
+  @observable
+  messageOffset = defaultMessageOffset
+
   // Public instance getters
 
   @computed
-  get entryHashes () {
-    return this.entries.map(e => e.hash)
+  get entries () {
+    return Object.values(this.entriesMap).sort(
+      // Descending chronological order by entry timestamp
+      (a, b) => b.payload.value.meta.ts - a.payload.value.meta.ts
+    )
+  }
+
+  @computed
+  get _visibleEntries () {
+    return this.entries.slice(0, this.messageOffset)
+  }
+
+  @computed
+  get _unseenEntries () {
+    return this.entries.filter(e => !e.seen)
   }
 
   @computed
   get messages () {
-    // Format entries to better suit a chat channel
-
-    const formatMeta = meta => Object.assign(meta, { from: formatFrom(meta.from) })
-
-    const formatFrom = from => {
-      return {
-        name: formatName(from),
-        image: from.image,
-        location: from.location
-      }
-    }
-
-    const formatName = from => {
-      if ('name' in from) {
-        if (checkName(from.name)) return from.name
-        else if ('id' in from.name && checkName(from.name.id)) return from.name.id
-      }
-      return 'anonymous'
-    }
-
-    const checkName = name => {
-      return typeof name === 'string' && name.length > 0
-    }
-
-    return this.entries
-      .map(e => JSON.parse(JSON.stringify(e))) // Make sure we are working with a copy
-      .map(entry =>
-        Object.assign(entry.payload.value, {
-          hash: entry.hash,
-          userIdentity: entry.identity,
-          unread: !entry.seen,
-          meta: formatMeta(entry.payload.value.meta)
-        })
-      )
-  }
-
-  @computed
-  get readMessages () {
-    return this.messages.filter(m => !m.unread)
+    return this._formatMessages(this._visibleEntries)
   }
 
   @computed
   get unreadMessages () {
-    return this.messages.filter(m => m.unread)
+    return this._formatMessages(this._unseenEntries)
   }
 
   @computed
   get hasUnreadMessages () {
-    return this.unreadMessages.length > 0
+    return this._unseenEntries ? this._unseenEntries.length > 0 : false
   }
 
   @computed
@@ -149,19 +150,13 @@ export default class ChannelStore {
   @action
   _updateEntries (entries) {
     if (!entries || entries.length === 0) return
-
-    const oldHashes = this.entryHashes
     const { lastSeenTimestamp = 0 } = this._storableState
-
-    const newEntries = entries
-      // Filter out entries we already have
-      .filter(e => !oldHashes.includes(e.hash))
+    entries.map(e => {
       // Set entries as seen
-      .map(e => Object.assign(e, { seen: e.payload.value.meta.ts <= lastSeenTimestamp }))
-
-    this.entries = this.entries
-      .concat(newEntries)
-      .sort((a, b) => a.payload.value.meta.ts - b.payload.value.meta.ts)
+      Object.assign(e, { seen: e.seen || e.payload.value.meta.ts <= lastSeenTimestamp })
+      // Add entries to store
+      this.entriesMap[e.hash] = e
+    })
   }
 
   @action
@@ -213,6 +208,7 @@ export default class ChannelStore {
 
   // Called when the user writes a message (text or file)
   _onWrite (entry) {
+    entry.seen = true
     this._updateEntries([entry])
     this._decrementSendingMessageCounter()
   }
@@ -236,6 +232,19 @@ export default class ChannelStore {
   }
 
   // Private instance methods
+
+  // Format entries to better suit a chat channel
+  _formatMessages (entries) {
+    return JSON.parse(JSON.stringify(entries)) // Deep copy
+      .map(entry =>
+        Object.assign(entry.payload.value, {
+          hash: entry.hash,
+          userIdentity: entry.identity,
+          unread: !entry.seen,
+          meta: formatMeta(entry.payload.value.meta)
+        })
+      )
+  }
 
   _getStoredStates () {
     return JSON.parse(localStorage.getItem(this.storagekey)) || {}
@@ -271,6 +280,27 @@ export default class ChannelStore {
     }
   }
 
+  _sendFile (file) {
+    return new Promise(resolve => {
+      const reader = new FileReader()
+      reader.onload = event => {
+        this.network.worker.postMessage({
+          action: 'channel:send-file-message',
+          options: {
+            channelName: this.channelName,
+            file: {
+              filename: file.name,
+              buffer: event.target.result,
+              meta: { mimeType: file.type, size: file.size }
+            }
+          }
+        })
+        resolve()
+      }
+      reader.readAsArrayBuffer(file)
+    })
+  }
+
   // Public instance actions
 
   @action.bound
@@ -292,6 +322,26 @@ export default class ChannelStore {
     this.markEntryAsRead(this.entries[index])
   }
 
+  @action.bound
+  markEntryAsReadWithHash (hash) {
+    if (typeof hash !== 'string') return
+    this.markEntryAsRead(this.entriesMap[hash])
+  }
+
+  @action.bound
+  increaseMessageOffset (count = defaultMessageOffset / 2) {
+    if (this.messageOffset >= this.entries.length) {
+      // Don't allow the offset to grow too far beyond current entry count
+      return
+    }
+    this.messageOffset += count
+  }
+
+  @action.bound
+  resetMessageOffset () {
+    this.messageOffset = 64
+  }
+
   // Public instance methods
 
   sendMessage (text) {
@@ -305,27 +355,6 @@ export default class ChannelStore {
     })
 
     return Promise.resolve()
-  }
-
-  _sendFile (file) {
-    return new Promise(resolve => {
-      const reader = new FileReader()
-      reader.onload = event => {
-        this.network.worker.postMessage({
-          action: 'channel:send-file-message',
-          options: {
-            channelName: this.channelName,
-            file: {
-              filename: file.name,
-              buffer: event.target.result,
-              meta: { mimeType: file.type, size: file.size }
-            }
-          }
-        })
-        resolve()
-      }
-      reader.readAsArrayBuffer(file)
-    })
   }
 
   sendFiles (files) {

@@ -1,6 +1,6 @@
 'use strict'
 
-import React, { useEffect } from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
 
@@ -10,30 +10,16 @@ import { getHumanReadableSize, isAudio, isText, isImage, isVideo } from '../../u
 
 import '../../styles/FileMessage.scss'
 
-function FileMessage ({
-  messageHash,
-  fileHash,
-  meta,
-  filepreviewOpen,
-  toggleFilepreview,
-  ...filePreviewProps
-}) {
+function FileMessage ({ messageHash, fileHash, meta, ...filePreviewProps }) {
+  const [showPreview, setShowPreview] = useState(false)
   const [t] = useTranslation()
 
   const { name, size, mimeType } = meta
 
   function handleNameClick () {
     if (!isImage(name) && !isText(name) && !isAudio(name) && !isVideo(name)) return
-    toggleFilepreview(messageHash)
+    setShowPreview(!showPreview)
   }
-
-  useEffect(() => {
-    let timer
-    if (!filepreviewOpen) timer = setTimeout(filePreviewProps.onSizeUpdate, 0)
-    return () => {
-      if (timer) clearTimeout(timer)
-    }
-  }, [filepreviewOpen])
 
   const ipfsLink =
     (window.gatewayAddress ? 'http://' + window.gatewayAddress : 'https://ipfs.io/ipfs/') + fileHash
@@ -51,7 +37,7 @@ function FileMessage ({
         <a className="download" href={ipfsLink} download={name}>
           {t('channel.file.download')}
         </a>
-        {filepreviewOpen && (
+        {showPreview && (
           <FilePreview hash={fileHash} name={name} mimeType={mimeType} {...filePreviewProps} />
         )}
       </div>
@@ -66,9 +52,7 @@ FileMessage.propTypes = {
     name: PropTypes.string.isRequired,
     size: PropTypes.number.isRequired,
     mimeType: PropTypes.string.isRequired
-  }).isRequired,
-  filepreviewOpen: PropTypes.bool.isRequired,
-  toggleFilepreview: PropTypes.func.isRequired
+  }).isRequired
 }
 
 FileMessage.defaultProps = {}

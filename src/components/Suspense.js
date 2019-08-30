@@ -1,24 +1,8 @@
 'use strict'
 
-import React, { useEffect, useState, useRef } from 'react'
+import { useState } from 'react'
 
-function useTimeout (callback, delay) {
-  const savedCallback = useRef()
-
-  useEffect(() => {
-    savedCallback.current = callback
-  }, [callback])
-
-  useEffect(() => {
-    function run () {
-      savedCallback.current()
-    }
-    if (delay !== null) {
-      const id = setTimeout(run, delay)
-      return () => clearTimeout(id)
-    }
-  }, [delay])
-}
+import { useTimeout } from '../utils/hooks'
 
 function Suspense (props) {
   const [displayFallback, setDisplayFallback] = useState(false)
