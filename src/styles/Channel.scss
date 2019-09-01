@@ -335,11 +335,13 @@ input[type="button"],
   }
 
   .progressBar {
+    filter: hue-rotate(30deg);
     position: absolute;
-    bottom: 0;
-    height: 2px;
+    top: 0;
+    height: 1px;
     width: 100%;
     background: $main-color;
+    opacity: 0.5;
     &:before {
       content: '';
       position: absolute;

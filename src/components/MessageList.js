@@ -1,9 +1,11 @@
 'use strict'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, useContext } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import debounce from 'lodash.debounce'
+
+import RootStoreContext from '../context/RootStoreContext'
 
 import MessageRow from './MessageRow'
 import MessagesDateSeparator from './MessagesDateSeparator'
@@ -23,6 +25,7 @@ function MessageList ({
   resetOffset,
   ...messageRowProps
 }) {
+  const { uiStore } = useContext(RootStoreContext)
   const [setListRef, listElement] = useRefCallback()
   const [setTopRef, topElement] = useRefCallback()
   const [setBotRef, botElement] = useRefCallback()
@@ -86,12 +89,13 @@ function MessageList ({
         ) : atTop && messages.length < entryCount ? (
           <LoadMore parentElement={listElement} onActivate={loadMore} />
         ) : (
-          <FirstMessage channelName={channelName} />
+          <LoadMore parentElement={listElement} onActivate={loadMore} />
+          // <FirstMessage channelName={channelName} />
         )}
       </div>
       {!atBottom && hasUnreadMessages ? <div className="unreadIndicator" /> : null}
       <DelayRender visible={loading}>
-        <div className="progressBar" />
+        <div className="progressBar" style={uiStore.theme} />
       </DelayRender>
     </React.Fragment>
   )
