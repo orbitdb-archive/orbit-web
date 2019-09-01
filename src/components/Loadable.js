@@ -24,7 +24,7 @@ function LoadAsync (opts) {
     Object.assign(
       {
         loading: Loading,
-        delay: 200,
+        delay: 0,
         timeout: 10000
       },
       opts

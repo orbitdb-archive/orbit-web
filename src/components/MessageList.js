@@ -94,8 +94,8 @@ function MessageList ({
         )}
       </div>
       {!atBottom && hasUnreadMessages ? <div className="unreadIndicator" /> : null}
-      <DelayRender visible={loading}>
-        <div className="progressBar" style={uiStore.theme} />
+      <DelayRender visible={loading} startDelay={0} stopDelay={0}>
+        <div className="progressBar" />
       </DelayRender>
     </React.Fragment>
   )
