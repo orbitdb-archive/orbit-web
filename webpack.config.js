@@ -14,6 +14,7 @@ const config = {
   },
   resolve: {
     alias: {
+      leveldown: 'level-js',
       components: path.join(__dirname, './src/components/'),
       config: path.join(__dirname, './src/config/'),
       containers: path.join(__dirname, './src/containers/'),
