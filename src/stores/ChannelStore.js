@@ -330,6 +330,12 @@ export default class ChannelStore {
 
   @action.bound
   increaseMessageOffset (count = defaultMessageOffset / 2) {
+    console.log("LOAD MORE!")
+    this.network.worker.postMessage({
+      action: 'channel:load-more',
+      options: { channelName: this.channelName }
+    })
+
     if (this.messageOffset >= this.entries.length) {
       // Don't allow the offset to grow too far beyond current entry count
       return

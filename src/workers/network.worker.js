@@ -26,6 +26,9 @@ function onMessage ({ data }) {
     case 'orbit:leave-channel':
       handleLeaveChannel.call(this, data)
       break
+    case 'channel:load-more':
+      handleLoadMore.call(this, data)
+      break
     case 'channel:send-text-message':
       handleSendTextMessage.call(this, data)
       break
@@ -145,7 +148,7 @@ async function handleStop () {
 async function handleJoinChannel ({ options: { channelName } }) {
   const channel = await this.orbit.join(channelName)
 
-  channel.load()
+  channel.load(1)
 
   // Bind all relevant events
   CHANNEL_FEED_EVENTS.forEach(eventName => {
@@ -155,6 +158,12 @@ async function handleJoinChannel ({ options: { channelName } }) {
 
 function handleLeaveChannel ({ options }) {
   this.orbit.leave(options.channelName)
+}
+
+function handleLoadMore ({ options }) {
+  const channel = this.orbit.channels[options.channelName]
+  const loadFunc = channel.loadMore.bind(channel)
+  queueCall.call(this, loadFunc)
 }
 
 function handleSendTextMessage ({ options }) {
