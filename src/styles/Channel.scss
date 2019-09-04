@@ -287,11 +287,6 @@ input[type="button"],
     }
   }
 
-  .messagesEnd {
-    display: block;
-    height: 0;
-  }
-
   &.size-normal {
     .dateSeparator {
       font-size: 0.7em;
@@ -369,11 +364,11 @@ input[type="button"],
     width: 100%;
 
     max-height: 100%;
-    overflow: hidden;
-    overflow-y: scroll;
+    overflow-x: hidden;
+    overflow-y: auto;
 
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
   }
 }
 

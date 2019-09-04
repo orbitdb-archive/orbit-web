@@ -1,6 +1,6 @@
 'use strict'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import debounce from 'lodash.debounce'
@@ -10,8 +10,7 @@ import MessagesDateSeparator from './MessagesDateSeparator'
 import { FirstMessage, LoadingMessages, LoadMore } from './MessageTypes'
 import DelayRender from './DelayRender'
 
-import { isRectInside } from '../utils/rect'
-import { useVisibility, useRefCallback } from '../utils/hooks'
+import { useVisibility } from '../utils/hooks'
 
 function MessageList ({
   messages,
@@ -23,71 +22,57 @@ function MessageList ({
   resetOffset,
   ...messageRowProps
 }) {
-  const [setListRef, listElement] = useRefCallback()
-  const [setTopRef, topElement] = useRefCallback()
-  const [setBotRef, botElement] = useRefCallback()
+  const listRef = useRef()
 
   const [atTop, setAtTop] = useState(false)
-  const [atBottom, setAtBottom] = useState(false)
+  const [atBottom, setAtBottom] = useState(true)
 
   const topMargin = 20
   const botMargin = 20
 
   function checkBoundaries () {
-    if (!listElement || !topElement || !botElement) return
-    const listRect = listElement.getBoundingClientRect()
-    const topRect = topElement.getBoundingClientRect()
-    const botRect = botElement.getBoundingClientRect()
+    if (!listRef.current) return
 
-    const topVisible = isRectInside(listRect, topRect, { topMargin })
-    const botVisible = isRectInside(listRect, botRect, { botMargin })
+    const el = listRef.current
+    const topVisible = el.scrollTop <= 0 + topMargin
+    const botVisible = el.scrollTop + el.clientHeight >= el.scrollHeight - botMargin
 
     setAtTop(topVisible)
     setAtBottom(botVisible)
-
-    if (topVisible && botVisible) loadMore()
   }
 
-  useEffect(() => {
-    checkBoundaries()
-  }, [messages.length])
+  function stayAtBottom () {
+    if (!listRef.current) return
+    if (atBottom) listRef.current.scrollTop = listRef.current.scrollHeight
+  }
 
-  useEffect(() => {
-    resetOffset()
-  }, [channelName])
+  useEffect(() => () => resetOffset(), [])
+  useLayoutEffect(checkBoundaries, [listRef])
+  useLayoutEffect(stayAtBottom, [atBottom, listRef, entryCount])
 
   const checkBoundariesDebounced = useCallback(debounce(checkBoundaries, 40, { leading: true }), [
-    listElement,
-    topElement,
-    botElement
+    listRef
   ])
 
-  // NOTE: MessageList is reversed by CSS!
   return (
     <React.Fragment>
-      <div
-        ref={setListRef}
-        onScroll={checkBoundariesDebounced}
-        className={classNames('MessageList')}
-      >
-        <span ref={setBotRef} />
-        {messages.map((m, index) => (
-          <MessageListRow
-            key={`message-${m.hash}`}
-            parentElement={listElement}
-            message={m}
-            prevMessage={messages[index + 1]}
-            {...messageRowProps}
-          />
-        ))}
-        <span ref={setTopRef} />
+      <div ref={listRef} onScroll={checkBoundariesDebounced} className={classNames('MessageList')}>
         {loading ? (
           <LoadingMessages />
         ) : atTop && messages.length < entryCount ? (
-          <LoadMore parentElement={listElement} onActivate={loadMore} />
+          <LoadMore parentElement={listRef.current} onActivate={loadMore} />
         ) : (
           <FirstMessage channelName={channelName} />
         )}
+        {messages.map((m, index) => (
+          <MessageListRow
+            key={`message-${m.hash}`}
+            parentElement={listRef.current}
+            message={m}
+            prevMessage={messages[index - 1]}
+            {...messageRowProps}
+          />
+        ))}
       </div>
       {!atBottom && hasUnreadMessages ? <div className="unreadIndicator" /> : null}
       <DelayRender visible={loading}>
