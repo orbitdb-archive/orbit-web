@@ -54,13 +54,21 @@ function MessageList ({
     listRef
   ])
 
+  const onLoadMore = useCallback(() => {
+    if (!listRef.current) return
+    const el = listRef.current
+    const scrollFromBot = el.scrollHeight - el.clientHeight - el.scrollTop
+    loadMore()
+    el.scrollTop = el.scrollHeight - el.clientHeight - scrollFromBot
+  }, [listRef])
+
   return (
     <React.Fragment>
       <div ref={listRef} onScroll={checkBoundariesDebounced} className={classNames('MessageList')}>
         {loading ? (
           <LoadingMessages />
         ) : atTop && messages.length < entryCount ? (
-          <LoadMore parentElement={listRef.current} onActivate={loadMore} />
+          <LoadMore parentElement={listRef.current} onActivate={onLoadMore} />
         ) : (
           <FirstMessage channelName={channelName} />
         )}
