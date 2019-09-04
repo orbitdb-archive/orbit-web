@@ -1,6 +1,6 @@
 'use strict'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import debounce from 'lodash.debounce'
 
 import { isRectInside } from './rect'
@@ -53,7 +53,7 @@ export function useVisibility (parentElement, delay = 100) {
     [element, parentElement, delay]
   )
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!parentElement) return
     parentElement.addEventListener('scroll', checkVisibility)
     return () => {
@@ -62,9 +62,7 @@ export function useVisibility (parentElement, delay = 100) {
     }
   }, [parentElement, checkVisibility])
 
-  useEffect(() => {
-    checkVisibility()
-  }, [checkVisibility])
+  useLayoutEffect(checkVisibility, [checkVisibility])
 
   return [setRef, isVisible, element]
 }
