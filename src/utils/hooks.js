@@ -37,7 +37,7 @@ export function useRefCallback () {
   return [setRef, element]
 }
 
-export function useVisibility (parentElement, delay = 100) {
+export function useVisibility (parentElement, margins, delay = 10) {
   const [isVisible, setIsVisible] = useState(false)
 
   const [setRef, element] = useRefCallback()
@@ -47,10 +47,10 @@ export function useVisibility (parentElement, delay = 100) {
       if (!element || !parentElement) return
       const parentRect = parentElement.getBoundingClientRect()
       const rect = element.getBoundingClientRect()
-      const visible = isRectInside(parentRect, rect)
+      const visible = isRectInside(parentRect, rect, margins)
       setIsVisible(visible)
     }, delay),
-    [element, parentElement, delay]
+    [element, parentElement, margins, delay]
   )
 
   useLayoutEffect(() => {
