@@ -324,7 +324,7 @@ input[type="button"],
   .unreadIndicator {
     position: absolute;
     bottom: 0;
-    height: 2px;
+    height: 1px;
     width: 100%;
     background: $second-color;
   }
@@ -332,9 +332,10 @@ input[type="button"],
   .progressBar {
     position: absolute;
     bottom: 0;
-    height: 2px;
+    height: 1px;
     width: 100%;
     background: $main-color;
+
     &:before {
       content: '';
       position: absolute;
