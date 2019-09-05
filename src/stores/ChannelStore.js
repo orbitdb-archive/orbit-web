@@ -82,14 +82,14 @@ export default class ChannelStore {
   @computed
   get entries () {
     return Object.values(this.entriesMap).sort(
-      // Descending chronological order by entry timestamp
-      (a, b) => b.payload.value.meta.ts - a.payload.value.meta.ts
+      // Ascending chronological order by entry timestamp
+      (a, b) => a.payload.value.meta.ts - b.payload.value.meta.ts
     )
   }
 
   @computed
   get _visibleEntries () {
-    return this.entries.slice(0, this.messageOffset)
+    return this.entries.slice(-this.messageOffset)
   }
 
   @computed
@@ -339,7 +339,7 @@ export default class ChannelStore {
 
   @action.bound
   resetMessageOffset () {
-    this.messageOffset = 64
+    this.messageOffset = defaultMessageOffset
   }
 
   // Public instance methods

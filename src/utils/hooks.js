@@ -1,6 +1,6 @@
 'use strict'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import debounce from 'lodash.debounce'
 
 import { isRectInside } from './rect'
@@ -37,7 +37,7 @@ export function useRefCallback () {
   return [setRef, element]
 }
 
-export function useVisibility (parentElement, delay = 100) {
+export function useVisibility (parentElement, margins, delay = 10) {
   const [isVisible, setIsVisible] = useState(false)
 
   const [setRef, element] = useRefCallback()
@@ -47,13 +47,13 @@ export function useVisibility (parentElement, delay = 100) {
       if (!element || !parentElement) return
       const parentRect = parentElement.getBoundingClientRect()
       const rect = element.getBoundingClientRect()
-      const visible = isRectInside(parentRect, rect)
+      const visible = isRectInside(parentRect, rect, margins)
       setIsVisible(visible)
     }, delay),
-    [element, parentElement, delay]
+    [element, parentElement, margins, delay]
   )
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!parentElement) return
     parentElement.addEventListener('scroll', checkVisibility)
     return () => {
@@ -62,9 +62,7 @@ export function useVisibility (parentElement, delay = 100) {
     }
   }, [parentElement, checkVisibility])
 
-  useEffect(() => {
-    checkVisibility()
-  }, [checkVisibility])
+  useLayoutEffect(checkVisibility, [checkVisibility])
 
   return [setRef, isVisible, element]
 }

@@ -1,70 +1,45 @@
 'use strict'
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useLayoutEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
 import debounce from 'lodash.debounce'
 
 function LoadMore ({ parentElement, onActivate, ...rest }) {
   const [t] = useTranslation()
-  const [paddingTop, setPaddingTop] = useState(0)
-  const lastTouchY = useRef(-1)
+  const lastScrollTop = useRef(-1)
 
   const activate = useCallback(() => {
     if (typeof onActivate === 'function') onActivate()
   }, [onActivate])
 
-  const onInteract = useCallback(
+  const debouncedActivate = useCallback(debounce(activate, 100, { leading: true }), [activate])
+
+  const onScroll = useCallback(
     event => {
-      if (event.type === 'click') activate()
-      else if (event.type === 'wheel') {
-        if (event.deltaY < 0) onScrollUp()
-        else onScrollDown()
-      } else if (event.type === 'touchmove') {
-        const clientY = event.changedTouches[0].clientY
-        if (lastTouchY.current > 0 && clientY - lastTouchY.current > 0) onScrollUp()
-        else onScrollDown()
-        lastTouchY.current = clientY
-      } else if (event.type === 'keydown') {
-        if (event.keyCode === 38) onScrollUp()
-        else if (event.keyCode === 40) onScrollDown()
+      const element = event.target
+      if (!element) return
+      if (lastScrollTop.current > 0 && element.scrollTop === 0) {
+        debouncedActivate()
+      } else if (lastScrollTop.current === 0) {
+        debouncedActivate.cancel()
       }
+      lastScrollTop.current = event.target.scrollTop
     },
-    [activate]
+    [debouncedActivate]
   )
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!parentElement) return
-    parentElement.addEventListener('wheel', onInteract)
-    parentElement.addEventListener('touchmove', onInteract)
-    document.addEventListener('keydown', onInteract)
+    parentElement.addEventListener('scroll', onScroll)
     return () => {
-      debouncedOnActivate.cancel()
-      parentElement.removeEventListener('wheel', onInteract)
-      parentElement.removeEventListener('touchmove', onInteract)
-      document.removeEventListener('keydown', onInteract)
+      debouncedActivate.cancel()
+      parentElement.removeEventListener('scroll', onScroll)
     }
-  }, [parentElement, onInteract])
-
-  const debouncedOnActivate = useCallback(debounce(activate, 200), [activate])
-
-  function onScrollUp () {
-    setPaddingTop(40)
-    debouncedOnActivate()
-  }
-
-  function onScrollDown () {
-    setPaddingTop(0)
-    debouncedOnActivate.cancel()
-  }
+  }, [parentElement, onScroll])
 
   return (
-    <div
-      style={{ paddingTop: paddingTop > 0 ? paddingTop : '' }}
-      className="firstMessage loadMore"
-      {...rest}
-      onClick={onInteract}
-    >
+    <div className="firstMessage loadMore" {...rest} onClick={activate}>
       {t('channel.loadMore')}
     </div>
   )
