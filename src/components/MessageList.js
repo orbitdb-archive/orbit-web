@@ -24,20 +24,16 @@ function MessageList ({
 }) {
   const listRef = useRef()
 
-  const [atTop, setAtTop] = useState(false)
   const [atBottom, setAtBottom] = useState(true)
 
-  const topMargin = 20
   const botMargin = 20
 
   function checkBoundaries () {
     if (!listRef.current) return
 
     const el = listRef.current
-    const topVisible = el.scrollTop <= 0 + topMargin
     const botVisible = el.scrollTop + el.clientHeight >= el.scrollHeight - botMargin
 
-    setAtTop(topVisible)
     setAtBottom(botVisible)
   }
 
@@ -67,7 +63,7 @@ function MessageList ({
       <div ref={listRef} onScroll={checkBoundariesDebounced} className={classNames('MessageList')}>
         {loading ? (
           <LoadingMessages />
-        ) : atTop && messages.length < entryCount ? (
+        ) : messages.length < entryCount ? (
           <LoadMore parentElement={listRef.current} onActivate={onLoadMore} />
         ) : (
           <FirstMessage channelName={channelName} />
