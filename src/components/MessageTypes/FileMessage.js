@@ -1,6 +1,6 @@
 'use strict'
 
-import React, { useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
 
@@ -13,6 +13,12 @@ import '../../styles/FileMessage.scss'
 function FileMessage ({ messageHash, fileHash, meta, ...filePreviewProps }) {
   const [showPreview, setShowPreview] = useState(false)
   const [t] = useTranslation()
+  const element = useRef()
+
+  const onLoaded = useCallback(() => {
+    if (!element.current) return
+    element.current.scrollIntoView({ block: 'nearest' })
+  }, [element])
 
   const { name, size, mimeType } = meta
 
@@ -25,7 +31,7 @@ function FileMessage ({ messageHash, fileHash, meta, ...filePreviewProps }) {
     (window.gatewayAddress ? 'http://' + window.gatewayAddress : 'https://ipfs.io/ipfs/') + fileHash
 
   return (
-    <div className="FileMessage">
+    <div ref={element} className="FileMessage">
       <div>
         <span className="name" onClick={handleNameClick}>
           {name}
@@ -38,7 +44,13 @@ function FileMessage ({ messageHash, fileHash, meta, ...filePreviewProps }) {
           {t('channel.file.download')}
         </a>
         {showPreview && (
-          <FilePreview hash={fileHash} name={name} mimeType={mimeType} {...filePreviewProps} />
+          <FilePreview
+            hash={fileHash}
+            name={name}
+            mimeType={mimeType}
+            onFilePreviewLoaded={onLoaded}
+            {...filePreviewProps}
+          />
         )}
       </div>
     </div>
