@@ -1,6 +1,6 @@
 'use strict'
 
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import debounce from 'lodash.debounce'
@@ -10,7 +10,7 @@ import MessagesDateSeparator from './MessagesDateSeparator'
 import { FirstMessage, LoadingMessages, LoadMore } from './MessageTypes'
 import DelayRender from './DelayRender'
 
-import { useVisibility } from '../utils/hooks'
+import { useVisibility, useRefCallback } from '../utils/hooks'
 
 function MessageList ({
   messages,
@@ -22,24 +22,24 @@ function MessageList ({
   resetOffset,
   ...messageRowProps
 }) {
-  const listRef = useRef()
+  const [listRef, setListRef] = useRefCallback()
 
   const [atBottom, setAtBottom] = useState(true)
 
   const botMargin = 20
 
   function checkBoundaries () {
-    if (!listRef.current) return
+    if (!listRef) return
 
-    const el = listRef.current
+    const el = listRef
     const botVisible = el.scrollTop + el.clientHeight >= el.scrollHeight - botMargin
 
     setAtBottom(botVisible)
   }
 
   function stayAtBottom () {
-    if (!listRef.current) return
-    if (atBottom) listRef.current.scrollTop = listRef.current.scrollHeight
+    if (!listRef) return
+    if (atBottom) listRef.scrollTop = listRef.scrollHeight
   }
 
   useEffect(() => () => resetOffset(), [])
@@ -51,8 +51,8 @@ function MessageList ({
   ])
 
   const onLoadMore = useCallback(() => {
-    if (!listRef.current) return
-    const el = listRef.current
+    if (!listRef) return
+    const el = listRef
     const scrollFromBot = el.scrollHeight - el.clientHeight - el.scrollTop
     loadMore()
     el.scrollTop = el.scrollHeight - el.clientHeight - scrollFromBot
@@ -60,18 +60,22 @@ function MessageList ({
 
   return (
     <React.Fragment>
-      <div ref={listRef} onScroll={checkBoundariesDebounced} className={classNames('MessageList')}>
+      <div
+        ref={setListRef}
+        onScroll={checkBoundariesDebounced}
+        className={classNames('MessageList')}
+      >
         {loading ? (
           <LoadingMessages />
         ) : messages.length < entryCount ? (
-          <LoadMore parentElement={listRef.current} onActivate={onLoadMore} />
+          <LoadMore parentElement={listRef} onActivate={onLoadMore} />
         ) : (
           <FirstMessage channelName={channelName} />
         )}
         {messages.map((m, index) => (
           <MessageListRow
             key={`message-${m.hash}`}
-            parentElement={listRef.current}
+            parentElement={listRef}
             message={m}
             prevMessage={messages[index - 1]}
             {...messageRowProps}
@@ -104,15 +108,18 @@ function MessageListRow ({
   markMessageRead,
   ...rest
 }) {
-  const [setRef, isVisible] = useVisibility(parentElement)
+  const [ref, setRef] = useRefCallback()
+  const isVisible = useVisibility(ref, parentElement)
+
+  useLayoutEffect(() => {
+    if (isVisible && message.unread) markMessageRead(message.hash)
+  }, [isVisible, message])
 
   // Parse dates so we know if we must add a date separator
   const prevDate = prevMessage && new Date(prevMessage.meta.ts)
   const date = new Date(message.meta.ts)
   // Add separator when this is the first message or the dates between messages differ
   const addDateSepator = date && (!prevDate || (prevDate && date.getDate() !== prevDate.getDate()))
-
-  if (isVisible && !message.read) markMessageRead(message.hash)
 
   return (
     <div ref={setRef}>

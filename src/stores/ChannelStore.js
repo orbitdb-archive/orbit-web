@@ -93,8 +93,8 @@ export default class ChannelStore {
   }
 
   @computed
-  get _unseenEntries () {
-    return this.entries.filter(e => !e.seen)
+  get _unreadEntries () {
+    return this.entries.filter(e => e.payload.value.meta.ts > this._storableState.lastSeenTimestamp)
   }
 
   @computed
@@ -104,12 +104,12 @@ export default class ChannelStore {
 
   @computed
   get unreadMessages () {
-    return this._formatMessages(this._unseenEntries)
+    return this._formatMessages(this._unreadEntries)
   }
 
   @computed
   get hasUnreadMessages () {
-    return this._unseenEntries ? this._unseenEntries.length > 0 : false
+    return this._unreadEntries ? this._unreadEntries.length > 0 : false
   }
 
   @computed
@@ -149,14 +149,8 @@ export default class ChannelStore {
 
   @action
   _updateEntries (entries) {
-    if (!entries || entries.length === 0) return
-    const { lastSeenTimestamp = 0 } = this._storableState
-    entries.map(e => {
-      // Set entries as seen
-      Object.assign(e, { seen: e.seen || e.payload.value.meta.ts <= lastSeenTimestamp })
-      // Add entries to store
-      this.entriesMap[e.hash] = e
-    })
+    if (!(entries instanceof Array)) return
+    entries.forEach(e => (this.entriesMap[e.hash] = e))
   }
 
   @action
@@ -208,7 +202,7 @@ export default class ChannelStore {
 
   // Called when the user writes a message (text or file)
   _onWrite (entry) {
-    entry.seen = true
+    this._markEntryAsRead(entry)
     this._updateEntries([entry])
     this._decrementSendingMessageCounter()
   }
@@ -231,6 +225,16 @@ export default class ChannelStore {
     } catch (err) {}
   }
 
+  @action.bound
+  _markEntryAsRead (entry) {
+    if (!entry) return
+
+    this._storableState.lastSeenTimestamp = Math.max(
+      this._storableState.lastSeenTimestamp || 0,
+      entry.payload.value.meta.ts || 0
+    )
+  }
+
   // Private instance methods
 
   // Format entries to better suit a chat channel
@@ -240,7 +244,7 @@ export default class ChannelStore {
         Object.assign(entry.payload.value, {
           hash: entry.hash,
           userIdentity: entry.identity,
-          unread: !entry.seen,
+          unread: entry.payload.value.meta.ts > this._storableState.lastSeenTimestamp,
           meta: formatMeta(entry.payload.value.meta)
         })
       )
@@ -304,28 +308,15 @@ export default class ChannelStore {
   // Public instance actions
 
   @action.bound
-  markEntryAsRead (entry) {
-    if (!entry || entry.seen === true) return
-
-    entry.seen = true
-
-    // Update the last read timestamp
-    this._storableState.lastSeenTimestamp = Math.max(
-      this._storableState.lastSeenTimestamp || 0,
-      entry.payload.value.meta.ts || 0
-    )
-  }
-
-  @action.bound
   markEntryAsReadAtIndex (index) {
     if (typeof index !== 'number') return
-    this.markEntryAsRead(this.entries[index])
+    this._markEntryAsRead(this.entries[index])
   }
 
   @action.bound
   markEntryAsReadWithHash (hash) {
     if (typeof hash !== 'string') return
-    this.markEntryAsRead(this.entriesMap[hash])
+    this._markEntryAsRead(this.entriesMap[hash])
   }
 
   @action.bound

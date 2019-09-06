@@ -34,35 +34,37 @@ export function useRefCallback () {
     ref.current = node
   }, [])
 
-  return [setRef, element]
+  return [element, setRef]
 }
 
-export function useVisibility (parentElement, margins, delay = 10) {
+export function useVisibility (element, parentElement, margins, delay = 100) {
   const [isVisible, setIsVisible] = useState(false)
 
-  const [setRef, element] = useRefCallback()
+  function checkVisibility () {
+    if (!element || !parentElement) return
+    const parentRect = parentElement.getBoundingClientRect()
+    const rect = element.getBoundingClientRect()
+    const visible = isRectInside(parentRect, rect, margins)
+    setIsVisible(visible)
+  }
 
-  const checkVisibility = useCallback(
-    debounce(() => {
-      if (!element || !parentElement) return
-      const parentRect = parentElement.getBoundingClientRect()
-      const rect = element.getBoundingClientRect()
-      const visible = isRectInside(parentRect, rect, margins)
-      setIsVisible(visible)
-    }, delay),
-    [element, parentElement, margins, delay]
-  )
+  const checkVisibilityDebounced = useCallback(debounce(checkVisibility, delay), [
+    element,
+    parentElement,
+    margins,
+    delay
+  ])
 
   useLayoutEffect(() => {
     if (!parentElement) return
-    parentElement.addEventListener('scroll', checkVisibility)
+    parentElement.addEventListener('scroll', checkVisibilityDebounced)
     return () => {
-      checkVisibility.cancel()
-      parentElement.removeEventListener('scroll', checkVisibility)
+      checkVisibilityDebounced.cancel()
+      parentElement.removeEventListener('scroll', checkVisibilityDebounced)
     }
-  }, [parentElement, checkVisibility])
+  }, [parentElement, checkVisibilityDebounced])
 
-  useLayoutEffect(checkVisibility, [checkVisibility])
+  useLayoutEffect(checkVisibility, [element, parentElement, margins])
 
-  return [setRef, isVisible, element]
+  return isVisible
 }
