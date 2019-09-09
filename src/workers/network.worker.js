@@ -133,6 +133,13 @@ async function channelEvent (eventName, channelName, ...args) {
 async function handleStart ({ options }) {
   await startIPFS.call(this, options)
   await startOrbit.call(this, options)
+
+  this.ipfs.version((err, { version }) => {
+    if (err) {
+      console.info('Unable to get js-ipfs version')
+    }
+    console.info(`Running js-ipfs version ${version}`)
+  })
 }
 
 async function handleStop () {
