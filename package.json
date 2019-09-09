@@ -47,7 +47,6 @@
     "highlight.js": "9.14.2",
     "i18next": "^14.0.1",
     "ipfs": "^0.34.4",
-    "ipfs-http-client": "^29.1.1",
     "lodash.debounce": "^4.0.8",
     "mobx": "^5.13.0",
     "mobx-react": "^6.1.1",
