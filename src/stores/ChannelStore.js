@@ -88,28 +88,29 @@ export default class ChannelStore {
   }
 
   @computed
-  get _visibleEntries () {
+  get visibleEntries () {
     return this.entries.slice(-this.messageOffset)
   }
 
   @computed
-  get _unreadEntries () {
-    return this.entries.filter(e => e.payload.value.meta.ts > this._storableState.lastSeenTimestamp)
+  get unreadEntries () {
+    const lastSeenTimestamp = this._storableState.lastSeenTimestamp || 0
+    return this.entries.filter(e => e.payload.value.meta.ts > lastSeenTimestamp)
   }
 
   @computed
   get messages () {
-    return this._formatMessages(this._visibleEntries)
+    return this._formatMessages(this.visibleEntries)
   }
 
   @computed
   get unreadMessages () {
-    return this._formatMessages(this._unreadEntries)
+    return this._formatMessages(this.unreadEntries)
   }
 
   @computed
   get hasUnreadMessages () {
-    return this._unreadEntries ? this._unreadEntries.length > 0 : false
+    return this.unreadEntries ? this.unreadEntries.length > 0 : false
   }
 
   @computed
@@ -239,12 +240,13 @@ export default class ChannelStore {
 
   // Format entries to better suit a chat channel
   _formatMessages (entries) {
+    const lastSeenTimestamp = this._storableState.lastSeenTimestamp || 0
     return JSON.parse(JSON.stringify(entries)) // Deep copy
       .map(entry =>
         Object.assign(entry.payload.value, {
           hash: entry.hash,
           userIdentity: entry.identity,
-          unread: entry.payload.value.meta.ts > this._storableState.lastSeenTimestamp,
+          unread: entry.payload.value.meta.ts > lastSeenTimestamp,
           meta: formatMeta(entry.payload.value.meta)
         })
       )

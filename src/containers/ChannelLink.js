@@ -24,7 +24,7 @@ function ChannelLink ({ channel, theme, ...navLinkProps }) {
         >
           #{channel.channelName}
           {channel.hasUnreadMessages ? (
-            <span className="unreadMessages">{channel.unreadMessages.length}</span>
+            <span className="unreadMessages">{channel.unreadEntries.length}</span>
           ) : null}
         </NavLink>
       )}
