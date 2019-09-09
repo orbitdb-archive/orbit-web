@@ -268,11 +268,17 @@ export default class NetworkStore {
 
     logger.info('Starting network')
 
+    const ipfsOptions = toJS(this.settingsStore.networkSettings.ipfs) || {}
+    ipfsOptions.repo = `orbit-chat-ipfs-${this.sessionStore.username}`
+
+    const orbitOptions = toJS(this.settingsStore.networkSettings.orbit) || {}
+    orbitOptions.directory = `orbit-chat-orbitdb-${this.sessionStore.username}`
+
     this.worker.postMessage({
       action: 'network:start',
       options: {
-        ipfs: toJS(this.settingsStore.networkSettings.ipfs),
-        orbit: toJS(this.settingsStore.networkSettings.orbit),
+        ipfs: ipfsOptions,
+        orbit: orbitOptions,
         username: this.sessionStore.username
       }
     })

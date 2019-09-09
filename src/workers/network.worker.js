@@ -195,14 +195,9 @@ function startIPFS (options) {
 }
 
 function startOrbit (options) {
-  this.orbit = new Orbit(this.ipfs, {
-    dbOptions: {
-      directory: `${options.orbit.root}/data/orbit-db`
-    },
-    channelOptions: {}
-  })
+  this.orbit = new Orbit(this.ipfs, options.orbit)
 
-  this.orbit.connect(options.username)
+  this.orbit.connect({ username: options.username })
 
   // Bind all relevant events
   ORBIT_EVENTS.forEach(eventName => {
