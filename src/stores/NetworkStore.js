@@ -202,11 +202,11 @@ export default class NetworkStore {
             break
           case 'load.progress':
             // args: [address, hash, entry, progress, total]
-            channel._onLoadProgress(data.args[2])
+            channel._onLoadProgress(data.args[2], data.meta.replicationStatus)
             break
           case 'replicate.progress':
             // args: [address, hash, entry, progress, have]
-            channel._onReplicateProgress(data.args[2])
+            channel._onReplicateProgress(data.args[2], data.meta.replicationStatus)
             break
           case 'ready': // load.done
             channel._onLoaded()

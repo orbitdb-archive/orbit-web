@@ -33,6 +33,7 @@ const checkName = name => {
 }
 
 const defaultMessageOffset = 64
+const defaultLoadmoreCount = 32
 
 export default class ChannelStore {
   constructor ({ network, channelName }) {
@@ -60,6 +61,9 @@ export default class ChannelStore {
 
   @observable
   _sendingMessageCounter = 0
+
+  @observable
+  _replicationStatus = { progress: 0, max: 0 }
 
   // Public instance variables
   @observable
@@ -160,8 +164,9 @@ export default class ChannelStore {
   }
 
   @action // Called while loading from local filesystem
-  _onLoadProgress (entry) {
+  _onLoadProgress (entry, replicationStatus) {
     if (!this.loading) this.loading = true
+    if (replicationStatus) Object.assign(this._replicationStatus, replicationStatus)
     this._onEntry(entry)
   }
 
@@ -171,8 +176,9 @@ export default class ChannelStore {
   }
 
   @action // Called while loading from IPFS (receiving new messages)
-  _onReplicateProgress (entry) {
+  _onReplicateProgress (entry, replicationStatus) {
     if (!this.replicating) this.replicating = true
+    if (replicationStatus) Object.assign(this._replicationStatus, replicationStatus)
     this._onEntry(entry)
   }
 
@@ -322,12 +328,8 @@ export default class ChannelStore {
   }
 
   @action.bound
-  increaseMessageOffset (count = defaultMessageOffset / 2) {
-    if (this.messageOffset >= this.entries.length) {
-      // Don't allow the offset to grow too far beyond current entry count
-      return
-    }
-    this.messageOffset += count
+  increaseMessageOffset (count = defaultLoadmoreCount) {
+    this.messageOffset = Math.min(this.messageOffset + count, this._replicationStatus.max)
   }
 
   @action.bound

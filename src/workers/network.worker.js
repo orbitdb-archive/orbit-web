@@ -115,7 +115,8 @@ async function channelEvent (eventName, channelName, ...args) {
   const channel = this.orbit.channels[channelName]
 
   const meta = {
-    channelName: channelName
+    channelName: channelName,
+    replicationStatus: channel.replicationStatus
   }
 
   if (eventName === 'peer.update') {
