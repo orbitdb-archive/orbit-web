@@ -270,10 +270,11 @@ export default class NetworkStore {
 
     const ipfsOptions = toJS(this.settingsStore.networkSettings.ipfs) || {}
     ipfsOptions.repo = `orbit-chat-ipfs-${this.sessionStore.username}`
+    ipfsOptions.EXPERIMENTAL = Object.assign({}, ipfsOptions.EXPERIMENTAL, { pubsub: true })
 
     const orbitOptions = toJS(this.settingsStore.networkSettings.orbit) || {}
     orbitOptions.directory = `orbit-chat-orbitdb-${this.sessionStore.username}`
-    orbitOptions.credentials = { username: this.sessionStore.username }
+    orbitOptions.id = this.sessionStore.username
 
     this.worker.postMessage({
       action: 'network:start',
