@@ -273,13 +273,13 @@ export default class NetworkStore {
 
     const orbitOptions = toJS(this.settingsStore.networkSettings.orbit) || {}
     orbitOptions.directory = `orbit-chat-orbitdb-${this.sessionStore.username}`
+    orbitOptions.credentials = { username: this.sessionStore.username }
 
     this.worker.postMessage({
       action: 'network:start',
       options: {
         ipfs: ipfsOptions,
-        orbit: orbitOptions,
-        username: this.sessionStore.username
+        orbit: orbitOptions
       }
     })
   }

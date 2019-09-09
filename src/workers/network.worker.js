@@ -2,7 +2,7 @@
 
 import '@babel/polyfill'
 
-import JsIPFS from 'ipfs'
+import IPFS from 'ipfs'
 import Orbit from 'orbit_'
 
 import promiseQueue from '../utils/promise-queue'
@@ -186,27 +186,20 @@ function queueCall (func) {
     })
 }
 
-function startIPFS (options) {
-  this.ipfs = new JsIPFS(options.ipfs)
-
-  return new Promise(resolve => {
-    this.ipfs.once('ready', () => resolve())
-  })
+async function startIPFS (options) {
+  this.ipfs = await IPFS.create(options.ipfs)
 }
 
-function startOrbit (options) {
-  this.orbit = new Orbit(this.ipfs, options.orbit)
-
-  this.orbit.connect({ username: options.username })
+async function startOrbit (options) {
+  this.orbit = await Orbit.create(this.ipfs, options.orbit)
 
   // Bind all relevant events
   ORBIT_EVENTS.forEach(eventName => {
     this.orbit.events.on(eventName, orbitEvent.bind(this, eventName))
   })
 
-  return new Promise(resolve => {
-    this.orbit.events.once('connected', () => resolve())
-  })
+  // Fake the 'connected' event since we can not hear it with the async create API
+  this.orbit.events.emit('connected', this.orbit.user)
 }
 
 function refreshChannelPeers () {

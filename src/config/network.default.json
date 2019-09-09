@@ -1,10 +1,5 @@
 {
   "ipfs": {
-    "EXPERIMENTAL": {
-      "pubsub": true,
-      "sharding": false,
-      "dht": false
-    },
     "preload": { "enabled": false },
     "config": {
       "Addresses": {
