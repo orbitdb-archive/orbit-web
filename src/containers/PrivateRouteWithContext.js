@@ -1,34 +1,18 @@
 'use strict'
 
-import React from 'react'
-import PropTypes from 'prop-types'
+import React, { useContext } from 'react'
 import { observer } from 'mobx-react'
 
 import RootStoreContext from '../context/RootStoreContext'
 
 import PrivateRoute from '../components/PrivateRoute'
 
-class PrivateRouteWithContext extends React.Component {
-  static contextType = RootStoreContext
+function PrivateRouteWithContext ({ ...rest }) {
+  const { sessionStore } = useContext(RootStoreContext)
 
-  static propTypes = {
-    loginPath: PropTypes.string.isRequired
-  }
-
-  render () {
-    const { sessionStore } = this.context
-    const { loginPath, ...rest } = this.props
-
-    if (!sessionStore) return null
-
-    return (
-      <PrivateRoute
-        {...rest}
-        loginPath={loginPath}
-        isAuthenticated={sessionStore.isAuthenticated}
-      />
-    )
-  }
+  return sessionStore ? (
+    <PrivateRoute {...rest} isAuthenticated={sessionStore.isAuthenticated} />
+  ) : null
 }
 
 export default observer(PrivateRouteWithContext)

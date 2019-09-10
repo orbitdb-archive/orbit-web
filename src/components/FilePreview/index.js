@@ -10,7 +10,7 @@ import PreviewImageFile from './PreviewImageFile'
 import PreviewTextFile from './PreviewTextFile'
 import PreviewVideoFile from './PreviewVideoFile'
 
-import Suspense from '../Suspense'
+import CustomSuspense from '../Suspense'
 
 import Logger from '../../utils/logger'
 import { isAudio, isImage, isVideo, toArrayBuffer } from '../../utils/file-helpers'
@@ -128,14 +128,14 @@ function FilePreview ({ hash, loadFile, name, mimeType, onSizeUpdate, onFilePrev
   )
 
   return (
-    <Suspense
+    <CustomSuspense
       fallback={loadingElement}
       callback={_onSizeUpdate}
       delay={250}
       loading={previewLoading}
     >
       {previewContent ? previewElement : errorElement}
-    </Suspense>
+    </CustomSuspense>
   )
 }
 

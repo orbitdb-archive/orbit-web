@@ -28,12 +28,6 @@ $controls-height: 2.8em;
     width: 100%;
   }
 
-  .spinner {
-    position: absolute;
-    bottom: 0.75em;
-    left: 0.75em;
-  }
-
   .active {
     background-color: $main-color;
     &:hover {

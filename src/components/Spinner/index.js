@@ -5,6 +5,8 @@ import PropTypes from 'prop-types'
 
 import MoonLoader from './MoonLoader'
 
+import '../../styles/Spinner.scss'
+
 function Spinner ({ className, theme, loading, ...rest }) {
   if (!loading) return null
 

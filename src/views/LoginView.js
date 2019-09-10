@@ -1,13 +1,12 @@
 'use strict'
 
-import React from 'react'
+import React, { lazy } from 'react'
 import { hot } from 'react-hot-loader'
 import { Redirect } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { observer } from 'mobx-react'
 import { withTranslation } from 'react-i18next'
 import { CSSTransitionGroup } from 'react-transition-group'
-import LoadAsync from '../components/Loadable'
 
 import { version } from '../../package.json'
 
@@ -17,13 +16,11 @@ import RootStoreContext from '../context/RootStoreContext'
 
 import '../styles/LoginView.scss'
 
-const BackgroundAnimation = LoadAsync({
-  loader: () =>
-    import(/* webpackChunkName: "BackgroundAnimation" */ '../components/BackgroundAnimation')
-})
-const LoginForm = LoadAsync({
-  loader: () => import(/* webpackChunkName: "LoginForm" */ '../components/LoginForm')
-})
+const BackgroundAnimation = lazy(() =>
+  import(/* webpackChunkName: "BackgroundAnimation" */ '../components/BackgroundAnimation')
+)
+
+const LoginForm = lazy(() => import(/* webpackChunkName: "LoginForm" */ '../components/LoginForm'))
 
 const logger = new Logger()
 
