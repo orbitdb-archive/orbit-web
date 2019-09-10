@@ -20,6 +20,7 @@ function MessageList ({
   entryCount,
   loadMore,
   resetOffset,
+  theme,
   ...messageRowProps
 }) {
   const [listRef, setListRef] = useRefCallback()
@@ -82,9 +83,9 @@ function MessageList ({
           />
         ))}
       </div>
-      {!atBottom && hasUnreadMessages ? <div className="unreadIndicator" /> : null}
+      {!atBottom && hasUnreadMessages ? <div className="unreadIndicator" style={theme} /> : null}
       <DelayRender visible={loading}>
-        <div className="progressBar" />
+        <div className="progressBar" style={theme} />
       </DelayRender>
     </React.Fragment>
   )
@@ -134,7 +135,8 @@ MessageListRow.propTypes = {
   message: PropTypes.object.isRequired,
   prevMessage: PropTypes.object,
   language: PropTypes.string,
-  markMessageRead: PropTypes.func.isRequired
+  markMessageRead: PropTypes.func.isRequired,
+  theme: PropTypes.object
 }
 
 export default MessageList

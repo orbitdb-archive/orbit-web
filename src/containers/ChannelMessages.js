@@ -48,6 +48,7 @@ function ChannelMessages ({ channel }) {
         emojiSet={uiStore.emojiSet}
         markMessageRead={channel.markEntryAsReadWithHash}
         onMessageUserClick={onMessageUserClick}
+        theme={uiStore.theme}
       />
     </div>
   ))
