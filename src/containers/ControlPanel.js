@@ -212,7 +212,7 @@ class ControlPanel extends React.Component {
 
     const { networkStore, sessionStore, uiStore } = this.context
 
-    if (!uiStore.isControlPanelOpen) return null
+    if (!uiStore.isControlPanelOpen || !sessionStore.isAuthenticated) return null
 
     const { t } = this.props
 
