@@ -12,12 +12,5 @@ jobs:
           name: Install project dependencies
           command: npm ci
       - run:
-          name: Build project
-          command: npm run build
-      - run:
-          name: HTTP server
-          command: npm run serve
-          background: true
-      - run:
           name: Run tests
           command: npm test
