@@ -192,6 +192,7 @@ export default class NetworkStore {
         break
       case 'channel-event':
         const channel = this.channels[data.meta.channelName]
+        if (!channel) return
 
         switch (data.name) {
           case 'error':
