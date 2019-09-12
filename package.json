@@ -6,17 +6,20 @@
   "scripts": {
     "dev": "NODE_ENV=development ./node_modules/.bin/webpack-dev-server --mode=development",
     "build": "webpack --mode=production",
-    "lint": "eslint src/",
+    "lint": "standard",
     "test-server": "http-server ./dist -s -p 8088 &",
     "pretest": "npm run build && npm run test-server",
-    "test": "jest --runInBand; exit_code=$?; kill $(lsof -t -i:8088); exit $exit_code"
+    "test": "standard && jest --runInBand; exit_code=$?; kill $(lsof -t -i:8088); exit $exit_code"
   },
   "standard": {
+    "settings": {
+      "react": {
+        "version": "detect"
+      }
+    },
     "parser": "babel-eslint",
     "env": {
-      "browser": true,
-      "node": true,
-      "jest": true
+      "browser": true
     }
   },
   "repository": {
@@ -76,19 +79,10 @@
     "@babel/preset-env": "^7.6.0",
     "@babel/preset-react": "^7.0.0",
     "@babel/register": "^7.6.0",
-    "@orbitdb/eslint-config-orbitdb": "0.0.2",
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.0.0",
     "clean-webpack-plugin": "^3.0.0",
     "css-loader": "^3.2.0",
-    "eslint": "^6.3.0",
-    "eslint-config-standard": "^14.1.0",
-    "eslint-plugin-compat": "^3.3.0",
-    "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-node": "^10.0.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-react": "^7.14.3",
-    "eslint-plugin-standard": "^4.0.1",
     "file-loader": "^4.2.0",
     "html-webpack-plugin": "^3.2.0",
     "http-server": "^0.11.1",
@@ -101,6 +95,7 @@
     "puppeteer": "^1.19.0",
     "react-hot-loader": "^4.12.12",
     "sass-loader": "^8.0.0",
+    "standard": "^14.2.0",
     "style-loader": "^1.0.0",
     "url-loader": "^2.1.0",
     "webpack": "^4.39.3",
