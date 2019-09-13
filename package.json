@@ -6,21 +6,11 @@
   "scripts": {
     "dev": "NODE_ENV=development ./node_modules/.bin/webpack-dev-server --mode=development",
     "build": "webpack --mode=production",
-    "lint": "standard",
+    "lint": "eslint src/ test/",
+    "lint:fix": "eslint --fix src/ test/",
     "test-server": "http-server ./dist -s -p 8088 &",
     "pretest": "npm run build && npm run test-server",
-    "test": "standard && jest --runInBand; exit_code=$?; kill $(lsof -t -i:8088); exit $exit_code"
-  },
-  "standard": {
-    "settings": {
-      "react": {
-        "version": "detect"
-      }
-    },
-    "parser": "babel-eslint",
-    "env": {
-      "browser": true
-    }
+    "test": "npm run lint && jest --runInBand; exit_code=$?; kill $(lsof -t -i:8088); exit $exit_code"
   },
   "repository": {
     "type": "git",
@@ -83,6 +73,14 @@
     "babel-loader": "^8.0.0",
     "clean-webpack-plugin": "^3.0.0",
     "css-loader": "^3.2.0",
+    "eslint": "~6.3.0",
+    "eslint-config-standard": "14.1.0",
+    "eslint-config-standard-jsx": "8.1.0",
+    "eslint-plugin-import": "~2.18.0",
+    "eslint-plugin-node": "~10.0.0",
+    "eslint-plugin-promise": "~4.2.1",
+    "eslint-plugin-react": "~7.14.2",
+    "eslint-plugin-standard": "~4.0.0",
     "file-loader": "^4.2.0",
     "html-webpack-plugin": "^3.2.0",
     "http-server": "^0.11.1",
@@ -95,7 +93,6 @@
     "puppeteer": "^1.19.0",
     "react-hot-loader": "^4.12.12",
     "sass-loader": "^8.0.0",
-    "standard": "^14.2.0",
     "style-loader": "^1.0.0",
     "url-loader": "^2.1.0",
     "webpack": "^4.39.3",
