@@ -19,7 +19,7 @@ function TextMessage ({ text, emojiSet, highlightWords, useEmojis, isCommand }) 
 
   const content = textProcessor.render(tokenized)
 
-  return <div className="TextMessage">{content}</div>
+  return <div className='TextMessage'>{content}</div>
 }
 
 TextMessage.propTypes = {

@@ -18,16 +18,16 @@ function FileUploadButton ({ onSelectFiles, theme }) {
   }
 
   return (
-    <div className="FileUploadButton" style={{ ...theme }}>
+    <div className='FileUploadButton' style={{ ...theme }}>
       <input
-        type="file"
-        id="file"
-        multiple={true}
+        type='file'
+        id='file'
+        multiple
         ref={fileInput}
         style={{ display: 'none' }}
         onChange={handleFileSelect}
       />
-      <div className="icon flaticon-tool490" onClick={handleClick} />
+      <div className='icon flaticon-tool490' onClick={handleClick} />
     </div>
   )
 }

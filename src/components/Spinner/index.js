@@ -12,7 +12,7 @@ function Spinner ({ className, theme, loading, ...rest }) {
 
   return (
     <div className={className} style={theme}>
-      <MoonLoader className="spinnerIcon" {...rest} />
+      <MoonLoader className='spinnerIcon' {...rest} />
     </div>
   )
 }

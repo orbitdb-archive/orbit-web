@@ -110,20 +110,20 @@ function FilePreview ({ hash, loadFile, name, mimeType, onSizeUpdate, onFilePrev
   }
 
   const loadingElement = (
-    <CSSTransitionGroup className="FilePreview" {...animationProps}>
-      <span className="previewStatus smallText">{t('channel.file.previewLoading')}</span>
+    <CSSTransitionGroup className='FilePreview' {...animationProps}>
+      <span className='previewStatus smallText'>{t('channel.file.previewLoading')}</span>
     </CSSTransitionGroup>
   )
 
   const errorElement = (
-    <CSSTransitionGroup className="FilePreview" {...animationProps}>
-      <span className="previewStatus smallText">{t('channel.file.unableToDisplay')}</span>
+    <CSSTransitionGroup className='FilePreview' {...animationProps}>
+      <span className='previewStatus smallText'>{t('channel.file.unableToDisplay')}</span>
     </CSSTransitionGroup>
   )
 
   const previewElement = (
-    <CSSTransitionGroup className="FilePreview" {...animationProps}>
-      <span className="preview smallText">{previewContent}</span>
+    <CSSTransitionGroup className='FilePreview' {...animationProps}>
+      <span className='preview smallText'>{previewContent}</span>
     </CSSTransitionGroup>
   )
 

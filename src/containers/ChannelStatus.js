@@ -10,7 +10,7 @@ function ChannelStatus ({ channel, theme }) {
   return (
     <Observer>
       {() => (
-        <div className="ChannelStatus" style={{ ...theme }}>
+        <div className='ChannelStatus' style={{ ...theme }}>
           {channel.userCount} {t('channel.status.users', { count: channel.userCount })}
         </div>
       )}

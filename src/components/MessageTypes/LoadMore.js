@@ -39,7 +39,7 @@ function LoadMore ({ parentElement, onActivate, ...rest }) {
   }, [parentElement, onScroll])
 
   return (
-    <div className="firstMessage loadMore" {...rest} onClick={activate}>
+    <div className='firstMessage loadMore' {...rest} onClick={activate}>
       {t('channel.loadMore')}
     </div>
   )

@@ -9,12 +9,12 @@ import '../styles/JoinChannel.scss'
 function JoinChannel ({ onSubmit, theme, inputRef }) {
   const [t] = useTranslation()
   return (
-    <div className="JoinChannel">
+    <div className='JoinChannel'>
       <form onSubmit={onSubmit}>
-        <div className="row">
-          <span className="label">#</span>
-          <span className="field" style={theme}>
-            <input type="text" ref={inputRef} placeholder={t('joinChannel.inputPlaceholder')} />
+        <div className='row'>
+          <span className='label'>#</span>
+          <span className='field' style={theme}>
+            <input type='text' ref={inputRef} placeholder={t('joinChannel.inputPlaceholder')} />
           </span>
         </div>
       </form>

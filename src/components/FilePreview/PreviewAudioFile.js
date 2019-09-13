@@ -4,7 +4,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 function PreviewAudioFile ({ src, ...rest }) {
-  return <audio src={src} controls autoPlay={true} {...rest} />
+  return <audio src={src} controls autoPlay {...rest} />
 }
 
 PreviewAudioFile.propTypes = {

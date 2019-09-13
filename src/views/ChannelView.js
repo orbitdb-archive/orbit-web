@@ -23,8 +23,8 @@ function ChannelView (props) {
     <Observer>
       {() =>
         networkStore.isOnline ? (
-          <div className="ChannelView">
-            <Suspense fallback={<Spinner className="spinner suspense-fallback" size={'64px'} />}>
+          <div className='ChannelView'>
+            <Suspense fallback={<Spinner className='spinner suspense-fallback' size='64px' />}>
               {/* Render the profile panel of a user */}
               {/* This is the panel that is shown when a username is clicked in chat  */}
               <MessageUserProfilePanel />

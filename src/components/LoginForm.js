@@ -24,28 +24,28 @@ function LoginForm ({ theme, onSubmit, setUsernameInputRef }) {
   return (
     <form onSubmit={e => onSubmit(e, usernameInputRef.current.value.trim())}>
       <CSSTransitionGroup
-        transitionName="loginScreenAnimation"
-        transitionAppear={true}
-        component="div"
-        className="inputs"
+        transitionName='loginScreenAnimation'
+        transitionAppear
+        component='div'
+        className='inputs'
         transitionAppearTimeout={5000}
         transitionEnterTimeout={5000}
         transitionLeaveTimeout={5000}
       >
-        <div className="usernameRow" onClick={() => usernameInputRef.current.focus()}>
+        <div className='usernameRow' onClick={() => usernameInputRef.current.focus()}>
           <input
             ref={usernameInputRef}
-            type="text"
+            type='text'
             placeholder={t('login.nickname')}
-            maxLength="32"
+            maxLength='32'
             autoFocus
             style={theme}
             onChange={() => setCurrentLength(usernameInputRef.current.value.length)}
           />
         </div>
-        <div className="connectButtonRow">
-          <span className="hint">{currentLength > 0 ? t('login.pressEnterToLogin') : null}</span>
-          <input type="submit" value="Connect" style={{ display: 'none' }} />
+        <div className='connectButtonRow'>
+          <span className='hint'>{currentLength > 0 ? t('login.pressEnterToLogin') : null}</span>
+          <input type='submit' value='Connect' style={{ display: 'none' }} />
         </div>
       </CSSTransitionGroup>
     </form>

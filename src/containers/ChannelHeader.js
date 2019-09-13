@@ -36,9 +36,9 @@ function ChannelHeader ({ match }) {
   return (
     <Observer>
       {() => (
-        <div className="Header" onClick={onHeaderClick}>
-          <div className="ChannelName">
-            <div className="currentChannel">
+        <div className='Header' onClick={onHeaderClick}>
+          <div className='ChannelName'>
+            <div className='currentChannel'>
               {currentChannelName ? `#${currentChannelName}` : overrideName}
             </div>
             {networkStore.channelsAsArray

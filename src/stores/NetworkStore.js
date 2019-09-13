@@ -168,6 +168,8 @@ export default class NetworkStore {
     if (typeof data.action !== 'string') return
     if (typeof data.name !== 'string') return
 
+    const channel = data.meta ? this.channels[data.meta.channelName] : null
+
     switch (data.action) {
       case 'orbit-event':
         switch (data.name) {
@@ -191,7 +193,6 @@ export default class NetworkStore {
         }
         break
       case 'channel-event':
-        const channel = this.channels[data.meta.channelName]
         if (!channel) return
 
         switch (data.name) {

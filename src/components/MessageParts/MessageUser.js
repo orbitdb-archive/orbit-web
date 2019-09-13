@@ -21,7 +21,8 @@ function MessageUser ({ message, colorify, isCommand, onClick }) {
       style={{ color }}
       onClick={evt => {
         if (typeof onClick === 'function') onClick(evt, userProfile, userIdentity)
-      }}>
+      }}
+    >
       {userProfile ? userProfile.name : ''}
     </div>
   )

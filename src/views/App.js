@@ -55,8 +55,8 @@ const AlphaDisclaimer = lazy(() =>
 
 function AppView () {
   return (
-    <div className="App view">
-      <Suspense fallback={<Spinner className="spinner suspense-fallback" size={'64px'} />}>
+    <div className='App view'>
+      <Suspense fallback={<Spinner className='spinner suspense-fallback' size='64px' />}>
         <PrivateRouteWithContext component={ControlPanel} />
 
         <PrivateRouteWithContext
@@ -69,13 +69,13 @@ function AppView () {
           <Route exact path={loginPath} component={LoginView} />
           <PrivateRouteWithContext
             exact
-            path="/channel/:channel"
+            path='/channel/:channel'
             component={ChannelView}
             loginPath={loginPath}
           />
           <PrivateRouteWithContext
             exact
-            path="/settings"
+            path='/settings'
             component={SettingsView}
             loginPath={loginPath}
           />

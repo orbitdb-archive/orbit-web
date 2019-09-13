@@ -13,7 +13,7 @@ import './styles/Main.scss'
 const App = lazy(() => import(/* webpackChunkName: "App" */ './views/App'))
 
 render(
-  <Suspense fallback={<Spinner className="spinner suspense-fallback" size={'64px'} />}>
+  <Suspense fallback={<Spinner className='spinner suspense-fallback' size='64px' />}>
     <App />
   </Suspense>,
   document.getElementById('root')

@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 
 function MessageUserAvatar ({ message }) {
   const { name: username } = message.meta.from
-  return <div className="Message__Avatar">{username ? username.charAt(0).toUpperCase() : ''}</div>
+  return <div className='Message__Avatar'>{username ? username.charAt(0).toUpperCase() : ''}</div>
 }
 
 MessageUserAvatar.propTypes = {

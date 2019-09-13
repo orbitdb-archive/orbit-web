@@ -66,7 +66,7 @@ class SettingsView extends React.Component {
     return (
       <input
         name={field.name}
-        type="checkbox"
+        type='checkbox'
         checked={uiStore[field.name]}
         onChange={e => this.handleChange(e, field)}
       />
@@ -94,24 +94,25 @@ class SettingsView extends React.Component {
     return (
       <CSSTransitionGroup
         key={field.name}
-        transitionName="rowAnimation"
-        transitionAppear={true}
+        transitionName='rowAnimation'
+        transitionAppear
         transitionAppearTimeout={1000}
         transitionEnterTimeout={0}
         transitionLeaveTimeout={0}
-        component="div"
-        className="row">
-        <span className="key">{t(`settings.names.${field.name}`)}</span>
+        component='div'
+        className='row'
+      >
+        <span className='key'>{t(`settings.names.${field.name}`)}</span>
         {fieldEl}
         {field.description ? (
-          <span className="description">{t(`settings.descriptions.${field.description}`)}</span>
+          <span className='description'>{t(`settings.descriptions.${field.description}`)}</span>
         ) : null}
       </CSSTransitionGroup>
     )
   }
 
   render () {
-    return <div className="SettingsView">{Object.keys(settingsOptions).map(this.renderField)}</div>
+    return <div className='SettingsView'>{Object.keys(settingsOptions).map(this.renderField)}</div>
   }
 }
 

@@ -39,7 +39,7 @@ function ChannelControls ({ channel }) {
   return (
     <Observer>
       {() => (
-        <div className="Controls">
+        <div className='Controls'>
           <SendMessage
             onSendMessage={sendMessage}
             theme={uiStore.theme}

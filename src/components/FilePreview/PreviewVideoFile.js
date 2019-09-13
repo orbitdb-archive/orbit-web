@@ -58,7 +58,7 @@ function PreviewVideoFile ({ loadAsBlob, stream, filename, mimeType, ...rest }) 
     processStream()
   })
 
-  return <video controls autoPlay={true} src={url} onError={() => loadBlob()} />
+  return <video controls autoPlay src={url} onError={() => loadBlob()} />
 }
 
 PreviewVideoFile.propTypes = {

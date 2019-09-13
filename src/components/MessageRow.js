@@ -40,19 +40,19 @@ function MessageRow ({
 
   const content = useLargeMessage ? (
     // Need to wrap elements and change their ordering
-    <div className="content-wrapper">
-      <div className="Message__Details">
+    <div className='content-wrapper'>
+      <div className='Message__Details'>
         {messageUser}
         {messageTimestamp}
       </div>
       {messageContent}
     </div>
   ) : (
-    <React.Fragment>
+    <>
       {messageTimestamp}
       {messageUser}
       {messageContent}
-    </React.Fragment>
+    </>
   )
 
   return (

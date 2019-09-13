@@ -60,7 +60,7 @@ function MessageList ({
   }, [listRef])
 
   return (
-    <React.Fragment>
+    <>
       <div
         ref={setListRef}
         onScroll={checkBoundariesDebounced}
@@ -83,11 +83,11 @@ function MessageList ({
           />
         ))}
       </div>
-      {!atBottom && hasUnreadMessages ? <div className="unreadIndicator" style={theme} /> : null}
+      {!atBottom && hasUnreadMessages ? <div className='unreadIndicator' style={theme} /> : null}
       <DelayRender visible={loading}>
-        <div className="progressBar" style={theme} />
+        <div className='progressBar' style={theme} />
       </DelayRender>
-    </React.Fragment>
+    </>
   )
 }
 

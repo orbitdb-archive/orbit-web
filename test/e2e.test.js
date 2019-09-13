@@ -1,3 +1,6 @@
+/* eslint-env jest */
+/* globals page */
+
 require('@babel/polyfill')
 const path = require('path')
 

@@ -1,3 +1,4 @@
+/* eslint-env worker */
 'use strict'
 
 import '@babel/polyfill'
@@ -120,7 +121,7 @@ async function channelEvent (eventName, channelName, ...args) {
   }
 
   if (eventName === 'peer.update') {
-    meta['peers'] = await channel.peers
+    meta.peers = await channel.peers
   }
 
   this.postMessage({
