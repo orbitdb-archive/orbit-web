@@ -43,7 +43,6 @@ function ChannelHeader ({ match }) {
             </div>
             {networkStore.channelsAsArray
               .filter(c => c.channelName !== currentChannelName)
-              .sort((a, b) => a.channelName.localeCompare(b.channelName))
               .map(c => (
                 <ChannelLink
                   key={c.channelName}

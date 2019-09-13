@@ -25,7 +25,7 @@ function JoinChannel ({ onSubmit, theme, inputRef }) {
 JoinChannel.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   theme: PropTypes.object.isRequired,
-  inputRef: PropTypes.func
+  inputRef: PropTypes.object
 }
 
 export default JoinChannel

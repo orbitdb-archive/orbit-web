@@ -1,5 +1,5 @@
-@import "Animations";
-@import "Colors";
+@import 'Animations';
+@import 'Colors';
 
 textarea,
 input {
@@ -18,6 +18,7 @@ input {
   transform-style: preserve-3d;
   width: 100%;
   height: 100%;
+  position: absolute;
 }
 
 $channel-name-max-height: 5.5vmin;

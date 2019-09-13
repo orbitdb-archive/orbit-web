@@ -1,7 +1,7 @@
 'use strict'
 
 import React, { Suspense, lazy } from 'react'
-import { HashRouter as Router, Route, Switch } from 'react-router-dom'
+import { HashRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
 
 import i18n from '../config/i18n.config'
 
@@ -53,7 +53,23 @@ const AlphaDisclaimer = lazy(() =>
   import(/* webpackChunkName: "AlphaDisclaimer" */ '../containers/AlphaDisclaimer')
 )
 
-function AppView () {
+function AppView ({ location }) {
+  const ctx = React.useContext(RootStoreContext)
+
+  const [appState, setAppState] = React.useState({
+    redirectTo: null
+  })
+
+  // Pass these down to children
+  ctx.setAppState = setAppState
+  ctx.appState = appState
+
+  React.useEffect(() => {
+    if (appState.redirectTo === location.pathname) {
+      setAppState(Object.assign({}, appState, { redirectTo: null }))
+    }
+  }, [appState, location.pathname])
+
   return (
     <div className='App view'>
       <Suspense fallback={<Spinner className='spinner suspense-fallback' size='64px' />}>
@@ -85,6 +101,7 @@ function AppView () {
         {/* Render an alpha disclaimer on login page */}
         <Route exact path={loginPath} component={AlphaDisclaimer} />
       </Suspense>
+      {appState.redirectTo ? <Redirect to={appState.redirectTo} /> : null}
     </div>
   )
 }

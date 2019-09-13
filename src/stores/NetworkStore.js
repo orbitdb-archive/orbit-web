@@ -85,7 +85,9 @@ export default class NetworkStore {
 
   @computed
   get channelsAsArray () {
-    return values(this.channels)
+    return values(this.channels).sort(({ channelName: a }, { channelName: b }) =>
+      a.localeCompare(b)
+    )
   }
 
   // Private instance actions
