@@ -2,7 +2,7 @@
 
 import React, { useCallback, useContext } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Observer } from 'mobx-react'
+import { useObserver } from 'mobx-react'
 import { CSSTransitionGroup } from 'react-transition-group'
 
 import Countries from '../config/countries.json'
@@ -25,25 +25,21 @@ function MessageUserProfilePanel () {
     [uiStore.closeUserProfilePanel]
   )
 
-  return (
-    <Observer>
-      {() =>
-        uiStore.userProfilePanelIsOpen ? (
-          <div
-            className='MessageUserProfilePanel'
-            style={calculatePanelStyle(uiStore.userProfilePanelPosition, uiStore.windowDimensions)}
-          >
-            <BackgroundAnimation
-              style={{ top: '-30px', left: '-70px', zIndex: '-1', display: 'block' }}
-              size={256}
-              theme={{ ...uiStore.theme }}
-            />
-            <span className='close' onClick={handleClose} children='X' />
-            {renderUserCard(t, uiStore.userProfilePanelUser)}
-          </div>
-        ) : null
-      }
-    </Observer>
+  return useObserver(() =>
+    uiStore.userProfilePanelIsOpen ? (
+      <div
+        className='MessageUserProfilePanel'
+        style={calculatePanelStyle(uiStore.userProfilePanelPosition, uiStore.windowDimensions)}
+      >
+        <BackgroundAnimation
+          style={{ top: '-30px', left: '-70px', zIndex: '-1', display: 'block' }}
+          size={256}
+          theme={{ ...uiStore.theme }}
+        />
+        <span className='close' onClick={handleClose} children='X' />
+        {renderUserCard(t, uiStore.userProfilePanelUser)}
+      </div>
+    ) : null
   )
 }
 

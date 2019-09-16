@@ -2,7 +2,7 @@
 
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
-import { Observer } from 'mobx-react'
+import { useObserver } from 'mobx-react'
 
 import Logger from '../utils/logger'
 
@@ -36,22 +36,18 @@ function ChannelControls ({ channel }) {
     }
   }
 
-  return (
-    <Observer>
-      {() => (
-        <div className='Controls'>
-          <SendMessage
-            onSendMessage={sendMessage}
-            theme={uiStore.theme}
-            useEmojis={uiStore.useEmojis}
-            emojiSet={uiStore.emojiSet}
-          />
-          <FileUploadButton onSelectFiles={sendFiles} theme={uiStore.theme} />
-          <ChannelStatus channel={channel} theme={uiStore.theme} />
-        </div>
-      )}
-    </Observer>
-  )
+  return useObserver(() => (
+    <div className='Controls'>
+      <SendMessage
+        onSendMessage={sendMessage}
+        theme={uiStore.theme}
+        useEmojis={uiStore.useEmojis}
+        emojiSet={uiStore.emojiSet}
+      />
+      <FileUploadButton onSelectFiles={sendFiles} theme={uiStore.theme} />
+      <ChannelStatus channel={channel} theme={uiStore.theme} />
+    </div>
+  ))
 }
 
 ChannelControls.propTypes = {

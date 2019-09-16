@@ -7,7 +7,7 @@ import { autorun } from 'mobx'
 import RootStoreContext from '../context/RootStoreContext'
 
 function IndexView () {
-  const { networkStore, uiStore, appState, setAppState } = React.useContext(RootStoreContext)
+  const { networkStore, uiStore, setAppState } = React.useContext(RootStoreContext)
 
   React.useEffect(() => {
     uiStore.setTitle('Orbit')
@@ -17,17 +17,9 @@ function IndexView () {
     () =>
       autorun(() => {
         if (networkStore.channelsAsArray.length === 1) {
-          setAppState(
-            Object.assign({}, appState, {
-              redirectTo: `/channel/${networkStore.channelsAsArray[0]}`
-            })
-          )
+          setAppState({ redirectTo: `/channel/${networkStore.channelsAsArray[0]}` })
         } else {
-          setAppState(
-            Object.assign({}, appState, {
-              redirectTo: `/channel/${networkStore.defaultChannels[0]}`
-            })
-          )
+          setAppState({ redirectTo: `/channel/${networkStore.defaultChannels[0]}` })
         }
       }),
     []

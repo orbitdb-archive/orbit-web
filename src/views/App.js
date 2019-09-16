@@ -54,26 +54,30 @@ const AlphaDisclaimer = lazy(() =>
 )
 
 function AppView ({ location }) {
-  const ctx = React.useContext(RootStoreContext)
-
-  const [appState, setAppState] = React.useState({
+  const [appState, setState] = React.useState({
     redirectTo: null
   })
 
-  // Pass these down to children
-  ctx.setAppState = setAppState
-  ctx.appState = appState
+  const setAppState = React.useCallback(
+    newState => setState(Object.assign({}, appState, newState)),
+    [appState]
+  )
 
   React.useEffect(() => {
     if (appState.redirectTo === location.pathname) {
-      setAppState(Object.assign({}, appState, { redirectTo: null }))
+      setAppState({ redirectTo: null })
     }
-  }, [appState, location.pathname])
+  }, [appState.redirectTo, location.pathname])
+
+  // Pass these down to children
+  const ctx = React.useContext(RootStoreContext)
+  ctx.setAppState = setAppState
+  ctx.appState = appState
 
   return (
     <div className='App view'>
       <Suspense fallback={<Spinner className='spinner suspense-fallback' size='64px' />}>
-        <PrivateRouteWithContext component={ControlPanel} />
+        <PrivateRouteWithContext children={props => <ControlPanel {...props} />} />
 
         <PrivateRouteWithContext
           exact
@@ -100,8 +104,8 @@ function AppView ({ location }) {
 
         {/* Render an alpha disclaimer on login page */}
         <Route exact path={loginPath} component={AlphaDisclaimer} />
+        {appState.redirectTo ? <Redirect to={appState.redirectTo} /> : null}
       </Suspense>
-      {appState.redirectTo ? <Redirect to={appState.redirectTo} /> : null}
     </div>
   )
 }
@@ -112,7 +116,7 @@ function App () {
       <Router>
         {/* Render App in a route so it will receive the "location"
               prop and rerender properly on location changes */}
-        <Route component={AppView} />
+        <Route children={props => <AppView {...props} />} />
       </Router>
     </RootStoreContext.Provider>
   )

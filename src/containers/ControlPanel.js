@@ -3,8 +3,8 @@
 import React from 'react'
 import { hot, setConfig } from 'react-hot-loader'
 import PropTypes from 'prop-types'
-import { withTranslation } from 'react-i18next'
-import { observer } from 'mobx-react'
+import { useTranslation } from 'react-i18next'
+import { useObserver } from 'mobx-react'
 import { CSSTransitionGroup } from 'react-transition-group'
 import classNames from 'classnames'
 
@@ -24,10 +24,9 @@ setConfig({
   pureRender: true
 })
 
-function ControlPanel ({ t, history }) {
-  const { networkStore, uiStore, sessionStore, appState, setAppState } = React.useContext(
-    RootStoreContext
-  )
+function ControlPanel ({ history }) {
+  const { networkStore, uiStore, sessionStore, setAppState } = React.useContext(RootStoreContext)
+  const [t] = useTranslation()
 
   const inputRef = React.useRef()
 
@@ -48,10 +47,10 @@ function ControlPanel ({ t, history }) {
 
   const handleRedirect = React.useCallback(
     url => {
-      setAppState(Object.assign({}, appState, { redirectTo: url }))
+      setAppState({ redirectTo: url })
       handleClose(url !== '/')
     },
-    [appState, handleClose]
+    [handleClose]
   )
 
   const handleJoinChannel = React.useCallback(
@@ -164,89 +163,88 @@ function ControlPanel ({ t, history }) {
     )
   }
 
-  if (!uiStore.isControlPanelOpen || !sessionStore.isAuthenticated) return null
-
-  return (
-    <>
-      <CSSTransitionGroup
-        {...transitionProps}
-        transitionName={
-          uiStore.sidePanelPosition === 'left'
-            ? 'openPanelAnimationLeft'
-            : 'openPanelAnimationRight'
-        }
-      >
-        <div
-          className={classNames('ControlPanel', {
-            left: uiStore.sidePanelPosition === 'left',
-            right: !(uiStore.sidePanelPosition === 'left'),
-            'no-close': !isClosable
-          })}
+  return useObserver(() =>
+    uiStore.isControlPanelOpen && sessionStore.isAuthenticated ? (
+      <>
+        <CSSTransitionGroup
+          {...transitionProps}
+          transitionName={
+            uiStore.sidePanelPosition === 'left'
+              ? 'openPanelAnimationLeft'
+              : 'openPanelAnimationRight'
+          }
         >
-          <div style={{ opacity: 0.8, zIndex: -1 }}>
-            <BackgroundAnimation
-              size={320}
-              startY={58}
-              theme={{ ...uiStore.theme }}
-              style={{ alignItems: 'flex-start' }}
-            />
-          </div>
-          <CSSTransitionGroup
-            {...transitionProps}
-            transitionName={
-              uiStore.sidePanelPosition === 'left'
-                ? 'panelHeaderAnimationLeft'
-                : 'panelHeaderAnimationRight'
-            }
-          >
-            <div className='header' onClick={handleClose}>
-              <div className='logo'>Orbit</div>
-            </div>
-          </CSSTransitionGroup>
-
-          <CSSTransitionGroup {...transitionProps} transitionName='networkNameAnimation'>
-            <div className='networkName'>
-              <div className='text'>{networkStore.networkName}</div>
-            </div>
-          </CSSTransitionGroup>
-
-          <div className='username'>{sessionStore.username}</div>
-
-          {renderJoinChannelInput()}
-
           <div
-            className={classNames({
-              panelHeader: networkStore.channelsAsArray.length > 0,
-              hidden: networkStore.channelsAsArray.length === 0
+            className={classNames('ControlPanel', {
+              left: uiStore.sidePanelPosition === 'left',
+              right: !(uiStore.sidePanelPosition === 'left'),
+              'no-close': !isClosable
             })}
           >
-            {t('controlPanel.channels')}
+            <div style={{ opacity: 0.8, zIndex: -1 }}>
+              <BackgroundAnimation
+                size={320}
+                startY={58}
+                theme={{ ...uiStore.theme }}
+                style={{ alignItems: 'flex-start' }}
+              />
+            </div>
+            <CSSTransitionGroup
+              {...transitionProps}
+              transitionName={
+                uiStore.sidePanelPosition === 'left'
+                  ? 'panelHeaderAnimationLeft'
+                  : 'panelHeaderAnimationRight'
+              }
+            >
+              <div className='header' onClick={handleClose}>
+                <div className='logo'>Orbit</div>
+              </div>
+            </CSSTransitionGroup>
+
+            <CSSTransitionGroup {...transitionProps} transitionName='networkNameAnimation'>
+              <div className='networkName'>
+                <div className='text'>{networkStore.networkName}</div>
+              </div>
+            </CSSTransitionGroup>
+
+            <div className='username'>{sessionStore.username}</div>
+
+            {renderJoinChannelInput()}
+
+            <div
+              className={classNames({
+                panelHeader: networkStore.channelsAsArray.length > 0,
+                hidden: networkStore.channelsAsArray.length === 0
+              })}
+            >
+              {t('controlPanel.channels')}
+            </div>
+
+            <CSSTransitionGroup
+              {...transitionProps}
+              transitionName='joinChannelAnimation'
+              className='openChannels'
+            >
+              {renderChannelsList()}
+            </CSSTransitionGroup>
+
+            {renderBottomRow()}
           </div>
-
-          <CSSTransitionGroup
-            {...transitionProps}
-            transitionName='joinChannelAnimation'
-            className='openChannels'
-          >
-            {renderChannelsList()}
-          </CSSTransitionGroup>
-
-          {renderBottomRow()}
-        </div>
-      </CSSTransitionGroup>
-      <CSSTransitionGroup
-        {...transitionProps}
-        transitionName='darkenerAnimation'
-        className={classNames('darkener', { 'no-close': !isClosable })}
-        onClick={handleClose}
-      />
-    </>
+        </CSSTransitionGroup>
+        <CSSTransitionGroup
+          {...transitionProps}
+          transitionName='darkenerAnimation'
+          className={classNames('darkener', { 'no-close': !isClosable })}
+          onClick={handleClose}
+        />
+      </>
+    ) : null
   )
 }
 
 ControlPanel.propTypes = {
-  t: PropTypes.func.isRequired,
   history: PropTypes.object.isRequired
 }
 
-export default hot(module)(withTranslation()(observer(ControlPanel)))
+export default hot(module)(ControlPanel)
