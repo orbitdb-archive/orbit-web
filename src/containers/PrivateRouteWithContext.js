@@ -3,12 +3,12 @@
 import React from 'react'
 import { useObserver } from 'mobx-react'
 
-import RootStoreContext from '../context/RootStoreContext'
+import RootContext from '../context/RootContext'
 
 import PrivateRoute from '../components/PrivateRoute'
 
 function PrivateRouteWithContext ({ ...rest }) {
-  const { sessionStore } = React.useContext(RootStoreContext)
+  const { sessionStore } = React.useContext(RootContext)
   return useObserver(() => (
     <PrivateRoute {...rest} isAuthenticated={sessionStore.isAuthenticated} />
   ))

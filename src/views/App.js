@@ -12,7 +12,7 @@ import { askPermission } from '../utils/notify'
 
 import PrivateRouteWithContext from '../containers/PrivateRouteWithContext'
 
-import RootStoreContext from '../context/RootStoreContext'
+import RootContext from '../context/RootContext'
 
 import Spinner from '../components/Spinner'
 
@@ -70,7 +70,7 @@ function AppView ({ location }) {
   }, [appState.redirectTo, location.pathname])
 
   // Pass these down to children
-  const ctx = React.useContext(RootStoreContext)
+  const ctx = React.useContext(RootContext)
   ctx.setAppState = setAppState
   ctx.appState = appState
 
@@ -112,13 +112,13 @@ function AppView ({ location }) {
 
 function App () {
   return (
-    <RootStoreContext.Provider value={rootStore}>
+    <RootContext.Provider value={rootStore}>
       <Router>
         {/* Render App in a route so it will receive the "location"
               prop and rerender properly on location changes */}
         <Route children={props => <AppView {...props} />} />
       </Router>
-    </RootStoreContext.Provider>
+    </RootContext.Provider>
   )
 }
 

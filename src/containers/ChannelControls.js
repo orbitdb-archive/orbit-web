@@ -6,7 +6,7 @@ import { useObserver } from 'mobx-react'
 
 import Logger from '../utils/logger'
 
-import RootStoreContext from '../context/RootStoreContext'
+import RootContext from '../context/RootContext'
 
 import FileUploadButton from '../components/FileUploadButton'
 
@@ -16,7 +16,7 @@ import SendMessage from './SendMessage'
 const logger = new Logger()
 
 function ChannelControls ({ channel }) {
-  const { uiStore } = useContext(RootStoreContext)
+  const { uiStore } = useContext(RootContext)
 
   async function sendMessage (text) {
     try {

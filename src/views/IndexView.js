@@ -4,10 +4,10 @@ import React from 'react'
 import { hot } from 'react-hot-loader'
 import { autorun } from 'mobx'
 
-import RootStoreContext from '../context/RootStoreContext'
+import RootContext from '../context/RootContext'
 
 function IndexView () {
-  const { networkStore, uiStore, setAppState } = React.useContext(RootStoreContext)
+  const { networkStore, uiStore, setAppState } = React.useContext(RootContext)
 
   React.useEffect(() => {
     uiStore.setTitle('Orbit')

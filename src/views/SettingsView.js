@@ -12,7 +12,7 @@ import settingsOptions from '../config/setting.options.json'
 import locales from '../locales'
 import themes from '../themes'
 
-import RootStoreContext from '../context/RootStoreContext'
+import RootContext from '../context/RootContext'
 
 import '../styles/SettingsView.scss'
 
@@ -20,7 +20,7 @@ settingsOptions.themeName.options = Object.keys(themes)
 settingsOptions.language.options = Object.keys(locales)
 
 class SettingsView extends React.Component {
-  static contextType = RootStoreContext
+  static contextType = RootContext
 
   static propTypes = {
     t: PropTypes.func.isRequired

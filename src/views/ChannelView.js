@@ -5,7 +5,7 @@ import { hot } from 'react-hot-loader'
 import PropTypes from 'prop-types'
 import { useObserver } from 'mobx-react'
 
-import RootStoreContext from '../context/RootStoreContext'
+import RootContext from '../context/RootContext'
 
 import Spinner from '../components/Spinner'
 
@@ -17,7 +17,7 @@ const MessageUserProfilePanel = lazy(() =>
 )
 
 function ChannelView (props) {
-  const { networkStore } = useContext(RootStoreContext)
+  const { networkStore } = useContext(RootContext)
 
   return useObserver(() =>
     networkStore.isOnline ? (

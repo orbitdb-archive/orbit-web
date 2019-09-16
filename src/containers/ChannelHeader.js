@@ -6,14 +6,14 @@ import PropTypes from 'prop-types'
 import { useObserver } from 'mobx-react'
 import { useTranslation } from 'react-i18next'
 
-import RootStoreContext from '../context/RootStoreContext'
+import RootContext from '../context/RootContext'
 
 import ChannelLink from './ChannelLink'
 
 import '../styles/ChannelHeader.scss'
 
 function ChannelHeader ({ match }) {
-  const { networkStore, uiStore } = useContext(RootStoreContext)
+  const { networkStore, uiStore } = useContext(RootContext)
   const [t] = useTranslation()
 
   function onChannelClick (e) {

@@ -7,7 +7,7 @@ import { CSSTransitionGroup } from 'react-transition-group'
 
 import Countries from '../config/countries.json'
 
-import RootStoreContext from '../context/RootStoreContext'
+import RootContext from '../context/RootContext'
 
 import BackgroundAnimation from '../components/BackgroundAnimation'
 
@@ -15,7 +15,7 @@ import '../styles/MessageUserProfilePanel.scss'
 import earthImg from '../images/earth.png'
 
 function MessageUserProfilePanel () {
-  const { uiStore } = useContext(RootStoreContext)
+  const { uiStore } = useContext(RootContext)
   const [t] = useTranslation()
 
   const handleClose = useCallback(

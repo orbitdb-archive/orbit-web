@@ -12,7 +12,7 @@ import { version } from '../../package.json'
 
 import Logger from '../utils/logger'
 
-import RootStoreContext from '../context/RootStoreContext'
+import RootContext from '../context/RootContext'
 
 import '../styles/LoginView.scss'
 
@@ -25,7 +25,7 @@ const LoginForm = lazy(() => import(/* webpackChunkName: "LoginForm" */ '../comp
 const logger = new Logger()
 
 class LoginView extends React.Component {
-  static contextType = RootStoreContext
+  static contextType = RootContext
 
   static propTypes = {
     location: PropTypes.object.isRequired,

@@ -4,7 +4,7 @@ import React, { lazy, useContext, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
 
-import RootStoreContext from '../context/RootStoreContext'
+import RootContext from '../context/RootContext'
 
 import '../styles/Channel.scss'
 
@@ -20,7 +20,7 @@ const DropZone = lazy(() => import(/* webpackChunkName: "DropZone" */ '../compon
 function Channel ({ channelName }) {
   const [channel, setChannel] = useState(null)
   const [dragActive, setDragActive] = useState(false)
-  const { networkStore, uiStore } = useContext(RootStoreContext)
+  const { networkStore, uiStore } = useContext(RootContext)
   const [t] = useTranslation()
 
   let mounted = true

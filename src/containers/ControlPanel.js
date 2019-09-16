@@ -8,7 +8,7 @@ import { useObserver } from 'mobx-react'
 import { CSSTransitionGroup } from 'react-transition-group'
 import classNames from 'classnames'
 
-import RootStoreContext from '../context/RootStoreContext'
+import RootContext from '../context/RootContext'
 
 import BackgroundAnimation from '../components/BackgroundAnimation'
 import JoinChannel from '../components/JoinChannel'
@@ -25,7 +25,7 @@ setConfig({
 })
 
 function ControlPanel ({ history }) {
-  const { networkStore, uiStore, sessionStore, setAppState } = React.useContext(RootStoreContext)
+  const { networkStore, uiStore, sessionStore, setAppState } = React.useContext(RootContext)
   const [t] = useTranslation()
 
   const inputRef = React.useRef()
