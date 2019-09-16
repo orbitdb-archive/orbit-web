@@ -2,30 +2,25 @@
 
 import React from 'react'
 import { hot } from 'react-hot-loader'
-import { autorun } from 'mobx'
+import { Redirect } from 'react-router-dom'
 
 import RootContext from '../context/RootContext'
+import { useObserver } from 'mobx-react'
 
 function IndexView () {
-  const { networkStore, uiStore, setAppState } = React.useContext(RootContext)
+  const { networkStore, uiStore } = React.useContext(RootContext)
 
   React.useEffect(() => {
     uiStore.setTitle('Orbit')
   }, [])
 
-  React.useEffect(
-    () =>
-      autorun(() => {
-        if (networkStore.channelsAsArray.length === 1) {
-          setAppState({ redirectTo: `/channel/${networkStore.channelsAsArray[0]}` })
-        } else {
-          setAppState({ redirectTo: `/channel/${networkStore.defaultChannels[0]}` })
-        }
-      }),
-    []
+  return useObserver(() =>
+    networkStore.channelNames.length === 1 ? (
+      <Redirect to={`/channel/${networkStore.channelNames[0]}`} />
+    ) : (
+      <Redirect to={`/channel/${networkStore.defaultChannels[0]}`} />
+    )
   )
-
-  return null
 }
 
 export default hot(module)(IndexView)
