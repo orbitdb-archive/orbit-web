@@ -3,7 +3,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withTranslation } from 'react-i18next'
-import { CSSTransitionGroup } from 'react-transition-group'
 import { emojiIndex } from 'emoji-mart'
 import EmojiPicker from '../components/EmojiPicker'
 
@@ -96,23 +95,14 @@ class SendMessage extends React.Component {
 
     const emojiPicker =
       emojiPickerActive && emojiResults.length > 0 ? (
-        <CSSTransitionGroup
-          component='div'
-          transitionName='emojiPreview'
-          transitionAppear
-          transitionAppearTimeout={1000}
-          transitionEnterTimeout={0}
-          transitionLeaveTimeout={0}
-        >
-          <EmojiPicker
-            ref={this.emojiPicker}
-            emojis={emojiResults}
-            onChange={this.handleEmojiChange.bind(this)}
-            emojiSize={pickerEmojiSize}
-            emojiSet={emojiSet}
-            style={this.getEmojiPickerStyle(pickerEmojiSize)}
-          />
-        </CSSTransitionGroup>
+        <EmojiPicker
+          ref={this.emojiPicker}
+          emojis={emojiResults}
+          onChange={this.handleEmojiChange.bind(this)}
+          emojiSize={pickerEmojiSize}
+          emojiSet={emojiSet}
+          style={this.getEmojiPickerStyle(pickerEmojiSize)}
+        />
       ) : null
 
     return (

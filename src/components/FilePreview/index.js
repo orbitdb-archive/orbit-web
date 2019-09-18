@@ -2,7 +2,6 @@
 
 import React, { useCallback, useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
-import { CSSTransitionGroup } from 'react-transition-group'
 import { useTranslation } from 'react-i18next'
 
 import PreviewAudioFile from './PreviewAudioFile'
@@ -98,33 +97,22 @@ function FilePreview ({ hash, loadFile, name, mimeType, onSizeUpdate, onFilePrev
     [hash] // Only run effect if 'hash' changes
   )
 
-  const animationProps = {
-    transitionName: 'filepreviewAnimation',
-    transitionAppear: true,
-    transitionEnter: false,
-    transitionLeave: false,
-    transitionAppearTimeout: 250,
-    transitionEnterTimeout: 0,
-    transitionLeaveTimeout: 0,
-    component: 'div'
-  }
-
   const loadingElement = (
-    <CSSTransitionGroup className='FilePreview' {...animationProps}>
+    <div className='FilePreview fadeInAnimation'>
       <span className='previewStatus smallText'>{t('channel.file.previewLoading')}</span>
-    </CSSTransitionGroup>
+    </div>
   )
 
   const errorElement = (
-    <CSSTransitionGroup className='FilePreview' {...animationProps}>
+    <div className='FilePreview fadeInAnimation'>
       <span className='previewStatus smallText'>{t('channel.file.unableToDisplay')}</span>
-    </CSSTransitionGroup>
+    </div>
   )
 
   const previewElement = (
-    <CSSTransitionGroup className='FilePreview' {...animationProps}>
+    <div className='FilePreview fadeInAnimation'>
       <span className='preview smallText'>{previewContent}</span>
-    </CSSTransitionGroup>
+    </div>
   )
 
   return (

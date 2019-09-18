@@ -16,7 +16,7 @@
     margin-right: 0.5em;
   }
 
-  input[type=text] {
+  input[type='text'] {
     margin: 0.25em;
     margin-top: 0.5em;
     margin-bottom: 0.5em;
@@ -30,11 +30,4 @@
     margin-right: 0.5em;
     padding: 0em 0.25em;
   }
-}
-
-.emojiPreview-appear {
-  animation: fadeInUp2;
-  animation-duration: .1s;
-  animation-fill-mode: both;
-  animation-timing-function: ease-out;
 }

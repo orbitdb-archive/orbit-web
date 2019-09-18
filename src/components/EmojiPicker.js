@@ -133,7 +133,7 @@ class EmojiPicker extends React.Component {
     const { emojis, emojiSize, emojiSet, ...rest } = this.props
 
     return (
-      <ul ref={this.listElement} className='EmojiPicker' {...rest}>
+      <ul ref={this.listElement} className='EmojiPicker fadeUpAnimation' {...rest}>
         {emojis.map((emoji, idx) => {
           return (
             <li

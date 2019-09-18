@@ -28,7 +28,7 @@ $channel-name-min-height: 1.5em;
   justify-content: flex-start;
   flex: 1 1 100%;
 
-  box-shadow: 8px 0px 12px 0px rgba(0,0,0,0.2);
+  box-shadow: 8px 0px 12px 0px rgba(0, 0, 0, 0.2);
   font-weight: bold;
 
   &.left {
@@ -66,61 +66,12 @@ $channel-name-min-height: 1.5em;
     overflow: auto;
   }
 
-  .row {
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: row;
-    flex: 1;
-    justify-content: space-between;
-    align-items: stretch;
-
-    .ChannelLink {
-      display: flex;
-      flex: 1 1 80%;
-      padding: 0.2em;
-      align-items: stretch;
-    }
-
-    &.active .ChannelLink:before {
-      content: "➭";
-      margin-right: 4px;
-    }
-
-    .closeChannelButton {
-      font-size: 0.8em;
-      padding: 0em 1em;
-      box-sizing: border-box;
-      flex: 1 1 20%;
-      align-items: center;
-      display: flex;
-    }
-
-    .closeChannelButton:hover {
-      background-color: rgba(64, 64, 64, 1);
-      cursor: pointer;
-    }
-
-    .unreadMessages {
-      color: $main-text-color;
-      flex-direction: column;
-      align-items: center;
-      min-width: 2em;
-      margin: 2px 1em 1px 1em;
-      align-self: center;
-    }
-
-    .hasMentions {
-      background: $main-color;
-    }
-  }
-
   .joinChannelInput {
     display: flex;
-    flex: 1 1 8%;
     justify-content: stretch;
     box-sizing: border-box;
     margin: 2em 0em;
-    margin-bottom: 1.0em;
+    margin-bottom: 1em;
   }
 
   .spinner {
@@ -136,7 +87,6 @@ $channel-name-min-height: 1.5em;
 
   .header {
     display: flex;
-    flex: 1 1 100%;
     justify-content: center;
     box-sizing: border-box;
 
@@ -165,16 +115,13 @@ $channel-name-min-height: 1.5em;
 
   .networkName {
     display: flex;
-    flex: 1 1 100%;
     justify-content: center;
     box-sizing: border-box;
 
     padding: 0em 0.2em;
 
-    .text {
-      font-weight: bold;
-      color: rgba(196, 196, 196, 0.5);
-    }
+    font-weight: bold;
+    color: rgba(196, 196, 196, 0.5);
   }
 
   .userProfile {
@@ -197,6 +144,78 @@ $channel-name-min-height: 1.5em;
     margin-top: 1.5em;
   }
 
+  .channelsList {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+    overflow: auto;
+    margin: 1em;
+    margin-top: 0;
+    margin-bottom: 0;
+    box-sizing: border-box;
+
+    font-weight: bold;
+
+    .row {
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: row;
+
+      justify-content: space-between;
+      align-items: stretch;
+
+      color: rgb(196, 196, 196);
+      margin-right: 0.2em;
+      margin-bottom: 0.1em;
+
+      &:hover {
+        background-color: rgb(48, 48, 48);
+        color: rgb(250, 250, 250);
+        border: 0px solid transparent;
+      }
+
+      .ChannelLink {
+        display: flex;
+        flex: 1 1 80%;
+        padding: 0.2em;
+        align-items: stretch;
+      }
+
+      &.active .ChannelLink:before {
+        content: '➭';
+        margin-right: 4px;
+      }
+
+      .closeChannelButton {
+        font-size: 0.8em;
+        padding: 0em 1em;
+        box-sizing: border-box;
+        flex: 1 1 20%;
+        align-items: center;
+        display: flex;
+      }
+
+      .closeChannelButton:hover {
+        background-color: rgba(64, 64, 64, 1);
+        cursor: pointer;
+      }
+
+      .unreadMessages {
+        color: $main-text-color;
+        flex-direction: column;
+        align-items: center;
+        min-width: 2em;
+        margin: 2px 1em 1px 1em;
+        align-self: center;
+      }
+
+      .hasMentions {
+        background: $main-color;
+      }
+    }
+  }
+
   .bottomRow {
     box-sizing: border-box;
     display: flex;
@@ -211,7 +230,7 @@ $channel-name-min-height: 1.5em;
 
     .icon {
       color: rgba(220, 220, 220, 0.2);
-      font-size: 1.0em;
+      font-size: 1em;
       padding: 0.5em;
       margin-bottom: 0.5em;
     }
@@ -221,7 +240,8 @@ $channel-name-min-height: 1.5em;
     }
   }
 
-  .submitButton, input[type=submit] {
+  .submitButton,
+  input[type='submit'] {
     display: flex;
     align-self: flex-end;
     margin: 0.75em;
@@ -234,7 +254,7 @@ $channel-name-min-height: 1.5em;
     align-self: center;
     color: $main-text-color;
     border: 1px solid $bar-background-color;
-    font-size: .8em;
+    font-size: 0.8em;
     line-height: 1.5;
   }
 }
@@ -246,90 +266,11 @@ $channel-name-min-height: 1.5em;
   width: 100%;
   height: 100%;
   z-index: 99;
-  background-color: rgba(0,0,0,0.33);
+  background-color: rgba(0, 0, 0, 0.33);
   cursor: pointer;
-
-  .darkenerAnimation {
-    animation: darken;
-    animation-duration: 1.5s;
-    animation-fill-mode: both;
-    animation-timing-function: ease-out;
-  }
 
   &.no-close {
     cursor: default;
     user-select: none;
   }
-}
-
-.RecentChannelsView {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-
-  .RecentChannels {
-    overflow: auto;
-    margin: 1em;
-    margin-top: 0;
-    margin-bottom: 0;
-    box-sizing: border-box;
-
-    font-weight: bold;
-
-    .link {
-      box-sizing: border-box;
-      vertical-align: middle;
-      cursor: pointer;
-      color: rgb(196, 196, 196);
-      margin-right: 0.2em;
-      margin-bottom: 0.1em;
-    }
-
-    .link:hover {
-      background-color: rgb(48, 48, 48);
-      color: rgb(250, 250, 250);
-      border: 0px solid transparent;
-    }
-  }
-
-  .submitButton {
-    display: flex;
-    align-self: flex-end;
-  }
-
-}
-
-.openPanelAnimationRight-appear {
-  animation: slideFromRight;
-  animation-duration: .3s;
-  animation-fill-mode: both;
-  animation-timing-function: ease-out;
-}
-
-.openPanelAnimationLeft-appear {
-  animation: slideFromLeft;
-  animation-duration: .3s;
-  animation-fill-mode: both;
-  animation-timing-function: ease-out;
-}
-
-.panelHeaderAnimationLeft-appear {
-  animation: bounceInLeft;
-  animation-duration: .6s;
-  animation-fill-mode: both;
-  animation-timing-function: ease-out;
-}
-
-.panelHeaderAnimationRight-appear {
-  animation: bounceInRight;
-  animation-duration:.6s;
-  animation-fill-mode: both;
-  animation-timing-function: ease-out;
-}
-
-.networkNameAnimation-appear {
-  animation: fadeIn;
-  animation-duration: 1s;
-  animation-fill-mode: both;
-  animation-timing-function: ease-in;
 }

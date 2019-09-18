@@ -5,7 +5,6 @@ import { hot, setConfig } from 'react-hot-loader'
 import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
 import { useObserver } from 'mobx-react'
-import { CSSTransitionGroup } from 'react-transition-group'
 import classNames from 'classnames'
 
 import RootContext from '../context/RootContext'
@@ -66,28 +65,24 @@ function ControlPanel ({ history }) {
     [handleRedirect]
   )
 
-  const transitionProps = {
-    component: 'div',
-    transitionAppear: true,
-    transitionAppearTimeout: 5000,
-    transitionEnterTimeout: 5000,
-    transitionLeaveTimeout: 5000
-  }
+  const handleCloseChannel = React.useCallback(
+    channel => {
+      if (uiStore.currentChannelName === channel.channelName) handleRedirect('/')
+      networkStore.leaveChannel(channel.channelName)
+    },
+    [uiStore.currentChannelName]
+  )
 
   function renderJoinChannelInput () {
     return networkStore.isOnline ? (
-      <CSSTransitionGroup
-        {...transitionProps}
-        transitionName='joinChannelAnimation'
-        className='joinChannelInput'
-      >
+      <div className='joinChannelInput fadeInAnimation' style={{ animationDuration: '.5s' }}>
         <JoinChannel
           onSubmit={handleJoinChannel}
           autoFocus
           theme={{ ...uiStore.theme }}
           inputRef={inputRef}
         />
-      </CSSTransitionGroup>
+      </div>
     ) : !networkStore.starting ? (
       <button
         className='startIpfsButton submitButton'
@@ -105,36 +100,41 @@ function ControlPanel ({ history }) {
 
   function renderChannelsList () {
     return (
-      <div className='RecentChannelsView'>
-        <div className='RecentChannels'>
-          {networkStore.channelsAsArray.map(c => (
-            <div
-              className={classNames('row link', {
-                active: uiStore.currentChannelName === c.channelName
-              })}
-              key={c.channelName}
-            >
-              <ChannelLink
-                channel={c}
-                theme={{ ...uiStore.theme }}
-                onClick={e => {
-                  e.preventDefault()
-                  handleRedirect(`/channel/${c.channelName}`)
-                }}
-              />
-              <span
-                className='closeChannelButton'
-                onClick={() => {
-                  if (uiStore.currentChannelName === c.channelName) handleRedirect('/')
-                  networkStore.leaveChannel(c.channelName)
-                }}
-              >
-                {t('controlPanel.closeChannel')}
-              </span>
-            </div>
-          ))}
+      <>
+        <div
+          className={classNames({
+            panelHeader: networkStore.channelsAsArray.length > 0,
+            hidden: networkStore.channelsAsArray.length === 0
+          })}
+        >
+          {t('controlPanel.channels')}
         </div>
-      </div>
+
+        <div className='openChannels fadeInAnimation' style={{ animationDuration: '.5s' }}>
+          <div className='channelsList'>
+            {networkStore.channelsAsArray.map(c => (
+              <div
+                className={classNames('row', {
+                  active: uiStore.currentChannelName === c.channelName
+                })}
+                key={c.channelName}
+              >
+                <ChannelLink
+                  channel={c}
+                  theme={{ ...uiStore.theme }}
+                  onClick={e => {
+                    e.preventDefault()
+                    handleRedirect(`/channel/${c.channelName}`)
+                  }}
+                />
+                <span className='closeChannelButton' onClick={() => handleCloseChannel(c)}>
+                  {t('controlPanel.closeChannel')}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </>
     )
   }
 
@@ -166,76 +166,40 @@ function ControlPanel ({ history }) {
   return useObserver(() =>
     uiStore.isControlPanelOpen && sessionStore.isAuthenticated ? (
       <>
-        <CSSTransitionGroup
-          {...transitionProps}
-          transitionName={
-            uiStore.sidePanelPosition === 'left'
-              ? 'openPanelAnimationLeft'
-              : 'openPanelAnimationRight'
-          }
+        <div
+          className={classNames('ControlPanel slideInAnimation', uiStore.sidePanelPosition, {
+            'no-close': !isClosable
+          })}
         >
-          <div
-            className={classNames('ControlPanel', {
-              left: uiStore.sidePanelPosition === 'left',
-              right: !(uiStore.sidePanelPosition === 'left'),
-              'no-close': !isClosable
-            })}
-          >
-            <div style={{ opacity: 0.8, zIndex: -1 }}>
-              <BackgroundAnimation
-                size={320}
-                startY={58}
-                theme={{ ...uiStore.theme }}
-                style={{ alignItems: 'flex-start' }}
-              />
-            </div>
-            <CSSTransitionGroup
-              {...transitionProps}
-              transitionName={
-                uiStore.sidePanelPosition === 'left'
-                  ? 'panelHeaderAnimationLeft'
-                  : 'panelHeaderAnimationRight'
-              }
-            >
-              <div className='header' onClick={handleClose}>
-                <div className='logo'>Orbit</div>
-              </div>
-            </CSSTransitionGroup>
-
-            <CSSTransitionGroup {...transitionProps} transitionName='networkNameAnimation'>
-              <div className='networkName'>
-                <div className='text'>{networkStore.networkName}</div>
-              </div>
-            </CSSTransitionGroup>
-
-            <div className='username'>{sessionStore.username}</div>
-
-            {renderJoinChannelInput()}
-
-            <div
-              className={classNames({
-                panelHeader: networkStore.channelsAsArray.length > 0,
-                hidden: networkStore.channelsAsArray.length === 0
-              })}
-            >
-              {t('controlPanel.channels')}
-            </div>
-
-            <CSSTransitionGroup
-              {...transitionProps}
-              transitionName='joinChannelAnimation'
-              className='openChannels'
-            >
-              {renderChannelsList()}
-            </CSSTransitionGroup>
-
-            {renderBottomRow()}
+          <div style={{ opacity: 0.8, zIndex: -1 }}>
+            <BackgroundAnimation
+              size={320}
+              startY={58}
+              theme={{ ...uiStore.theme }}
+              style={{ alignItems: 'flex-start' }}
+            />
           </div>
-        </CSSTransitionGroup>
-        <CSSTransitionGroup
-          {...transitionProps}
-          transitionName='darkenerAnimation'
-          className={classNames('darkener', { 'no-close': !isClosable })}
+
+          <div
+            className={classNames('header bounceInAnimation', uiStore.sidePanelPosition)}
+            onClick={handleClose}
+          >
+            <div className='logo'>Orbit</div>
+          </div>
+
+          <div className='networkName fadeInAnimation' style={{ animationDuration: '1s' }}>
+            {networkStore.networkName}
+          </div>
+
+          <div className='username'>{sessionStore.username}</div>
+
+          {renderJoinChannelInput()}
+          {renderChannelsList()}
+          {renderBottomRow()}
+        </div>
+        <div
+          className={classNames('darkener fadeInAnimation', { 'no-close': !isClosable })}
+          style={{ animationDuration: '1s' }}
           onClick={handleClose}
         />
       </>

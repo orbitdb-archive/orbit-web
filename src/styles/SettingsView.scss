@@ -8,7 +8,7 @@
   height: 100%;
   margin: 0;
 
-  font-size: 1.0em;
+  font-size: 1em;
   color: rgba(240, 240, 240, 0.9);
 
   .row {
@@ -16,10 +16,11 @@
     align-items: center;
     padding: 0.2em;
     padding-left: 1.2em;
-    background-color: rgba(38, 38, 38, 1.0);
+    background-color: rgba(38, 38, 38, 1);
     border-bottom: 1px solid rgb(34, 34, 34);
 
-    select, option {
+    select,
+    option {
       font-weight: bold;
     }
   }
@@ -36,12 +37,4 @@
     font-style: italic;
     color: $dark-text-color;
   }
-
-  .rowAnimation-appear {
-    animation-name: fadeIn;
-    animation-duration: .3s;
-    animation-fill-mode: both;
-    animation-timing-function: ease-in;
-  }
-
 }
