@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { hot, setConfig } from 'react-hot-loader'
+import { Redirect } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
 import { useObserver } from 'mobx-react'
@@ -24,16 +25,16 @@ setConfig({
 })
 
 function ControlPanel ({ history }) {
-  const { networkStore, uiStore, sessionStore, setAppState } = React.useContext(RootContext)
+  const { networkStore, uiStore, sessionStore } = React.useContext(RootContext)
   const [t] = useTranslation()
+
+  const [redirect, setRedirect] = React.useState('')
 
   const inputRef = React.useRef()
 
   const focusInput = React.useCallback(() => {
     if (inputRef.current) inputRef.current.focus()
   }, [])
-
-  React.useLayoutEffect(focusInput)
 
   const isClosable = history.location ? history.location.pathname !== '/' : true
 
@@ -44,34 +45,33 @@ function ControlPanel ({ history }) {
     [isClosable]
   )
 
-  const handleRedirect = React.useCallback(
-    url => {
-      setAppState({ redirectTo: url })
-      handleClose(url !== '/')
-    },
-    [handleClose]
-  )
+  const handleChannelLinkClick = React.useCallback((e, channel) => {
+    e.preventDefault()
+    setRedirect(`/channel/${channel.channelName}`)
+  }, [])
 
-  const handleJoinChannel = React.useCallback(
-    e => {
-      e.preventDefault()
-      if (!inputRef.current) return
-      const channel = inputRef.current.value.trim()
-      networkStore.joinChannel(channel).then(() => {
-        inputRef.current.value = ''
-        handleRedirect(`/channel/${channel}`)
-      })
-    },
-    [handleRedirect]
-  )
+  const handleJoinChannel = React.useCallback(e => {
+    e.preventDefault()
+    if (!inputRef.current) return
+    const channel = inputRef.current.value.trim()
+    networkStore.joinChannel(channel).then(() => {
+      inputRef.current.value = ''
+      setRedirect(`/channel/${channel}`)
+    })
+  }, [])
 
   const handleCloseChannel = React.useCallback(
     channel => {
-      if (uiStore.currentChannelName === channel.channelName) handleRedirect('/')
+      if (uiStore.currentChannelName === channel.channelName) setRedirect('/')
       networkStore.leaveChannel(channel.channelName)
     },
-    [uiStore.currentChannelName, handleRedirect]
+    [uiStore.currentChannelName]
   )
+
+  React.useLayoutEffect(focusInput)
+  React.useLayoutEffect(() => {
+    if (redirect) handleClose(redirect !== '/')
+  }, [handleClose, redirect])
 
   function renderJoinChannelInput () {
     return networkStore.isOnline ? (
@@ -122,10 +122,7 @@ function ControlPanel ({ history }) {
                 <ChannelLink
                   channel={c}
                   theme={{ ...uiStore.theme }}
-                  onClick={e => {
-                    e.preventDefault()
-                    handleRedirect(`/channel/${c.channelName}`)
-                  }}
+                  onClick={e => handleChannelLinkClick(e, c)}
                 />
                 <span className='closeChannelButton' onClick={() => handleCloseChannel(c)}>
                   {t('controlPanel.closeChannel')}
@@ -143,7 +140,7 @@ function ControlPanel ({ history }) {
       <div className='bottomRow'>
         <div
           className='icon flaticon-gear94'
-          onClick={() => handleRedirect('/settings')}
+          onClick={() => setRedirect('/settings')}
           style={{ ...uiStore.theme }}
           key='settingsIcon'
         />
@@ -202,6 +199,7 @@ function ControlPanel ({ history }) {
           style={{ animationDuration: '1s' }}
           onClick={handleClose}
         />
+        {redirect ? <Redirect to={redirect} /> : null}
       </>
     ) : null
   )
