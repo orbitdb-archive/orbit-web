@@ -1,7 +1,7 @@
 'use strict'
 
 import React, { Suspense, lazy } from 'react'
-import { HashRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
+import { HashRouter as Router, Route, Switch } from 'react-router-dom'
 
 import i18n from '../config/i18n.config'
 
@@ -47,38 +47,22 @@ const IndexView = lazy(() => import(/* webpackChunkName: "IndexView" */ './Index
 
 const LoginView = lazy(() => import(/* webpackChunkName: "LoginView" */ './LoginView'))
 
+const LogoutView = lazy(() => import(/* webpackChunkName: "LogoutView" */ './LogoutView'))
+
 const SettingsView = lazy(() => import(/* webpackChunkName: "SettingsView" */ './SettingsView'))
 
 const AlphaDisclaimer = lazy(() =>
   import(/* webpackChunkName: "AlphaDisclaimer" */ '../containers/AlphaDisclaimer')
 )
 
-function AppView ({ location }) {
-  const [appState, setState] = React.useState({
-    redirectTo: null
-  })
-
-  const setAppState = React.useCallback(
-    newState => setState(Object.assign({}, appState, newState)),
-    [appState]
-  )
-
-  React.useEffect(() => {
-    if (appState.redirectTo === location.pathname) {
-      setAppState({ redirectTo: null })
-    }
-  }, [appState.redirectTo, location.pathname])
-
-  // Pass these down to children
-  const ctx = React.useContext(RootContext)
-  ctx.setAppState = setAppState
-  ctx.appState = appState
-
+function AppView () {
   return (
     <div className='App view'>
       <Suspense fallback={<Spinner className='spinner suspense-fallback' size='64px' />}>
+        {/* Controlpanel */}
         <PrivateRouteWithContext children={props => <ControlPanel {...props} />} />
 
+        {/* Channelheader */}
         <PrivateRouteWithContext
           exact
           path={['/channel/:channel', '/settings']}
@@ -86,25 +70,34 @@ function AppView ({ location }) {
         />
 
         <Switch>
-          <Route exact path={loginPath} component={LoginView} />
+          {/* Channel */}
           <PrivateRouteWithContext
             exact
             path='/channel/:channel'
-            component={ChannelView}
             loginPath={loginPath}
+            component={ChannelView}
           />
+
+          {/* Settings */}
           <PrivateRouteWithContext
             exact
             path='/settings'
-            component={SettingsView}
             loginPath={loginPath}
+            component={SettingsView}
           />
-          <PrivateRouteWithContext component={IndexView} loginPath={loginPath} />
+
+          {/* Log out */}
+          <Route exact path='/logout' component={LogoutView} />
+
+          {/* Log in */}
+          <Route exact path={loginPath} component={LoginView} />
+
+          {/* Index */}
+          <PrivateRouteWithContext loginPath={loginPath} component={IndexView} />
         </Switch>
 
         {/* Render an alpha disclaimer on login page */}
         <Route exact path={loginPath} component={AlphaDisclaimer} />
-        {appState.redirectTo ? <Redirect to={appState.redirectTo} /> : null}
       </Suspense>
     </div>
   )

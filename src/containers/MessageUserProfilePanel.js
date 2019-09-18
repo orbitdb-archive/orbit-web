@@ -3,7 +3,6 @@
 import React, { useCallback, useContext } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useObserver } from 'mobx-react'
-import { CSSTransitionGroup } from 'react-transition-group'
 
 import Countries from '../config/countries.json'
 
@@ -58,16 +57,8 @@ function renderUserCard (t, user) {
   const country = Countries[user.profile.location]
   return (
     <>
-      <CSSTransitionGroup
-        transitionName='profilePictureAnimation'
-        transitionAppear
-        component='div'
-        transitionAppearTimeout={1500}
-        transitionEnterTimeout={0}
-        transitionLeaveTimeout={0}
-      >
-        <img className='picture' src={earthImg} />
-      </CSSTransitionGroup>
+      <img className='picture fadeInAnimation' src={earthImg} />
+
       <div className='name'>{user.profile.name}</div>
       <div className='country'>{country ? country + ', Earth' : 'Earth'}</div>
       <dl className='profileDataContainer'>

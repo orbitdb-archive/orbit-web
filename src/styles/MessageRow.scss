@@ -2,8 +2,8 @@
 @import 'Colors';
 
 $background-color: rgb(40, 40, 40);
-$border-color: 		 rgb(36, 36, 36);
-$timestamp-color:  rgba(240, 240, 240, 0.6);
+$border-color: rgb(36, 36, 36);
+$timestamp-color: rgba(240, 240, 240, 0.6);
 
 .highlighted {
   background-color: rgb(37, 37, 37) !important;
@@ -13,7 +13,6 @@ $timestamp-color:  rgba(240, 240, 240, 0.6);
   font-style: italic;
   color: rgba(240, 240, 240, 1) !important;
 }
-
 
 .Message {
   display: flex;
@@ -31,7 +30,7 @@ $timestamp-color:  rgba(240, 240, 240, 0.6);
   &__Content {
     display: flex;
     flex: 1;
-    margin: 0 .5em;
+    margin: 0 0.5em;
   }
 
   .popout {
@@ -46,7 +45,7 @@ $timestamp-color:  rgba(240, 240, 240, 0.6);
     margin-right: 0.5em;
     color: rgba(228, 228, 228, 0.8);
     background: rgb(32, 32, 32);
-    padding: 1.0em;
+    padding: 1em;
   }
 
   &__User {
@@ -60,8 +59,8 @@ $timestamp-color:  rgba(240, 240, 240, 0.6);
   &__Avatar {
     width: 2.25rem;
     height: 2.25rem;
-    margin-left: .5em;
-    margin-top: .1em;
+    margin-left: 0.5em;
+    margin-top: 0.1em;
     background-color: rgba(255, 255, 255, 0.1);
 
     display: flex;
@@ -69,7 +68,7 @@ $timestamp-color:  rgba(240, 240, 240, 0.6);
     align-items: center;
     font-weight: bold;
     font-size: 1.25em;
-    font-family: "LatoBold";
+    font-family: 'LatoBold';
     color: rgb(95, 95, 95);
 
     // background-image: url('../images/earth.png') cover;
@@ -81,50 +80,50 @@ $timestamp-color:  rgba(240, 240, 240, 0.6);
 .size-normal {
   .Message {
     align-items: baseline;
-    padding-bottom: .15em;
+    padding-bottom: 0.15em;
 
     &__User {
-      margin-left: .5em;
+      margin-left: 0.5em;
     }
 
     &__Timestamp {
       border-right: 1px solid rgba(255, 255, 255, 0.2);
       font-style: normal;
-      margin-left: .3em;
-      padding-right: .5em;
+      margin-left: 0.3em;
+      padding-right: 0.5em;
     }
   }
 }
 
 .size-large {
   .Message {
-    padding-bottom: .5em;
+    padding-bottom: 0.5em;
 
     .content-wrapper {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      margin-left: .2em;
+      margin-left: 0.2em;
       flex: 1;
     }
 
-    &__Details{
+    &__Details {
       display: flex;
       flex-direction: row;
       align-items: baseline;
-      margin: 0 .5em .1em .5em;
+      margin: 0 0.5em 0.1em 0.5em;
     }
 
     &__Timestamp {
-      border:none;
+      border: none;
       font-style: italic;
-      margin-left: .5em;
+      margin-left: 0.5em;
     }
   }
 }
 
 .font-normal {
-  .Message{
+  .Message {
     // font-size: 1em;
     font-weight: bold;
   }
@@ -132,17 +131,8 @@ $timestamp-color:  rgba(240, 240, 240, 0.6);
 
 .font-monospace {
   .Message {
-    font-family: "Roboto Mono";
+    font-family: 'Roboto Mono';
     // font-size: .9em;
     font-weight: normal;
   }
-}
-
-.messageAnimation-appear {
-  opacity: 0.01;
-}
-
-.messageAnimation-appear.messageAnimation-appear-active  {
-  opacity: 1;
-  transition: opacity .3s ease-in;
 }

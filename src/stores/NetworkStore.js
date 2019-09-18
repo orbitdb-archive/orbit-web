@@ -80,7 +80,7 @@ export default class NetworkStore {
 
   @computed
   get channelNames () {
-    return keys(this.channels)
+    return keys(this.channels).sort((a, b) => a.localeCompare(b))
   }
 
   @computed

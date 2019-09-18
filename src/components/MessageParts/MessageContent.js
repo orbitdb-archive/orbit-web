@@ -3,9 +3,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import { CSSTransitionGroup } from 'react-transition-group'
 
 import { FileMessage, TextMessage } from '../MessageTypes'
+
+import { FadeAnimation } from '../../utils/animations'
 
 function MessageContent ({ message, isCommand, loadFile, ...rest }) {
   let content
@@ -34,24 +35,14 @@ function MessageContent ({ message, isCommand, loadFile, ...rest }) {
       content = message.content
   }
 
-  const animationProps = {
-    transitionName: 'messageAnimation',
-    transitionAppear: message.unread,
-    transitionEnter: false,
-    transitionLeave: false,
-    transitionAppearTimeout: 500,
-    transitionEnterTimeout: 0,
-    transitionLeaveTimeout: 0,
-    component: 'div'
-  }
-
   return (
-    <CSSTransitionGroup
-      className={classNames('Message__Content', { command: isCommand })}
-      {...animationProps}
+    <div
+      className={classNames('Message__Content', {
+        command: isCommand
+      })}
     >
-      {content}
-    </CSSTransitionGroup>
+      <FadeAnimation in={!message.unread}>{content}</FadeAnimation>
+    </div>
   )
 }
 

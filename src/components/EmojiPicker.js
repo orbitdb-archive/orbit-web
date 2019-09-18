@@ -1,153 +1,136 @@
 'use strict'
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import { Emoji } from 'emoji-mart'
 
 import 'emoji-mart/css/emoji-mart.css'
 import '../styles/EmojiPicker.scss'
 
-class EmojiPicker extends React.Component {
-  static propTypes = {
-    emojis: PropTypes.array.isRequired,
-    emojiSize: PropTypes.number.isRequired,
-    emojiSet: PropTypes.string.isRequired,
-    onChange: PropTypes.func.isRequired
-  }
+function EmojiPicker ({ emojis, emojiSize, emojiSet, onChange, ...rest }, ref) {
+  const [selectedIndex, setSelectedIndex] = React.useState(0)
 
-  static defaultProps = {}
+  const listRef = React.useRef()
 
-  state = {
-    selected: 0
-  }
-
-  constructor (props) {
-    super(props)
-
-    this.listElement = React.createRef()
-
-    this.onChange = this.onChange.bind(this)
-    this.calculateLeftRightIndex = this.calculateLeftRightIndex.bind(this)
-    this.calculateUpDownIndex = this.calculateUpDownIndex.bind(this)
-  }
-
-  onKeyDown (e) {
-    let handled = false
-
-    if (this.state.selected > this.props.emojis.length) this.setState({ selected: 0 })
-
-    switch (e.key) {
-      case 'ArrowRight':
-        this.setState({ selected: this.calculateLeftRightIndex(true) })
-        handled = true
-        break
-      case 'ArrowLeft':
-        this.setState({ selected: this.calculateLeftRightIndex(false) })
-        handled = true
-        break
-      case 'ArrowDown':
-        this.setState({ selected: this.calculateUpDownIndex(true) })
-        handled = true
-        break
-      case 'ArrowUp':
-        this.setState({ selected: this.calculateUpDownIndex(false) })
-        handled = true
-        break
-      case 'Tab':
-        this.onChange(true)
-        handled = true
-        break
-      case 'Enter':
-        this.onChange(true)
-        handled = true
-        break
-      default:
-        break
-    }
-
-    if (handled) e.preventDefault()
-  }
-
-  calculateLeftRightIndex (right) {
-    const { selected: currentIndex } = this.state
-    const { emojis } = this.props
-
-    if (right) {
-      return (currentIndex + 1) % emojis.length
-    } else {
-      return currentIndex > 0 ? currentIndex - 1 : emojis.length - 1
-    }
-  }
-
-  calculateUpDownIndex (down) {
-    if (!this.listElement.current) return
-    const { selected: currentIndex } = this.state
-    const { emojis } = this.props
-
-    const actualEmojiSize = this.props.emojiSize + 2 * 1 // 1px padding
-    const actualWidth = this.listElement.current.offsetWidth - 5 * 2 // 5px padding
-    const itemsPerRow = actualWidth / actualEmojiSize
-
-    if (down) {
-      if (currentIndex + itemsPerRow > emojis.length - 1) {
-        // Going over the bottom, must flip
-        return currentIndex % itemsPerRow
-      } else {
-        // Normal case
-        return currentIndex + itemsPerRow
+  const handleChange = React.useCallback(
+    done => {
+      try {
+        const emoji = emojis[selectedIndex]
+        return onChange(emoji, done)
+      } catch (e) {
+        return onChange(null, done)
       }
-    } else {
-      if (currentIndex - itemsPerRow < 0) {
-        // Going over the top, must flip
-        const rows = Math.floor(emojis.length / itemsPerRow)
-        if (emojis.length % itemsPerRow > currentIndex) {
-          // There is an element at the same index on the last row
-          return currentIndex + itemsPerRow * rows
+    },
+    [selectedIndex, emojis, onChange]
+  )
+
+  const handleClick = React.useCallback(
+    index => {
+      setSelectedIndex(index)
+      handleChange()
+    },
+    [handleChange]
+  )
+
+  const handleKeyDown = React.useCallback(
+    e => {
+      if (selectedIndex > emojis.length) setSelectedIndex(0)
+
+      let handled = true
+
+      switch (e.key) {
+        case 'ArrowRight':
+          setSelectedIndex(calculateLeftRightIndex(true))
+          break
+        case 'ArrowLeft':
+          setSelectedIndex(calculateLeftRightIndex(false))
+          break
+        case 'ArrowDown':
+          setSelectedIndex(calculateUpDownIndex(true))
+          break
+        case 'ArrowUp':
+          setSelectedIndex(calculateUpDownIndex(false))
+          break
+        case 'Tab':
+          handleChange(true)
+          break
+        case 'Enter':
+          handleChange(true)
+          break
+        default:
+          handled = false
+          break
+      }
+
+      if (handled) e.preventDefault()
+    },
+    [selectedIndex, emojis.length, handleChange]
+  )
+
+  // Allow parent component to call 'handleKeyDown'
+  React.useImperativeHandle(ref, () => ({ handleKeyDown }), [handleKeyDown])
+
+  const calculateLeftRightIndex = React.useCallback(
+    right =>
+      right
+        ? (selectedIndex + 1) % emojis.length
+        : selectedIndex > 0
+          ? selectedIndex - 1
+          : emojis.length - 1,
+    [selectedIndex, emojis.length]
+  )
+
+  const calculateUpDownIndex = React.useCallback(
+    down => {
+      if (!listRef.current) return
+
+      const actualEmojiSize = emojiSize + 2 * 1 // 1px padding
+      const actualWidth = listRef.current.offsetWidth - 5 * 2 // 5px padding
+      const itemsPerRow = actualWidth / actualEmojiSize
+
+      if (down) {
+        if (selectedIndex + itemsPerRow > emojis.length - 1) {
+          // Going over the bottom, must flip
+          return selectedIndex % itemsPerRow
         } else {
-          // There is NOT an element at the same index on the last row
-          // Go to the second last row since it should have this index
-          return currentIndex + itemsPerRow * (rows - 1)
+          // Normal case
+          return selectedIndex + itemsPerRow
         }
       } else {
-        // Normal case
-        return currentIndex - itemsPerRow
+        if (selectedIndex - itemsPerRow < 0) {
+          // Going over the top, must flip
+          const rows = Math.floor(emojis.length / itemsPerRow)
+          if (emojis.length % itemsPerRow > selectedIndex) {
+            // There is an element at the same index on the last row
+            return selectedIndex + itemsPerRow * rows
+          } else {
+            // There is NOT an element at the same index on the last row
+            // Go to the second last row since it should have this index
+            return selectedIndex + itemsPerRow * (rows - 1)
+          }
+        } else {
+          // Normal case
+          return selectedIndex - itemsPerRow
+        }
       }
-    }
-  }
+    },
+    [selectedIndex, emojis.length, emojiSize]
+  )
 
-  onChange (done) {
-    try {
-      const emoji = this.props.emojis[this.state.selected]
-      return this.props.onChange(emoji, done)
-    } catch (e) {
-      return this.props.onChange(null, done)
-    }
-  }
-
-  onClick (e, idx) {
-    this.setState({ selected: idx }, this.onChange)
-  }
-
-  render () {
-    const { selected } = this.state
-    const { emojis, emojiSize, emojiSet, ...rest } = this.props
-
-    return (
-      <ul ref={this.listElement} className='EmojiPicker' {...rest}>
-        {emojis.map((emoji, idx) => {
-          return (
-            <li
-              key={emoji.id}
-              className={selected === idx ? 'selected' : ''}
-              onClick={e => this.onClick(e, idx)}
-            >
-              <Emoji emoji={emoji} size={emojiSize} set={emojiSet} />
-            </li>
-          )
-        })}
-      </ul>
-    )
-  }
+  return (
+    <ul ref={listRef} className='EmojiPicker fadeUpAnimation' {...rest}>
+      {emojis.map((emoji, idx) => {
+        return (
+          <li
+            key={emoji.id}
+            className={selectedIndex === idx ? 'selected' : ''}
+            onClick={() => handleClick(idx)}
+          >
+            <Emoji emoji={emoji} size={emojiSize} set={emojiSet} />
+          </li>
+        )
+      })}
+    </ul>
+  )
 }
 
-export default EmojiPicker
+export default React.forwardRef(EmojiPicker)
