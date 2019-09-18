@@ -47,6 +47,8 @@ const IndexView = lazy(() => import(/* webpackChunkName: "IndexView" */ './Index
 
 const LoginView = lazy(() => import(/* webpackChunkName: "LoginView" */ './LoginView'))
 
+const LogoutView = lazy(() => import(/* webpackChunkName: "LogoutView" */ './LogoutView'))
+
 const SettingsView = lazy(() => import(/* webpackChunkName: "SettingsView" */ './SettingsView'))
 
 const AlphaDisclaimer = lazy(() =>
@@ -77,8 +79,10 @@ function AppView ({ location }) {
   return (
     <div className='App view'>
       <Suspense fallback={<Spinner className='spinner suspense-fallback' size='64px' />}>
+        {/* Controlpanel */}
         <PrivateRouteWithContext children={props => <ControlPanel {...props} />} />
 
+        {/* Channelheader */}
         <PrivateRouteWithContext
           exact
           path={['/channel/:channel', '/settings']}
@@ -86,20 +90,30 @@ function AppView ({ location }) {
         />
 
         <Switch>
-          <Route exact path={loginPath} component={LoginView} />
+          {/* Channel */}
           <PrivateRouteWithContext
             exact
             path='/channel/:channel'
-            component={ChannelView}
             loginPath={loginPath}
+            component={ChannelView}
           />
+
+          {/* Settings */}
           <PrivateRouteWithContext
             exact
             path='/settings'
-            component={SettingsView}
             loginPath={loginPath}
+            component={SettingsView}
           />
-          <PrivateRouteWithContext component={IndexView} loginPath={loginPath} />
+
+          {/* Log out */}
+          <Route exact path='/logout' component={LogoutView} />
+
+          {/* Log in */}
+          <Route exact path={loginPath} component={LoginView} />
+
+          {/* Index */}
+          <PrivateRouteWithContext loginPath={loginPath} component={IndexView} />
         </Switch>
 
         {/* Render an alpha disclaimer on login page */}
