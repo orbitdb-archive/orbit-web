@@ -85,7 +85,9 @@ export default class NetworkStore {
 
   @computed
   get channelsAsArray () {
-    return values(this.channels)
+    return values(this.channels).sort(({ channelName: a }, { channelName: b }) =>
+      a.localeCompare(b)
+    )
   }
 
   // Private instance actions
@@ -168,6 +170,8 @@ export default class NetworkStore {
     if (typeof data.action !== 'string') return
     if (typeof data.name !== 'string') return
 
+    const channel = data.meta ? this.channels[data.meta.channelName] : null
+
     switch (data.action) {
       case 'orbit-event':
         switch (data.name) {
@@ -191,7 +195,7 @@ export default class NetworkStore {
         }
         break
       case 'channel-event':
-        const channel = this.channels[data.meta.channelName]
+        if (!channel) return
 
         switch (data.name) {
           case 'error':
@@ -202,11 +206,11 @@ export default class NetworkStore {
             break
           case 'load.progress':
             // args: [address, hash, entry, progress, total]
-            channel._onLoadProgress(data.args[2])
+            channel._onLoadProgress(data.args[2], data.meta.replicationStatus)
             break
           case 'replicate.progress':
             // args: [address, hash, entry, progress, have]
-            channel._onReplicateProgress(data.args[2])
+            channel._onReplicateProgress(data.args[2], data.meta.replicationStatus)
             break
           case 'ready': // load.done
             channel._onLoaded()
@@ -268,12 +272,19 @@ export default class NetworkStore {
 
     logger.info('Starting network')
 
+    const ipfsOptions = toJS(this.settingsStore.networkSettings.ipfs) || {}
+    ipfsOptions.repo = `orbit-chat-ipfs-${this.sessionStore.username}`
+    ipfsOptions.EXPERIMENTAL = Object.assign({}, ipfsOptions.EXPERIMENTAL, { pubsub: true })
+
+    const orbitOptions = toJS(this.settingsStore.networkSettings.orbit) || {}
+    orbitOptions.directory = `orbit-chat-orbitdb-${this.sessionStore.username}`
+    orbitOptions.id = this.sessionStore.username
+
     this.worker.postMessage({
       action: 'network:start',
       options: {
-        ipfs: toJS(this.settingsStore.networkSettings.ipfs),
-        orbit: toJS(this.settingsStore.networkSettings.orbit),
-        username: this.sessionStore.username
+        ipfs: ipfsOptions,
+        orbit: orbitOptions
       }
     })
   }

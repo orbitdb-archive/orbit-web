@@ -5,12 +5,14 @@ import PropTypes from 'prop-types'
 
 import MoonLoader from './MoonLoader'
 
+import '../../styles/Spinner.scss'
+
 function Spinner ({ className, theme, loading, ...rest }) {
   if (!loading) return null
 
   return (
     <div className={className} style={theme}>
-      <MoonLoader className="spinnerIcon" {...rest} />
+      <MoonLoader className='spinnerIcon' {...rest} />
     </div>
   )
 }

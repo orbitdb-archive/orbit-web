@@ -3,17 +3,17 @@
 import React, { useContext } from 'react'
 import { hot } from 'react-hot-loader'
 import PropTypes from 'prop-types'
-import { Observer } from 'mobx-react'
+import { useObserver } from 'mobx-react'
 import { useTranslation } from 'react-i18next'
 
-import RootStoreContext from '../context/RootStoreContext'
+import RootContext from '../context/RootContext'
 
 import ChannelLink from './ChannelLink'
 
 import '../styles/ChannelHeader.scss'
 
 function ChannelHeader ({ match }) {
-  const { networkStore, uiStore } = useContext(RootStoreContext)
+  const { networkStore, uiStore } = useContext(RootContext)
   const [t] = useTranslation()
 
   function onChannelClick (e) {
@@ -33,30 +33,25 @@ function ChannelHeader ({ match }) {
 
   const overrideName = t(`viewNames.${path.slice(1)}`)
 
-  return (
-    <Observer>
-      {() => (
-        <div className="Header" onClick={onHeaderClick}>
-          <div className="ChannelName">
-            <div className="currentChannel">
-              {currentChannelName ? `#${currentChannelName}` : overrideName}
-            </div>
-            {networkStore.channelsAsArray
-              .filter(c => c.channelName !== currentChannelName)
-              .sort((a, b) => a.channelName.localeCompare(b.channelName))
-              .map(c => (
-                <ChannelLink
-                  key={c.channelName}
-                  channel={c}
-                  theme={{ ...uiStore.theme }}
-                  onClick={onChannelClick}
-                />
-              ))}
-          </div>
+  return useObserver(() => (
+    <div className='Header' onClick={onHeaderClick}>
+      <div className='ChannelName'>
+        <div className='currentChannel'>
+          {currentChannelName ? `#${currentChannelName}` : overrideName}
         </div>
-      )}
-    </Observer>
-  )
+        {networkStore.channelsAsArray
+          .filter(c => c.channelName !== currentChannelName)
+          .map(c => (
+            <ChannelLink
+              key={c.channelName}
+              channel={c}
+              theme={{ ...uiStore.theme }}
+              onClick={onChannelClick}
+            />
+          ))}
+      </div>
+    </div>
+  ))
 }
 
 ChannelHeader.propTypes = {

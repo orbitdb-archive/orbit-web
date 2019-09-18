@@ -1,41 +1,15 @@
 {
-  "parser": "babel-eslint",
-  "extends": [
-    "@orbitdb/eslint-config-orbitdb",
-    "plugin:react/recommended",
-    "plugin:compat/recommended"
-  ],
   "env": {
-    "browser": true,
-    "node": true,
-    "jest": true
-  },
-  "globals": {
-    "ipcRenderer": true,
-    "page": true,
-    "browser": true,
-    "context": true,
-    "jestPuppeteer": true
-  },
-  "rules": {
-    "max-len": [
-      "error",
-      {
-        "code": 100,
-        "tabWidth": 2,
-        "ignoreComments": true,
-        "ignoreStrings": true,
-        "ignoreTemplateLiterals": true,
-        "ignoreRegExpLiterals": true
-      }
-    ],
-    "no-var": "warn",
-    "prefer-const": "error"
+    "browser": true
   },
   "settings": {
-    "polyfills": ["Promise", "Object.assign"],
-    "react": {
-      "version": "16.8"
-    }
+    "react": { "version": "detect" }
+  },
+  "extends": ["standard", "standard-jsx"],
+  "parser": "babel-eslint",
+  "rules": {
+    "react/jsx-curly-newline": ["off", "consistent"],
+    "react/jsx-handler-names": "warn",
+    "no-unused-vars": "warn"
   }
 }

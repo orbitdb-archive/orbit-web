@@ -7,8 +7,8 @@ import '../styles/Disclaimer.scss'
 
 function Disclaimer ({ text }) {
   return (
-    <div className="Disclaimer">
-      <div className="content">{text}</div>
+    <div className='Disclaimer'>
+      <div className='content'>{text}</div>
     </div>
   )
 }

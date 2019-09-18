@@ -1,17 +1,29 @@
 'use strict'
 
-import { useContext, useEffect } from 'react'
+import React from 'react'
 import { hot } from 'react-hot-loader'
+import { autorun } from 'mobx'
 
-import RootStoreContext from '../context/RootStoreContext'
+import RootContext from '../context/RootContext'
 
 function IndexView () {
-  const { uiStore } = useContext(RootStoreContext)
+  const { networkStore, uiStore, setAppState } = React.useContext(RootContext)
 
-  useEffect(() => {
+  React.useEffect(() => {
     uiStore.setTitle('Orbit')
-    uiStore.openControlPanel()
-  })
+  }, [])
+
+  React.useEffect(
+    () =>
+      autorun(() => {
+        if (networkStore.channelsAsArray.length === 1) {
+          setAppState({ redirectTo: `/channel/${networkStore.channelsAsArray[0]}` })
+        } else {
+          setAppState({ redirectTo: `/channel/${networkStore.defaultChannels[0]}` })
+        }
+      }),
+    []
+  )
 
   return null
 }

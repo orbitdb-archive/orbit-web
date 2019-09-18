@@ -7,12 +7,12 @@ import classNames from 'classnames'
 
 import getMousePosition from '../utils/mouse-position'
 
-import RootStoreContext from '../context/RootStoreContext'
+import RootContext from '../context/RootContext'
 
 import MessageList from '../components/MessageList'
 
 function ChannelMessages ({ channel }) {
-  const { sessionStore, uiStore } = useContext(RootStoreContext)
+  const { sessionStore, uiStore } = useContext(RootContext)
 
   function onMessageUserClick (evt, profile, identity) {
     evt.persist()
@@ -48,6 +48,7 @@ function ChannelMessages ({ channel }) {
         emojiSet={uiStore.emojiSet}
         markMessageRead={channel.markEntryAsReadWithHash}
         onMessageUserClick={onMessageUserClick}
+        theme={uiStore.theme}
       />
     </div>
   ))

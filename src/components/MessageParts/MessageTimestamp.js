@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 import { getFormattedTimestamp } from '../../utils/format-time'
 
 function MessageTimestamp ({ message }) {
-  return <span className="Message__Timestamp">{getFormattedTimestamp(message.meta.ts)}</span>
+  return <span className='Message__Timestamp'>{getFormattedTimestamp(message.meta.ts)}</span>
 }
 
 MessageTimestamp.propTypes = {

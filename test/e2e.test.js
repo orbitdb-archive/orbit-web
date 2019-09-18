@@ -1,8 +1,11 @@
+/* eslint-env jest */
+/* globals page */
+
 require('@babel/polyfill')
 const path = require('path')
 
 // URL of the http-server running the production build
-const baseUrl = 'http://localhost:8080'
+const baseUrl = 'http://localhost:8088'
 
 // Fixtures
 const channelName = 'testchannel'

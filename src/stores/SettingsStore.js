@@ -73,7 +73,7 @@ export default class SettingsStore {
   // Public instance actions
 
   @action.bound
-  load (username) {
+  load () {
     let networkSettings = {}
     let uiSettings = {}
 
@@ -87,17 +87,6 @@ export default class SettingsStore {
       networkSettings = JSON.parse(localStorage.getItem(networkKey)) || {}
       uiSettings = JSON.parse(localStorage.getItem(uiKey)) || {}
     } catch (err) {}
-
-    // Set default orbit root
-    if (username && !networkSettings.orbit) {
-      defaulNetworkSettingsCopy.orbit.root += `/${username}`
-    }
-
-    // Set default ipfs repo
-    if (!networkSettings.ipfs) {
-      const { orbit } = defaulNetworkSettingsCopy
-      defaulNetworkSettingsCopy.ipfs.repo = `${orbit.root}/ipfs`
-    }
 
     // Merge default settings with user defined settings
     Object.assign(this.networkSettings, defaulNetworkSettingsCopy, networkSettings)

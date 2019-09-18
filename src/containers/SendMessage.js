@@ -27,14 +27,9 @@ class SendMessage extends React.Component {
 
     this.inputField = React.createRef()
     this.emojiPicker = React.createRef()
-
-    this.onSubmit = this.onSubmit.bind(this)
-    this.onChange = this.onChange.bind(this)
-    this.onKeyDown = this.onKeyDown.bind(this)
-    this.onSelectEmoji = this.onSelectEmoji.bind(this)
   }
 
-  onSubmit (e) {
+  handleInputSubmit (e) {
     e.preventDefault()
 
     const inputField = this.inputField.current
@@ -51,7 +46,7 @@ class SendMessage extends React.Component {
     })
   }
 
-  onChange () {
+  handleInputChange () {
     const inputValue = this.inputField.current.value
     const lastWord = inputValue.split(' ').pop()
     const emojiPickerActive = lastWord.startsWith(':') && this.props.useEmojis
@@ -68,13 +63,13 @@ class SendMessage extends React.Component {
     this.setState({ inputValue, emojiResults, emojiPickerActive })
   }
 
-  onKeyDown (e) {
+  handleInputKeyDown (e) {
     if (this.emojiPicker.current) {
       this.emojiPicker.current.onKeyDown(e)
     }
   }
 
-  onSelectEmoji (emoji, done = false) {
+  handleEmojiChange (emoji, done = false) {
     if (!emoji) return
 
     const i = this.state.inputValue.lastIndexOf(':')
@@ -102,9 +97,9 @@ class SendMessage extends React.Component {
     const emojiPicker =
       emojiPickerActive && emojiResults.length > 0 ? (
         <CSSTransitionGroup
-          component="div"
-          transitionName="emojiPreview"
-          transitionAppear={true}
+          component='div'
+          transitionName='emojiPreview'
+          transitionAppear
           transitionAppearTimeout={1000}
           transitionEnterTimeout={0}
           transitionLeaveTimeout={0}
@@ -112,7 +107,7 @@ class SendMessage extends React.Component {
           <EmojiPicker
             ref={this.emojiPicker}
             emojis={emojiResults}
-            onChange={this.onSelectEmoji}
+            onChange={this.handleEmojiChange.bind(this)}
             emojiSize={pickerEmojiSize}
             emojiSet={emojiSet}
             style={this.getEmojiPickerStyle(pickerEmojiSize)}
@@ -121,19 +116,19 @@ class SendMessage extends React.Component {
       ) : null
 
     return (
-      <div className="SendMessage">
-        <form onSubmit={this.onSubmit}>
+      <div className='SendMessage'>
+        <form onSubmit={this.handleInputSubmit.bind(this)}>
           {emojiPicker}
           <input
             ref={this.inputField}
-            type="text"
+            type='text'
             placeholder={t('channel.sendMessagePlaceholder')}
-            autoComplete="on"
-            autoFocus={true}
+            autoComplete='on'
+            autoFocus
             style={theme}
             value={inputValue}
-            onKeyDown={this.onKeyDown}
-            onChange={this.onChange}
+            onKeyDown={this.handleInputKeyDown.bind(this)}
+            onChange={this.handleInputChange.bind(this)}
           />
         </form>
       </div>

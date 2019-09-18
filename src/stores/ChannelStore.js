@@ -33,6 +33,7 @@ const checkName = name => {
 }
 
 const defaultMessageOffset = 64
+const defaultLoadmoreCount = 32
 
 export default class ChannelStore {
   constructor ({ network, channelName }) {
@@ -61,6 +62,9 @@ export default class ChannelStore {
   @observable
   _sendingMessageCounter = 0
 
+  @observable
+  _replicationStatus = { progress: 0, max: 0 }
+
   // Public instance variables
   @observable
   entriesMap = {}
@@ -88,28 +92,29 @@ export default class ChannelStore {
   }
 
   @computed
-  get _visibleEntries () {
+  get visibleEntries () {
     return this.entries.slice(-this.messageOffset)
   }
 
   @computed
-  get _unseenEntries () {
-    return this.entries.filter(e => !e.seen)
+  get unreadEntries () {
+    const lastSeenTimestamp = this._storableState.lastSeenTimestamp || 0
+    return this.entries.filter(e => e.payload.value.meta.ts > lastSeenTimestamp)
   }
 
   @computed
   get messages () {
-    return this._formatMessages(this._visibleEntries)
+    return this._formatMessages(this.visibleEntries)
   }
 
   @computed
   get unreadMessages () {
-    return this._formatMessages(this._unseenEntries)
+    return this._formatMessages(this.unreadEntries)
   }
 
   @computed
   get hasUnreadMessages () {
-    return this._unseenEntries ? this._unseenEntries.length > 0 : false
+    return this.unreadEntries ? this.unreadEntries.length > 0 : false
   }
 
   @computed
@@ -149,14 +154,8 @@ export default class ChannelStore {
 
   @action
   _updateEntries (entries) {
-    if (!entries || entries.length === 0) return
-    const { lastSeenTimestamp = 0 } = this._storableState
-    entries.map(e => {
-      // Set entries as seen
-      Object.assign(e, { seen: e.seen || e.payload.value.meta.ts <= lastSeenTimestamp })
-      // Add entries to store
-      this.entriesMap[e.hash] = e
-    })
+    if (!(entries instanceof Array)) return
+    entries.forEach(e => (this.entriesMap[e.hash] = e))
   }
 
   @action
@@ -165,8 +164,9 @@ export default class ChannelStore {
   }
 
   @action // Called while loading from local filesystem
-  _onLoadProgress (entry) {
+  _onLoadProgress (entry, replicationStatus) {
     if (!this.loading) this.loading = true
+    if (replicationStatus) Object.assign(this._replicationStatus, replicationStatus)
     this._onEntry(entry)
   }
 
@@ -176,8 +176,9 @@ export default class ChannelStore {
   }
 
   @action // Called while loading from IPFS (receiving new messages)
-  _onReplicateProgress (entry) {
+  _onReplicateProgress (entry, replicationStatus) {
     if (!this.replicating) this.replicating = true
+    if (replicationStatus) Object.assign(this._replicationStatus, replicationStatus)
     this._onEntry(entry)
   }
 
@@ -208,7 +209,7 @@ export default class ChannelStore {
 
   // Called when the user writes a message (text or file)
   _onWrite (entry) {
-    entry.seen = true
+    this._markEntryAsRead(entry)
     this._updateEntries([entry])
     this._decrementSendingMessageCounter()
   }
@@ -231,16 +232,27 @@ export default class ChannelStore {
     } catch (err) {}
   }
 
+  @action.bound
+  _markEntryAsRead (entry) {
+    if (!entry) return
+
+    this._storableState.lastSeenTimestamp = Math.max(
+      this._storableState.lastSeenTimestamp || 0,
+      entry.payload.value.meta.ts || 0
+    )
+  }
+
   // Private instance methods
 
   // Format entries to better suit a chat channel
   _formatMessages (entries) {
+    const lastSeenTimestamp = this._storableState.lastSeenTimestamp || 0
     return JSON.parse(JSON.stringify(entries)) // Deep copy
       .map(entry =>
         Object.assign(entry.payload.value, {
           hash: entry.hash,
           userIdentity: entry.identity,
-          unread: !entry.seen,
+          unread: entry.payload.value.meta.ts > lastSeenTimestamp,
           meta: formatMeta(entry.payload.value.meta)
         })
       )
@@ -304,37 +316,20 @@ export default class ChannelStore {
   // Public instance actions
 
   @action.bound
-  markEntryAsRead (entry) {
-    if (!entry || entry.seen === true) return
-
-    entry.seen = true
-
-    // Update the last read timestamp
-    this._storableState.lastSeenTimestamp = Math.max(
-      this._storableState.lastSeenTimestamp || 0,
-      entry.payload.value.meta.ts || 0
-    )
-  }
-
-  @action.bound
   markEntryAsReadAtIndex (index) {
     if (typeof index !== 'number') return
-    this.markEntryAsRead(this.entries[index])
+    this._markEntryAsRead(this.entries[index])
   }
 
   @action.bound
   markEntryAsReadWithHash (hash) {
     if (typeof hash !== 'string') return
-    this.markEntryAsRead(this.entriesMap[hash])
+    this._markEntryAsRead(this.entriesMap[hash])
   }
 
   @action.bound
-  increaseMessageOffset (count = defaultMessageOffset / 2) {
-    if (this.messageOffset >= this.entries.length) {
-      // Don't allow the offset to grow too far beyond current entry count
-      return
-    }
-    this.messageOffset += count
+  increaseMessageOffset (count = defaultLoadmoreCount) {
+    this.messageOffset = Math.min(this.messageOffset + count, this._replicationStatus.max)
   }
 
   @action.bound

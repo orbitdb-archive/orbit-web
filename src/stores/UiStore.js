@@ -17,6 +17,7 @@ throttleEvent('resize', 'optimizedResize', window)
 export default class UiStore {
   constructor (rootStore) {
     this.rootStore = rootStore
+    this.sessionStore = this.rootStore.sessionStore
     this.settingsStore = this.rootStore.settingsStore
     this.networkStore = this.rootStore.networkStore
 
@@ -125,6 +126,7 @@ export default class UiStore {
 
   @action.bound
   openControlPanel () {
+    if (!this.sessionStore.isAuthenticated) return
     this._isControlPanelOpen = true
   }
 

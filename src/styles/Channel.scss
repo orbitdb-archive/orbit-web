@@ -28,12 +28,6 @@ $controls-height: 2.8em;
     width: 100%;
   }
 
-  .spinner {
-    position: absolute;
-    bottom: 0.75em;
-    left: 0.75em;
-  }
-
   .active {
     background-color: $main-color;
     &:hover {
@@ -327,14 +321,16 @@ input[type="button"],
     height: 1px;
     width: 100%;
     background: $second-color;
+    opacity: 0.5;
   }
 
   .progressBar {
     position: absolute;
-    bottom: 0;
+    top: 0;
     height: 1px;
     width: 100%;
     background: $main-color;
+    opacity: 0.5;
 
     &:before {
       content: '';

@@ -31,16 +31,16 @@ function FileMessage ({ messageHash, fileHash, meta, ...filePreviewProps }) {
     (window.gatewayAddress ? 'http://' + window.gatewayAddress : 'https://ipfs.io/ipfs/') + fileHash
 
   return (
-    <div ref={element} className="FileMessage">
+    <div ref={element} className='FileMessage'>
       <div>
-        <span className="name" onClick={handleNameClick}>
+        <span className='name' onClick={handleNameClick}>
           {name}
         </span>
-        <span className="size">{getHumanReadableSize(size)}</span>
-        <a className="download" href={ipfsLink} target="_blank" rel="noopener noreferrer">
+        <span className='size'>{getHumanReadableSize(size)}</span>
+        <a className='download' href={ipfsLink} target='_blank' rel='noopener noreferrer'>
           {t('channel.file.open')}
         </a>
-        <a className="download" href={ipfsLink} download={name}>
+        <a className='download' href={ipfsLink} download={name}>
           {t('channel.file.download')}
         </a>
         {showPreview && (

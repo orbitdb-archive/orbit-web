@@ -1,13 +1,13 @@
 'use strict'
 
-import React, { useContext } from 'react'
+import React, { useCallback, useContext } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Observer } from 'mobx-react'
+import { useObserver } from 'mobx-react'
 import { CSSTransitionGroup } from 'react-transition-group'
 
 import Countries from '../config/countries.json'
 
-import RootStoreContext from '../context/RootStoreContext'
+import RootContext from '../context/RootContext'
 
 import BackgroundAnimation from '../components/BackgroundAnimation'
 
@@ -15,30 +15,31 @@ import '../styles/MessageUserProfilePanel.scss'
 import earthImg from '../images/earth.png'
 
 function MessageUserProfilePanel () {
-  const { uiStore } = useContext(RootStoreContext)
+  const { uiStore } = useContext(RootContext)
   const [t] = useTranslation()
 
-  return (
-    <Observer>
-      {() =>
-        uiStore.userProfilePanelIsOpen ? (
-          <div
-            className="MessageUserProfilePanel"
-            style={calculatePanelStyle(uiStore.userProfilePanelPosition, uiStore.windowDimensions)}
-          >
-            <BackgroundAnimation
-              style={{ top: '-30px', left: '-70px', zIndex: '-1', display: 'block' }}
-              size={256}
-              theme={{ ...uiStore.theme }}
-            />
-            <span className="close" onClick={uiStore.closeUserProfilePanel}>
-              X
-            </span>
-            {renderUserCard(t, uiStore.userProfilePanelUser)}
-          </div>
-        ) : null
-      }
-    </Observer>
+  const handleClose = useCallback(
+    e => {
+      uiStore.closeUserProfilePanel(e)
+    },
+    [uiStore.closeUserProfilePanel]
+  )
+
+  return useObserver(() =>
+    uiStore.userProfilePanelIsOpen ? (
+      <div
+        className='MessageUserProfilePanel'
+        style={calculatePanelStyle(uiStore.userProfilePanelPosition, uiStore.windowDimensions)}
+      >
+        <BackgroundAnimation
+          style={{ top: '-30px', left: '-70px', zIndex: '-1', display: 'block' }}
+          size={256}
+          theme={{ ...uiStore.theme }}
+        />
+        <span className='close' onClick={handleClose} children='X' />
+        {renderUserCard(t, uiStore.userProfilePanelUser)}
+      </div>
+    ) : null
   )
 }
 
@@ -56,28 +57,28 @@ function calculatePanelStyle (panelPosition, windowDimensions) {
 function renderUserCard (t, user) {
   const country = Countries[user.profile.location]
   return (
-    <React.Fragment>
+    <>
       <CSSTransitionGroup
-        transitionName="profilePictureAnimation"
-        transitionAppear={true}
-        component="div"
+        transitionName='profilePictureAnimation'
+        transitionAppear
+        component='div'
         transitionAppearTimeout={1500}
         transitionEnterTimeout={0}
         transitionLeaveTimeout={0}
       >
-        <img className="picture" src={earthImg} />
+        <img className='picture' src={earthImg} />
       </CSSTransitionGroup>
-      <div className="name">{user.profile.name}</div>
-      <div className="country">{country ? country + ', Earth' : 'Earth'}</div>
-      <dl className="profileDataContainer">
+      <div className='name'>{user.profile.name}</div>
+      <div className='country'>{country ? country + ', Earth' : 'Earth'}</div>
+      <dl className='profileDataContainer'>
         <dt>{t('userProfile.identityType')}:</dt>
         <dd>{user.identity.type}</dd>
         <dt>{t('userProfile.identityId')}:</dt>
-        <dd className="code">{user.identity.id}</dd>
+        <dd className='code'>{user.identity.id}</dd>
         <dt>{t('userProfile.identityPublicKey')}:</dt>
-        <dd className="code">{user.identity.publicKey}</dd>
+        <dd className='code'>{user.identity.publicKey}</dd>
       </dl>
-    </React.Fragment>
+    </>
   )
 }
 

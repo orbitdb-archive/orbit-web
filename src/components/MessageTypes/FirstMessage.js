@@ -8,7 +8,7 @@ function FirstMessage ({ channelName, ...rest }) {
   const [t] = useTranslation()
 
   return (
-    <div className="firstMessage" {...rest}>
+    <div className='firstMessage' {...rest}>
       {t('channel.beginningOf', { channel: channelName })}
     </div>
   )

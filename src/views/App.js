@@ -1,7 +1,7 @@
 'use strict'
 
-import React from 'react'
-import { HashRouter as Router, Route, Switch } from 'react-router-dom'
+import React, { Suspense, lazy } from 'react'
+import { HashRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
 
 import i18n from '../config/i18n.config'
 
@@ -12,12 +12,10 @@ import { askPermission } from '../utils/notify'
 
 import PrivateRouteWithContext from '../containers/PrivateRouteWithContext'
 
-import RootStoreContext from '../context/RootStoreContext'
+import RootContext from '../context/RootContext'
 
-import LoadAsync from '../components/Loadable'
+import Spinner from '../components/Spinner'
 
-import '../styles/normalize.css'
-import '../styles/Main.scss'
 import '../styles/App.scss'
 import '../styles/Scrollbars.scss'
 
@@ -35,76 +33,92 @@ askPermission()
 
 const loginPath = '/connect'
 
-const ControlPanel = LoadAsync({
-  loader: () => import(/* webpackChunkName: "ControlPanel" */ '../containers/ControlPanel')
-})
+const ControlPanel = lazy(() =>
+  import(/* webpackChunkName: "ControlPanel" */ '../containers/ControlPanel')
+)
 
-const ChannelHeader = LoadAsync({
-  loader: () => import(/* webpackChunkName: "ChannelHeader" */ '../containers/ChannelHeader')
-})
+const ChannelHeader = lazy(() =>
+  import(/* webpackChunkName: "ChannelHeader" */ '../containers/ChannelHeader')
+)
 
-const ChannelView = LoadAsync({
-  loader: () => import(/* webpackChunkName: "ChannelView" */ './ChannelView')
-})
+const ChannelView = lazy(() => import(/* webpackChunkName: "ChannelView" */ './ChannelView'))
 
-const IndexView = LoadAsync({
-  loader: () => import(/* webpackChunkName: "IndexView" */ './IndexView')
-})
+const IndexView = lazy(() => import(/* webpackChunkName: "IndexView" */ './IndexView'))
 
-const LoginView = LoadAsync({
-  loader: () => import(/* webpackChunkName: "LoginView" */ './LoginView')
-})
+const LoginView = lazy(() => import(/* webpackChunkName: "LoginView" */ './LoginView'))
 
-const SettingsView = LoadAsync({
-  loader: () => import(/* webpackChunkName: "SettingsView" */ './SettingsView')
-})
+const SettingsView = lazy(() => import(/* webpackChunkName: "SettingsView" */ './SettingsView'))
 
-const AlphaDisclaimer = LoadAsync({
-  loader: () => import(/* webpackChunkName: "AlphaDisclaimer" */ '../containers/AlphaDisclaimer')
-})
+const AlphaDisclaimer = lazy(() =>
+  import(/* webpackChunkName: "AlphaDisclaimer" */ '../containers/AlphaDisclaimer')
+)
 
-function AppView () {
+function AppView ({ location }) {
+  const [appState, setState] = React.useState({
+    redirectTo: null
+  })
+
+  const setAppState = React.useCallback(
+    newState => setState(Object.assign({}, appState, newState)),
+    [appState]
+  )
+
+  React.useEffect(() => {
+    if (appState.redirectTo === location.pathname) {
+      setAppState({ redirectTo: null })
+    }
+  }, [appState.redirectTo, location.pathname])
+
+  // Pass these down to children
+  const ctx = React.useContext(RootContext)
+  ctx.setAppState = setAppState
+  ctx.appState = appState
+
   return (
-    <div className="App view">
-      {/* Only render ControlPanel when logged in */}
-      <PrivateRouteWithContext component={ControlPanel} loginPath={loginPath} />
+    <div className='App view'>
+      <Suspense fallback={<Spinner className='spinner suspense-fallback' size='64px' />}>
+        <PrivateRouteWithContext children={props => <ControlPanel {...props} />} />
 
-      {/* Render ChannelHeader when in a channel OR when in settings */}
-      <Route exact path="/channel/:channel" component={ChannelHeader} />
-      <Route exact path="/settings" component={ChannelHeader} />
-
-      <Switch>
-        <Route exact path={loginPath} component={LoginView} />
         <PrivateRouteWithContext
           exact
-          path="/channel/:channel"
-          component={ChannelView}
-          loginPath={loginPath}
+          path={['/channel/:channel', '/settings']}
+          component={ChannelHeader}
         />
-        <PrivateRouteWithContext
-          exact
-          path="/settings"
-          component={SettingsView}
-          loginPath={loginPath}
-        />
-        <PrivateRouteWithContext component={IndexView} loginPath={loginPath} />
-      </Switch>
 
-      {/* Render an alpha disclaimer on login page */}
-      <Route exact path={loginPath} component={AlphaDisclaimer} />
+        <Switch>
+          <Route exact path={loginPath} component={LoginView} />
+          <PrivateRouteWithContext
+            exact
+            path='/channel/:channel'
+            component={ChannelView}
+            loginPath={loginPath}
+          />
+          <PrivateRouteWithContext
+            exact
+            path='/settings'
+            component={SettingsView}
+            loginPath={loginPath}
+          />
+          <PrivateRouteWithContext component={IndexView} loginPath={loginPath} />
+        </Switch>
+
+        {/* Render an alpha disclaimer on login page */}
+        <Route exact path={loginPath} component={AlphaDisclaimer} />
+        {appState.redirectTo ? <Redirect to={appState.redirectTo} /> : null}
+      </Suspense>
     </div>
   )
 }
 
 function App () {
   return (
-    <RootStoreContext.Provider value={rootStore}>
+    <RootContext.Provider value={rootStore}>
       <Router>
         {/* Render App in a route so it will receive the "location"
               prop and rerender properly on location changes */}
-        <Route component={AppView} />
+        <Route children={props => <AppView {...props} />} />
       </Router>
-    </RootStoreContext.Provider>
+    </RootContext.Provider>
   )
 }
 

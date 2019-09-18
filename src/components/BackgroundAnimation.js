@@ -93,13 +93,13 @@ function BackgroundAnimation ({
   transform += `translate(${adjustedPosition},${adjustedPosition})`
 
   return (
-    <div className="BackgroundAnimation" style={style} {...rest}>
-      <svg className="Rings" width={size} height={size} key="circles" style={theme}>
-        <g className="transparent" transform={transform}>
+    <div className='BackgroundAnimation' style={style} {...rest}>
+      <svg className='Rings' width={size} height={size} key='circles' style={theme}>
+        <g className='transparent' transform={transform}>
           {circles}
         </g>
       </svg>
-      <svg className="Planets opaque" width={size} height={size} key="dots" style={theme}>
+      <svg className='Planets opaque' width={size} height={size} key='dots' style={theme}>
         <g transform={transform}>{dots}</g>
       </svg>
     </div>

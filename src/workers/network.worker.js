@@ -1,8 +1,9 @@
+/* eslint-env worker */
 'use strict'
 
 import '@babel/polyfill'
 
-import JsIPFS from 'ipfs'
+import IPFS from 'ipfs'
 import Orbit from 'orbit_'
 
 import promiseQueue from '../utils/promise-queue'
@@ -115,11 +116,12 @@ async function channelEvent (eventName, channelName, ...args) {
   const channel = this.orbit.channels[channelName]
 
   const meta = {
-    channelName: channelName
+    channelName: channelName,
+    replicationStatus: channel.replicationStatus
   }
 
   if (eventName === 'peer.update') {
-    meta['peers'] = await channel.peers
+    meta.peers = await channel.peers
   }
 
   this.postMessage({
@@ -133,6 +135,13 @@ async function channelEvent (eventName, channelName, ...args) {
 async function handleStart ({ options }) {
   await startIPFS.call(this, options)
   await startOrbit.call(this, options)
+
+  this.ipfs.version((err, { version }) => {
+    if (err) {
+      console.info('Unable to get js-ipfs version')
+    }
+    console.info(`Running js-ipfs version ${version}`)
+  })
 }
 
 async function handleStop () {
@@ -186,32 +195,20 @@ function queueCall (func) {
     })
 }
 
-function startIPFS (options) {
-  this.ipfs = new JsIPFS(options.ipfs)
-
-  return new Promise(resolve => {
-    this.ipfs.once('ready', () => resolve())
-  })
+async function startIPFS (options) {
+  this.ipfs = await IPFS.create(options.ipfs)
 }
 
-function startOrbit (options) {
-  this.orbit = new Orbit(this.ipfs, {
-    dbOptions: {
-      directory: `${options.orbit.root}/data/orbit-db`
-    },
-    channelOptions: {}
-  })
-
-  this.orbit.connect(options.username)
+async function startOrbit (options) {
+  this.orbit = await Orbit.create(this.ipfs, options.orbit)
 
   // Bind all relevant events
   ORBIT_EVENTS.forEach(eventName => {
     this.orbit.events.on(eventName, orbitEvent.bind(this, eventName))
   })
 
-  return new Promise(resolve => {
-    this.orbit.events.once('connected', () => resolve())
-  })
+  // Fake the 'connected' event since we can not hear it with the async create API
+  this.orbit.events.emit('connected', this.orbit.user)
 }
 
 function refreshChannelPeers () {

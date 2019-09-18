@@ -6,8 +6,8 @@ import '../styles/DropZone.scss'
 const DropZone = props => {
   const { onDrop, onDragLeave, label } = props
   return (
-    <div className="dropzone" onDrop={onDrop} onDragLeave={onDragLeave}>
-      <div className="droplabel">{label}</div>
+    <div className='dropzone' onDrop={onDrop} onDragLeave={onDragLeave}>
+      <div className='droplabel'>{label}</div>
     </div>
   )
 }

@@ -2,14 +2,13 @@
 
 import React from 'react'
 import { hot, setConfig } from 'react-hot-loader'
-import { Redirect } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import { withTranslation } from 'react-i18next'
-import { observer } from 'mobx-react'
+import { useTranslation } from 'react-i18next'
+import { useObserver } from 'mobx-react'
 import { CSSTransitionGroup } from 'react-transition-group'
 import classNames from 'classnames'
 
-import RootStoreContext from '../context/RootStoreContext'
+import RootContext from '../context/RootContext'
 
 import BackgroundAnimation from '../components/BackgroundAnimation'
 import JoinChannel from '../components/JoinChannel'
@@ -25,110 +24,73 @@ setConfig({
   pureRender: true
 })
 
-class ControlPanel extends React.Component {
-  static contextType = RootStoreContext
+function ControlPanel ({ history }) {
+  const { networkStore, uiStore, sessionStore, setAppState } = React.useContext(RootContext)
+  const [t] = useTranslation()
 
-  static propTypes = {
-    t: PropTypes.func.isRequired,
-    history: PropTypes.object.isRequired
-  }
+  const inputRef = React.useRef()
 
-  state = { redirectTo: null }
+  const focusInput = React.useCallback(() => {
+    if (inputRef.current) inputRef.current.focus()
+  }, [])
 
-  constructor (props) {
-    super(props)
-    this.onClose = this.onClose.bind(this)
-    this.onJoinChannel = this.onJoinChannel.bind(this)
-    this.redirect = this.redirect.bind(this)
-    this.isClosable = this.isClosable.bind(this)
-    this.renderJoinChannelInput = this.renderJoinChannelInput.bind(this)
-    this.renderChannelsList = this.renderChannelsList.bind(this)
-    this.renderBottomRow = this.renderBottomRow.bind(this)
-  }
+  React.useLayoutEffect(focusInput)
 
-  componentDidMount () {
-    const {
-      networkStore: {
-        defaultChannels = [],
-        settingsStore: {
-          networkSettings: { channels = [] }
-        }
-      }
-    } = this.context
-    this.focusJoinChannelInput()
-    if (channels.length === 1) {
-      this.redirect(`/channel/${channels[0]}`)
-    } else if (channels.every(channel => defaultChannels.includes(channel))) {
-      this.redirect('/channel/orbitdb')
-    }
-  }
+  const isClosable = history.location ? history.location.pathname !== '/' : true
 
-  componentDidUpdate () {
-    this.focusJoinChannelInput()
-  }
+  const handleClose = React.useCallback(
+    force => {
+      if (force || isClosable) uiStore.closeControlPanel()
+    },
+    [isClosable]
+  )
 
-  focusJoinChannelInput () {
-    if (this.joinChannelInput) this.joinChannelInput.focus()
-  }
+  const handleRedirect = React.useCallback(
+    url => {
+      setAppState({ redirectTo: url })
+      handleClose(url !== '/')
+    },
+    [handleClose]
+  )
 
-  onClose () {
-    if (!this.isClosable()) return
-    this.context.uiStore.closeControlPanel()
-  }
-
-  onJoinChannel (e) {
-    e.preventDefault()
-    if (!this.joinChannelInput) return
-    const { networkStore } = this.context
-    const channel = this.joinChannelInput.value.trim()
-    networkStore.joinChannel(channel).then(() => {
-      this.joinChannelInput.value = ''
-      this.redirect(`/channel/${channel}`)
-    })
-  }
-
-  isClosable () {
-    const {
-      history: {
-        location: { pathname }
-      }
-    } = this.props
-
-    return pathname !== '/'
-  }
-
-  redirect (to) {
-    this.setState({ redirectTo: to }, () => {
-      // Reset the state so we will not continue to redirect after one redirect
-      // since this component is always mounted
-      this.setState({ redirectTo: null }, () => {
-        // Remember to close the panel
-        this.onClose()
+  const handleJoinChannel = React.useCallback(
+    e => {
+      e.preventDefault()
+      if (!inputRef.current) return
+      const channel = inputRef.current.value.trim()
+      networkStore.joinChannel(channel).then(() => {
+        inputRef.current.value = ''
+        handleRedirect(`/channel/${channel}`)
       })
-    })
+    },
+    [handleRedirect]
+  )
+
+  const transitionProps = {
+    component: 'div',
+    transitionAppear: true,
+    transitionAppearTimeout: 5000,
+    transitionEnterTimeout: 5000,
+    transitionLeaveTimeout: 5000
   }
 
-  renderJoinChannelInput (transitionProps) {
-    const { networkStore, uiStore } = this.context
-    const { t } = this.props
-
+  function renderJoinChannelInput () {
     return networkStore.isOnline ? (
       <CSSTransitionGroup
         {...transitionProps}
-        transitionName="joinChannelAnimation"
-        className="joinChannelInput"
+        transitionName='joinChannelAnimation'
+        className='joinChannelInput'
       >
         <JoinChannel
-          onSubmit={this.onJoinChannel}
+          onSubmit={handleJoinChannel}
           autoFocus
-          // requirePassword={this.state.requirePassword}
           theme={{ ...uiStore.theme }}
-          inputRef={el => (this.joinChannelInput = el)}
+          inputRef={inputRef}
         />
       </CSSTransitionGroup>
     ) : !networkStore.starting ? (
       <button
-        className="startIpfsButton submitButton"
+        className='startIpfsButton submitButton'
         style={{ ...uiStore.theme }}
         onClick={() => networkStore.start()}
       >
@@ -141,14 +103,11 @@ class ControlPanel extends React.Component {
     )
   }
 
-  renderChannelsList (channels) {
-    const { networkStore, uiStore } = this.context
-    const { t } = this.props
-
+  function renderChannelsList () {
     return (
-      <div className="RecentChannelsView">
-        <div className="RecentChannels">
-          {channels.map(c => (
+      <div className='RecentChannelsView'>
+        <div className='RecentChannels'>
+          {networkStore.channelsAsArray.map(c => (
             <div
               className={classNames('row link', {
                 active: uiStore.currentChannelName === c.channelName
@@ -160,13 +119,13 @@ class ControlPanel extends React.Component {
                 theme={{ ...uiStore.theme }}
                 onClick={e => {
                   e.preventDefault()
-                  this.redirect(`/channel/${c.channelName}`)
+                  handleRedirect(`/channel/${c.channelName}`)
                 }}
               />
               <span
-                className="closeChannelButton"
+                className='closeChannelButton'
                 onClick={() => {
-                  if (uiStore.currentChannelName === c.channelName) this.redirect('/')
+                  if (uiStore.currentChannelName === c.channelName) handleRedirect('/')
                   networkStore.leaveChannel(c.channelName)
                 }}
               >
@@ -179,68 +138,47 @@ class ControlPanel extends React.Component {
     )
   }
 
-  renderBottomRow () {
-    const { sessionStore, uiStore } = this.context
-
+  function renderBottomRow () {
     return (
-      <div className="bottomRow">
+      <div className='bottomRow'>
         <div
-          className="icon flaticon-gear94"
-          onClick={() => this.redirect('/settings')}
+          className='icon flaticon-gear94'
+          onClick={() => handleRedirect('/settings')}
           style={{ ...uiStore.theme }}
-          key="settingsIcon"
+          key='settingsIcon'
         />
         {/* <div
           className="icon flaticon-sharing7"
-          // onClick={this.props.onOpenSwarmView}
+          // onClick={onOpenSwarmView}
           style={{ ...uiStore.theme }}
           key="swarmIcon"
         /> */}
         <div
-          className="icon flaticon-prohibition35"
+          className='icon flaticon-prohibition35'
           onClick={() => sessionStore.logout()}
           style={{ ...uiStore.theme }}
-          key="disconnectIcon"
+          key='disconnectIcon'
         />
       </div>
     )
   }
 
-  render () {
-    const { redirectTo } = this.state
-    if (redirectTo) return <Redirect to={redirectTo} />
-
-    const { networkStore, sessionStore, uiStore } = this.context
-
-    if (!uiStore.isControlPanelOpen) return null
-
-    const { t } = this.props
-
-    const leftSide = uiStore.sidePanelPosition === 'left'
-
-    const transitionProps = {
-      component: 'div',
-      transitionAppear: true,
-      transitionAppearTimeout: 5000,
-      transitionEnterTimeout: 5000,
-      transitionLeaveTimeout: 5000
-    }
-
-    const channels = networkStore.channelsAsArray.sort(({ channelName: a }, { channelName: b }) =>
-      a.localeCompare(b)
-    )
-
-    return (
-      <React.Fragment>
+  return useObserver(() =>
+    uiStore.isControlPanelOpen && sessionStore.isAuthenticated ? (
+      <>
         <CSSTransitionGroup
           {...transitionProps}
-          transitionName={leftSide ? 'openPanelAnimationLeft' : 'openPanelAnimationRight'}
+          transitionName={
+            uiStore.sidePanelPosition === 'left'
+              ? 'openPanelAnimationLeft'
+              : 'openPanelAnimationRight'
+          }
         >
           <div
             className={classNames('ControlPanel', {
-              left: leftSide,
-              right: !leftSide,
-              'no-close': !this.isClosable()
+              left: uiStore.sidePanelPosition === 'left',
+              right: !(uiStore.sidePanelPosition === 'left'),
+              'no-close': !isClosable
             })}
           >
             <div style={{ opacity: 0.8, zIndex: -1 }}>
@@ -253,27 +191,31 @@ class ControlPanel extends React.Component {
             </div>
             <CSSTransitionGroup
               {...transitionProps}
-              transitionName={leftSide ? 'panelHeaderAnimationLeft' : 'panelHeaderAnimationRight'}
+              transitionName={
+                uiStore.sidePanelPosition === 'left'
+                  ? 'panelHeaderAnimationLeft'
+                  : 'panelHeaderAnimationRight'
+              }
             >
-              <div className="header" onClick={this.onClose}>
-                <div className="logo">Orbit</div>
+              <div className='header' onClick={handleClose}>
+                <div className='logo'>Orbit</div>
               </div>
             </CSSTransitionGroup>
 
-            <CSSTransitionGroup {...transitionProps} transitionName="networkNameAnimation">
-              <div className="networkName">
-                <div className="text">{networkStore.networkName}</div>
+            <CSSTransitionGroup {...transitionProps} transitionName='networkNameAnimation'>
+              <div className='networkName'>
+                <div className='text'>{networkStore.networkName}</div>
               </div>
             </CSSTransitionGroup>
 
-            <div className="username">{sessionStore.username}</div>
+            <div className='username'>{sessionStore.username}</div>
 
-            {this.renderJoinChannelInput(transitionProps)}
+            {renderJoinChannelInput()}
 
             <div
               className={classNames({
-                panelHeader: channels.length > 0,
-                hidden: channels.length === 0
+                panelHeader: networkStore.channelsAsArray.length > 0,
+                hidden: networkStore.channelsAsArray.length === 0
               })}
             >
               {t('controlPanel.channels')}
@@ -281,24 +223,28 @@ class ControlPanel extends React.Component {
 
             <CSSTransitionGroup
               {...transitionProps}
-              transitionName="joinChannelAnimation"
-              className="openChannels"
+              transitionName='joinChannelAnimation'
+              className='openChannels'
             >
-              {this.renderChannelsList(channels)}
+              {renderChannelsList()}
             </CSSTransitionGroup>
 
-            {this.renderBottomRow()}
+            {renderBottomRow()}
           </div>
         </CSSTransitionGroup>
         <CSSTransitionGroup
           {...transitionProps}
-          transitionName="darkenerAnimation"
-          className={classNames('darkener', { 'no-close': !this.isClosable() })}
-          onClick={this.onClose}
+          transitionName='darkenerAnimation'
+          className={classNames('darkener', { 'no-close': !isClosable })}
+          onClick={handleClose}
         />
-      </React.Fragment>
-    )
-  }
+      </>
+    ) : null
+  )
 }
 
-export default hot(module)(withTranslation()(observer(ControlPanel)))
+ControlPanel.propTypes = {
+  history: PropTypes.object.isRequired
+}
+
+export default hot(module)(ControlPanel)
