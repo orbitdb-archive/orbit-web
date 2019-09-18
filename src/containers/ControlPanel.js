@@ -70,7 +70,7 @@ function ControlPanel ({ history }) {
       if (uiStore.currentChannelName === channel.channelName) handleRedirect('/')
       networkStore.leaveChannel(channel.channelName)
     },
-    [uiStore.currentChannelName]
+    [uiStore.currentChannelName, handleRedirect]
   )
 
   function renderJoinChannelInput () {
