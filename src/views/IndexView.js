@@ -15,7 +15,7 @@ function IndexView () {
   }, [])
 
   return useObserver(() =>
-    networkStore.channelNames.length === 1 ? (
+    networkStore.channelNames.length > 0 ? (
       <Redirect to={`/channel/${networkStore.channelNames[0]}`} />
     ) : (
       <Redirect to={`/channel/${networkStore.defaultChannels[0]}`} />
