@@ -23,7 +23,14 @@ function Channel ({ channelName }) {
   const { networkStore, uiStore } = useContext(RootContext)
   const [t] = useTranslation()
 
-  let mounted = true
+  const mounted = React.useRef(true)
+
+  useEffect(() => {
+    mounted.current = true
+    return () => {
+      mounted.current = false
+    }
+  }, [])
 
   useEffect(handleChannelNameChange, [channelName])
 
@@ -32,11 +39,10 @@ function Channel ({ channelName }) {
     uiStore.setCurrentChannelName(channelName)
 
     networkStore.joinChannel(channelName).then(channel => {
-      if (mounted) setChannel(channel)
+      if (mounted.current) setChannel(channel)
     })
 
     return () => {
-      mounted = false
       uiStore.setCurrentChannelName(null)
       uiStore.closeUserProfilePanel()
     }
