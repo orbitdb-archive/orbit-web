@@ -11,90 +11,42 @@ import promiseQueue from '../utils/promise-queue'
 const ORBIT_EVENTS = ['connected', 'disconnected', 'joined', 'left', 'peers']
 const CHANNEL_FEED_EVENTS = ['write', 'load.progress', 'replicate.progress', 'ready', 'replicated']
 
-function onMessage ({ data }) {
-  if (!data.action || !(typeof data.action === 'string')) return
+async function onMessage ({ data }) {
+  if (!data.action || typeof data.action !== 'string') return
+
+  let response
 
   switch (data.action) {
     case 'network:start':
-      handleStart.call(this, data)
+      response = await handleStart.call(this, data)
       break
     case 'network:stop':
-      handleStop.call(this, data)
+      response = await handleStop.call(this, data)
       break
     case 'orbit:join-channel':
-      handleJoinChannel.call(this, data)
+      response = await handleJoinChannel.call(this, data)
       break
     case 'orbit:leave-channel':
-      handleLeaveChannel.call(this, data)
+      response = await handleLeaveChannel.call(this, data)
       break
     case 'channel:send-text-message':
-      handleSendTextMessage.call(this, data)
+      response = await handleSendTextMessage.call(this, data)
       break
     case 'channel:send-file-message':
-      handleSendFileMessage.call(this, data)
+      response = await handleSendFileMessage.call(this, data)
       break
-    case 'proxy:req':
-      handleProxyRequest.call(this, data)
+    case 'ipfs:get-file':
+      response = await handleIpfsGetFile.call(this, data)
       break
     default:
       console.warn('Unknown action', data.action)
       break
   }
-}
 
-async function handleProxyRequest ({ req, options, key }) {
-  switch (req) {
-    case 'ipfs-file':
-      try {
-        if (!options.asStream) {
-          const array = await getFileBuffer(this.orbit, options.hash, options)
-          this.postMessage({ action: 'proxy:res', key, value: array }, [array.buffer])
-        } else {
-          this.postMessage({
-            action: 'proxy:res',
-            key,
-            value: null,
-            errorMsg: 'Streams are not supported yet'
-          })
-        }
-      } catch (error) {
-        this.postMessage({ action: 'proxy:res', key, value: null, errorMsg: error.message })
-      }
-      break
+  if (!response) response = [{}, null]
+  if (data.asyncKey) response[0].asyncKey = data.asyncKey
 
-    default:
-      break
-  }
-}
-
-function getFileBuffer (orbit, hash, options = {}) {
-  const timeoutError = new Error('Timeout while fetching file')
-  const timeout = options.timeout || 5 * 1000
-  return new Promise((resolve, reject) => {
-    let timeoutTimer = setTimeout(() => {
-      reject(timeoutError)
-    }, timeout)
-    const stream = orbit.getFile(hash)
-    let array = new Uint8Array(0)
-    stream.on('error', error => {
-      clearTimeout(timeoutTimer)
-      reject(error)
-    })
-    stream.on('data', chunk => {
-      clearTimeout(timeoutTimer)
-      const tmp = new Uint8Array(array.length + chunk.length)
-      tmp.set(array)
-      tmp.set(chunk, array.length)
-      array = tmp
-      timeoutTimer = setTimeout(() => {
-        reject(timeoutError)
-      }, timeout)
-    })
-    stream.on('end', () => {
-      clearTimeout(timeoutTimer)
-      resolve(array)
-    })
-  })
+  this.postMessage(...response)
 }
 
 function orbitEvent (eventName, ...args) {
@@ -217,6 +169,54 @@ function refreshChannelPeers () {
       channelEvent.call(this, 'peer.update', channelName)
     })
   }
+}
+
+async function handleIpfsGetFile ({ options }) {
+  try {
+    if (!options.asStream) {
+      const array = await getFileBuffer(this.orbit, options.hash, options)
+      return [{ value: array }, array.buffer]
+    } else {
+      return [
+        {
+          value: null,
+          errorMsg: 'Streams are not supported yet'
+        }
+      ]
+    }
+  } catch (error) {
+    return [{ value: null, errorMsg: error.message }]
+  }
+}
+
+function getFileBuffer (orbit, hash, options = {}) {
+  const timeoutError = new Error('Timeout while fetching file')
+  const timeout = options.timeout || 5 * 1000
+  return new Promise((resolve, reject) => {
+    let timeoutTimer = setTimeout(() => {
+      reject(timeoutError)
+    }, timeout)
+    const stream = orbit.getFile(hash)
+    let array = new Uint8Array(0)
+    stream.on('error', error => {
+      clearTimeout(timeoutTimer)
+      reject(error)
+    })
+    stream.on('data', chunk => {
+      clearTimeout(timeoutTimer)
+      const tmp = new Uint8Array(array.length + chunk.length)
+      tmp.set(array)
+      tmp.set(chunk, array.length)
+      array = tmp
+      timeoutTimer = setTimeout(() => {
+        reject(timeoutError)
+      }, timeout)
+    })
+    stream.on('end', () => {
+      clearTimeout(timeoutTimer)
+      resolve(array)
+    })
+  })
 }
 
 // Get a reference just so we can bind onmessage and use 'call' on setinterval

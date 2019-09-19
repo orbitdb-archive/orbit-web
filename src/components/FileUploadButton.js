@@ -3,19 +3,22 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-function FileUploadButton ({ onSelectFiles, theme }) {
+function FileUploadButton ({ onSelectFiles, theme, disabled }) {
   const fileInput = React.createRef()
 
-  function handleClick (e) {
-    e.preventDefault()
-    fileInput.current.click()
-  }
+  const handleClick = React.useCallback(
+    e => {
+      e.preventDefault()
+      if (!disabled) fileInput.current.click()
+    },
+    [disabled]
+  )
 
-  function handleFileSelect () {
+  const handleFileSelect = React.useCallback(() => {
     const files = fileInput.current.files
     if (files) onSelectFiles(files)
     fileInput.current.value = null
-  }
+  }, [onSelectFiles])
 
   return (
     <div className='FileUploadButton' style={{ ...theme }}>
@@ -34,7 +37,8 @@ function FileUploadButton ({ onSelectFiles, theme }) {
 
 FileUploadButton.propTypes = {
   onSelectFiles: PropTypes.func.isRequired,
-  theme: PropTypes.object.isRequired
+  theme: PropTypes.object.isRequired,
+  disabled: PropTypes.bool
 }
 
 export default FileUploadButton

@@ -53,17 +53,14 @@ function ControlPanel ({ history }) {
   const handleJoinChannel = React.useCallback(e => {
     e.preventDefault()
     if (!inputRef.current) return
-    const channel = inputRef.current.value.trim()
-    networkStore.joinChannel(channel).then(() => {
-      inputRef.current.value = ''
-      setRedirect(`/channel/${channel}`)
-    })
+    setRedirect(`/channel/${inputRef.current.value.trim()}`)
   }, [])
 
   const handleCloseChannel = React.useCallback(
     channelName => {
-      networkStore.leaveChannel(channelName)
-      if (uiStore.currentChannelName === channelName) setRedirect('/')
+      networkStore.leaveChannel(channelName).then(() => {
+        if (uiStore.currentChannelName === channelName) setRedirect('/')
+      })
     },
     [uiStore.currentChannelName]
   )
@@ -84,7 +81,6 @@ function ControlPanel ({ history }) {
       <div className='joinChannelInput fadeInAnimation' style={{ animationDuration: '.5s' }}>
         <JoinChannel
           onSubmit={handleJoinChannel}
-          autoFocus
           theme={{ ...uiStore.theme }}
           inputRef={inputRef}
         />

@@ -15,7 +15,7 @@ import SendMessage from './SendMessage'
 
 const logger = new Logger()
 
-function ChannelControls ({ channel }) {
+function ChannelControls ({ channel, disabled }) {
   const { uiStore } = useContext(RootContext)
 
   async function sendMessage (text) {
@@ -39,20 +39,22 @@ function ChannelControls ({ channel }) {
   return useObserver(() => (
     <div className='Controls'>
       <SendMessage
-        channelName={channel.channelName}
+        channelName={channel ? channel.channelName : ''}
         onSendMessage={sendMessage}
         theme={uiStore.theme}
         useEmojis={uiStore.useEmojis}
         emojiSet={uiStore.emojiSet}
+        disabled={disabled}
       />
-      <FileUploadButton onSelectFiles={sendFiles} theme={uiStore.theme} />
+      <FileUploadButton onSelectFiles={sendFiles} theme={uiStore.theme} disabled={disabled} />
       <ChannelStatus channel={channel} theme={uiStore.theme} />
     </div>
   ))
 }
 
 ChannelControls.propTypes = {
-  channel: PropTypes.object.isRequired
+  channel: PropTypes.object,
+  disabled: PropTypes.bool
 }
 
 export default ChannelControls

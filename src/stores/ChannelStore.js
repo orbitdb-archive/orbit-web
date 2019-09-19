@@ -295,18 +295,8 @@ export default class ChannelStore {
   _sendFile (file) {
     return new Promise(resolve => {
       const reader = new FileReader()
-      reader.onload = event => {
-        this.network.worker.postMessage({
-          action: 'channel:send-file-message',
-          options: {
-            channelName: this.channelName,
-            file: {
-              filename: file.name,
-              buffer: event.target.result,
-              meta: { mimeType: file.type, size: file.size }
-            }
-          }
-        })
+      reader.onload = async event => {
+        await this.network.workerProxy.sendFileMessage(this.channelName, file, event.target.result)
         resolve()
       }
       reader.readAsArrayBuffer(file)
@@ -344,12 +334,7 @@ export default class ChannelStore {
 
     this._incrementSendingMessageCounter()
 
-    this.network.worker.postMessage({
-      action: 'channel:send-text-message',
-      options: { channelName: this.channelName, message: text }
-    })
-
-    return Promise.resolve()
+    return this.network.workerProxy.sendTextMessage(this.channelName, text)
   }
 
   sendFiles (files) {
@@ -361,12 +346,9 @@ export default class ChannelStore {
   }
 
   async loadFile (hash, asStream) {
-    const array = await this.network.workerProxy(
-      'ipfs-file',
-      { hash, asStream, timeout: 20 * 1000 },
-      hash
-    )
-    return { buffer: array, url: null, stream: null }
+    const response = await this.network.workerProxy.getFile({ hash, asStream, timeout: 20 * 1000 })
+    return { buffer: response.value, url: null, stream: null }
+
     // return new Promise((resolve, reject) => {
     //   // TODO: Handle electron
     //   const stream = this.network.orbit.getFile(hash)
