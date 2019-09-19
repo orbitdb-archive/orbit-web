@@ -112,7 +112,7 @@ function MessageListRow ({
   const [ref, setRef] = useRefCallback()
   const isVisible = useVisibility(ref, parentElement)
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (isVisible && message.unread) markMessageRead(message.hash)
   }, [isVisible, message])
 
