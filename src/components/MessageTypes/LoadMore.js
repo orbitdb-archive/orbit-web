@@ -32,6 +32,8 @@ function LoadMore ({ parentElement, onActivate, ...rest }) {
   useLayoutEffect(() => {
     if (!parentElement) return
     parentElement.addEventListener('scroll', onScroll)
+    // Scroll down 1 pixel so the scroll event will fire when scrolling up
+    if (parentElement.scrollTop === 0) parentElement.scrollTop = 1
     return () => {
       debouncedActivate.cancel()
       parentElement.removeEventListener('scroll', onScroll)
