@@ -38,7 +38,7 @@ function ControlPanel ({ history }) {
 
   const isClosable = history.location ? history.location.pathname !== '/' : true
 
-  const handleClose = React.useCallback(
+  const handleClosePanel = React.useCallback(
     force => {
       if (force || isClosable) uiStore.closeControlPanel()
     },
@@ -68,10 +68,16 @@ function ControlPanel ({ history }) {
     [uiStore.currentChannelName]
   )
 
-  React.useLayoutEffect(focusInput)
   React.useLayoutEffect(() => {
-    if (redirect) handleClose(redirect !== '/')
-  }, [handleClose, redirect])
+    if (uiStore.isControlPanelOpen) focusInput()
+  }, [focusInput, uiStore.isControlPanelOpen])
+
+  React.useEffect(() => {
+    if (redirect) {
+      handleClosePanel(redirect !== '/')
+      setRedirect('')
+    }
+  }, [handleClosePanel, redirect])
 
   function renderJoinChannelInput () {
     return networkStore.isOnline ? (
@@ -179,7 +185,7 @@ function ControlPanel ({ history }) {
 
           <div
             className={classNames('header bounceInAnimation', uiStore.sidePanelPosition)}
-            onClick={handleClose}
+            onClick={handleClosePanel}
           >
             <div className='logo'>Orbit</div>
           </div>
@@ -197,7 +203,7 @@ function ControlPanel ({ history }) {
         <div
           className={classNames('darkener fadeInAnimation', { 'no-close': !isClosable })}
           style={{ animationDuration: '1s' }}
-          onClick={handleClose}
+          onClick={handleClosePanel}
         />
         {redirect ? <Redirect to={redirect} /> : null}
       </>
