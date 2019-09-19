@@ -61,9 +61,9 @@ function ControlPanel ({ history }) {
   }, [])
 
   const handleCloseChannel = React.useCallback(
-    channel => {
-      if (uiStore.currentChannelName === channel.channelName) setRedirect('/')
-      networkStore.leaveChannel(channel.channelName)
+    channelName => {
+      networkStore.leaveChannel(channelName)
+      if (uiStore.currentChannelName === channelName) setRedirect('/')
     },
     [uiStore.currentChannelName]
   )
@@ -130,7 +130,10 @@ function ControlPanel ({ history }) {
                   theme={{ ...uiStore.theme }}
                   onClick={e => handleChannelLinkClick(e, c)}
                 />
-                <span className='closeChannelButton' onClick={() => handleCloseChannel(c)}>
+                <span
+                  className='closeChannelButton'
+                  onClick={() => handleCloseChannel(c.channelName)}
+                >
                   {t('controlPanel.closeChannel')}
                 </span>
               </div>
