@@ -9,7 +9,7 @@ import EmojiPicker from '../components/EmojiPicker'
 
 import '../styles/SendMessage.scss'
 
-function SendMessage ({ onSendMessage, theme, useEmojis, emojiSet }) {
+function SendMessage ({ channelName, onSendMessage, theme, useEmojis, emojiSet }) {
   const [t] = useTranslation()
 
   const [inputValue, setInputValue] = React.useState('')
@@ -18,6 +18,10 @@ function SendMessage ({ onSendMessage, theme, useEmojis, emojiSet }) {
 
   const inputRef = React.useRef()
   const emojiPickerRef = React.useRef()
+
+  const focusInput = React.useCallback(() => {
+    if (inputRef.current) inputRef.current.focus()
+  }, [])
 
   const handleInputSubmit = React.useCallback(
     e => {
@@ -32,16 +36,16 @@ function SendMessage ({ onSendMessage, theme, useEmojis, emojiSet }) {
       setEmojiResults([])
       setEmojiPickerActive(false)
 
-      inputField.focus()
+      focusInput()
 
       onSendMessage(text).catch(e => {
         // There was an error sending the message
         // Revert input value and focus the field
         setInputValue(text)
-        inputField.focus()
+        focusInput()
       })
     },
-    [onSendMessage]
+    [onSendMessage, focusInput]
   )
 
   const handleInputChange = React.useCallback(() => {
@@ -86,6 +90,8 @@ function SendMessage ({ onSendMessage, theme, useEmojis, emojiSet }) {
     [inputValue]
   )
 
+  React.useLayoutEffect(focusInput, [channelName, focusInput])
+
   function getEmojiPickerStyle (emojiSize) {
     return {
       maxWidth: (emojiSize + 2) * 10, // 2 * 1px padding or border
@@ -112,8 +118,6 @@ function SendMessage ({ onSendMessage, theme, useEmojis, emojiSet }) {
           ref={inputRef}
           type='text'
           placeholder={t('channel.sendMessagePlaceholder')}
-          autoComplete='on'
-          autoFocus
           style={theme}
           value={inputValue}
           onKeyDown={handleInputKeyDown}
@@ -125,6 +129,7 @@ function SendMessage ({ onSendMessage, theme, useEmojis, emojiSet }) {
 }
 
 SendMessage.propTypes = {
+  channelName: PropTypes.string.isRequired,
   onSendMessage: PropTypes.func.isRequired,
   theme: PropTypes.object.isRequired,
   useEmojis: PropTypes.bool.isRequired,
