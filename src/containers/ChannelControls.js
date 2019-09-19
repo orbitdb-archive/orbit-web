@@ -39,6 +39,7 @@ function ChannelControls ({ channel }) {
   return useObserver(() => (
     <div className='Controls'>
       <SendMessage
+        channelName={channel.channelName}
         onSendMessage={sendMessage}
         theme={uiStore.theme}
         useEmojis={uiStore.useEmojis}
