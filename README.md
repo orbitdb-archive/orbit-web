@@ -53,6 +53,22 @@ If you want to code but don't know where to start, check out the issues labelled
 
 For specific guidelines for contributing to this repository, check out the [Contributing guide](CONTIRBUTING.md). For more on contributing to OrbitDB in general, take a look at the [orbitdb welcome repository](https://github.com/orbitdb/welcome). Please note that all interactions in [@OrbitDB](https://github.com/orbitdb) fall under our [Code of Conduct](CODE_OF_CONDUCT.md).
 
+## Deploying to a domain with IPFS
+
+1. Point the domain to some public IPFS gateway
+
+   - TYPE: **A**
+   - Name: **@** (or a subdomain)
+   - Value: **_< IP address of the gateway >_**
+
+2. `npm run build`
+3. Pin `dist`-folder to IPFS (upload the folder to some pinning service)
+4. Add or update the _TXT_ entry of `_dnslink` subdomain in DNS records of the domain
+
+   - TYPE: **TXT**
+   - Name: **\_dnslink**
+   - Value: **"dnslink=/ipfs/_< hash from pinning service >_"**
+
 ## License
 
 [MIT](LICENSE) © 2017-2018 Protocol Labs Inc., 2018-2019 Haja Networks Oy
