@@ -1,5 +1,3 @@
-@import 'Fonts';
-
 html,
 body {
   font-family: 'Lato';
@@ -21,12 +19,4 @@ h1 {
 #root {
   width: 100%;
   height: 100%;
-}
-
-.spinner {
-  position: relative;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }

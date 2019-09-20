@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 
 import RootContext from '../context/RootContext'
 
-import Spinner from '../components/Spinner'
+import { BigSpinner } from '../components/Spinner'
 
 import '../styles/Channel.scss'
 
@@ -73,8 +73,6 @@ function Channel ({ channelName }) {
     [channel]
   )
 
-  const loadingSpinner = <Spinner className='spinner suspense-fallback' size='64px' />
-
   return (
     <div
       className='Channel'
@@ -91,8 +89,8 @@ function Channel ({ channelName }) {
         />
       )}
 
-      <React.Suspense fallback={loadingSpinner}>
-        {channel ? <ChannelMessages channel={channel} /> : loadingSpinner}
+      <React.Suspense fallback={<BigSpinner />}>
+        {channel ? <ChannelMessages channel={channel} /> : <BigSpinner />}
       </React.Suspense>
 
       <ChannelControls channel={channel} disabled={!channel} />

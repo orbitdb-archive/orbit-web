@@ -1,5 +1,5 @@
-@import "Animations";
-@import "Colors";
+@import 'Animations';
+@import 'Colors';
 
 $controls-height: 2.8em;
 
@@ -54,64 +54,6 @@ $controls-height: 2.8em;
   }
 }
 
-.dimmed {
-  opacity: 0.5;
-}
-
-.hide {
-  display: none;
-}
-
-.none {
-  display: none;
-}
-
-.icon {
-  width: 1em;
-  height: 1em;
-  font-size: 1.2em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.35em;
-  margin-left: 0.2em;
-  margin-right: 0.2em;
-  color: $main-text-color;
-}
-
-.icon-active {
-  width: 1em;
-  height: 1em;
-  font-size: 1.2em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5em;
-  margin-left: 0.2em;
-  margin-right: 0.2em;
-  color: $main-text-color;
-  background-color: $main-color;
-  border-radius: 32px;
-}
-.icon-active:hover {
-  background-color: $main-color;
-  border-radius: 32px;
-}
-
-.icon:hover {
-  background-color: rgba(48, 48, 48, 1);
-  border-radius: 32px;
-}
-
-.icon:active {
-  background-color: $main-color;
-  border-radius: 32px;
-}
-
-.blurred {
-  filter: blur(2px);
-}
-
 .ChannelOptions {
   position: absolute;
   bottom: 2.75em;
@@ -142,12 +84,12 @@ $controls-height: 2.8em;
     margin-left: 1vw;
   }
 
-  input[type="text"] {
+  input[type='text'] {
     font-size: 0.8em;
     width: 100%;
   }
 
-  input[type="submit"] {
+  input[type='submit'] {
     margin-top: 0.2em;
     font-size: 0.8em;
     align-self: flex-end;
@@ -167,7 +109,7 @@ $controls-height: 2.8em;
   }
 }
 
-input[type="button"],
+input[type='button'],
 .channelOptionsButton {
   border-top: 1px solid $bar-border-color;
   border-bottom: 1px solid $bar-border-color;
@@ -182,7 +124,7 @@ input[type="button"],
   font-size: 1em;
 }
 
-input[type="button"],
+input[type='button'],
 .addFilesButton {
   display: block;
   border-top: 1px solid $bar-border-color;
@@ -304,7 +246,7 @@ input[type="button"],
 
   &.font-monospace {
     .dateSeparator {
-      font-family: "Roboto Mono";
+      font-family: 'Roboto Mono';
       font-weight: normal;
       padding-bottom: 0.4em;
     }
@@ -337,7 +279,7 @@ input[type="button"],
       position: absolute;
       background-color: $main-color-highligth;
       top: 0;
-      left:0;
+      left: 0;
       bottom: 0;
       will-change: left, right;
       animation: indeterminate 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
@@ -347,7 +289,7 @@ input[type="button"],
       position: absolute;
       background-color: $main-color-highligth;
       top: 0;
-      left:0;
+      left: 0;
       bottom: 0;
       will-change: left, right;
       animation: indeterminate-short 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;

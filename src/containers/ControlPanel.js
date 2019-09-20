@@ -16,7 +16,6 @@ import Spinner from '../components/Spinner'
 
 import ChannelLink from './ChannelLink'
 
-import '../styles/flaticon.css'
 import '../styles/ControlPanel.scss'
 
 setConfig({
