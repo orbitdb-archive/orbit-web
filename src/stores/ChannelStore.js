@@ -33,7 +33,7 @@ const checkName = name => {
 }
 
 const defaultMessageOffset = 64
-const defaultLoadmoreCount = 32
+const defaultLoadmoreCount = 64
 
 export default class ChannelStore {
   constructor ({ network, channelName }) {
