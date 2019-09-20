@@ -84,6 +84,11 @@ export default class ChannelStore {
   // Public instance getters
 
   @computed
+  get entryCount () {
+    return this.entries.length
+  }
+
+  @computed
   get entries () {
     return Object.values(this.entriesMap).sort(
       // Ascending chronological order by entry timestamp
@@ -319,7 +324,7 @@ export default class ChannelStore {
 
   @action.bound
   increaseMessageOffset (count = defaultLoadmoreCount) {
-    this.messageOffset = Math.min(this.messageOffset + count, this._replicationStatus.max)
+    this.messageOffset = Math.min(this.messageOffset + count, this.entryCount)
   }
 
   @action.bound
