@@ -1,8 +1,8 @@
-@import "Fonts";
+@import 'Fonts';
 
 html,
 body {
-  font-family: "Lato";
+  font-family: 'Lato';
   font-weight: normal;
   background: #222222;
   color: white;
@@ -21,4 +21,12 @@ h1 {
 #root {
   width: 100%;
   height: 100%;
+}
+
+.spinner {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
