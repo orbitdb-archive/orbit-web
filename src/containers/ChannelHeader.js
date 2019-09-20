@@ -16,13 +16,13 @@ function ChannelHeader ({ match }) {
   const { networkStore, uiStore } = useContext(RootContext)
   const [t] = useTranslation()
 
-  function onChannelClick (e) {
-    // Stop propagation to Header
+  function handleChannelNameClick (e) {
     e.stopPropagation()
     // No other actions needed since ChannelLink is doing the rest
   }
 
-  function onHeaderClick (e) {
+  function handleMenuButtonClick (e) {
+    e.stopPropagation()
     uiStore.openControlPanel()
   }
 
@@ -34,8 +34,13 @@ function ChannelHeader ({ match }) {
   const overrideName = t(`viewNames.${path.slice(1)}`)
 
   return useObserver(() => (
-    <div className='Header' onClick={onHeaderClick}>
+    <div className='Header'>
       <div className='ChannelName'>
+        <div
+          className='icon flaticon-lines18'
+          onClick={handleMenuButtonClick}
+          style={{ ...uiStore.theme }}
+        />
         <div className='currentChannel'>
           {currentChannelName ? `#${currentChannelName}` : overrideName}
         </div>
@@ -46,7 +51,7 @@ function ChannelHeader ({ match }) {
               key={c.channelName}
               channel={c}
               theme={{ ...uiStore.theme }}
-              onClick={onChannelClick}
+              onClick={handleChannelNameClick}
             />
           ))}
       </div>
