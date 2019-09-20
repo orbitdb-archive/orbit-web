@@ -44,7 +44,7 @@ export default class NetworkStore {
 
   // Public instance variables
 
-  networkName = 'Orbit DEV Network'
+  networkName = process.env.NODE_ENV !== 'production' ? 'Orbit DEV Network' : 'Orbit Network'
 
   @observable
   starting = false
@@ -62,7 +62,7 @@ export default class NetworkStore {
   swarmPeers = []
 
   @observable
-  defaultChannels = ['orbitdb']
+  defaultChannels = process.env.NODE_ENV !== 'production' ? ['orbit-dev'] : ['orbit']
 
   // Public instance getters
 
