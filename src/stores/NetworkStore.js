@@ -25,6 +25,7 @@ export default class NetworkStore {
   worker = null
 
   constructor (rootStore) {
+    this.rootStore = rootStore
     this.sessionStore = rootStore.sessionStore
     this.settingsStore = rootStore.settingsStore
 
@@ -62,7 +63,7 @@ export default class NetworkStore {
   swarmPeers = []
 
   @observable
-  defaultChannels = process.env.NODE_ENV !== 'production' ? ['orbit-dev'] : ['orbit']
+  defaultChannels = process.env.NODE_ENV !== 'production' ? ['orbit-dev', 'test1'] : ['orbit']
 
   // Public instance getters
 
@@ -94,7 +95,10 @@ export default class NetworkStore {
     this.settingsStore.networkSettings.channels.forEach(this.joinChannel)
 
     // Join channels that should be joined by default
-    if (this.settingsStore.networkSettings.channels.length === 0) {
+    if (
+      this.rootStore.isNewAppVersion ||
+      this.settingsStore.networkSettings.channels.length === 0
+    ) {
       this.defaultChannels.forEach(this.joinChannel)
     }
   }

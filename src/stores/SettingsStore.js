@@ -5,6 +5,8 @@ import { action, configure, observable, reaction, values, computed } from 'mobx'
 import defaulNetworkSettings from '../config/network.default.json'
 import defaultUiSettings from '../config/ui.default.json'
 
+import { version } from '../../package.json'
+
 configure({ enforceActions: 'observed' })
 
 export default class SettingsStore {
@@ -91,5 +93,8 @@ export default class SettingsStore {
     // Merge default settings with user defined settings
     Object.assign(this.networkSettings, defaulNetworkSettingsCopy, networkSettings)
     Object.assign(this.uiSettings, defaultUiSettingsCopy, uiSettings)
+
+    this.rootStore.isNewAppVersion = this.uiSettings.appVersion !== version
+    this.uiSettings.appVersion = version
   }
 }
