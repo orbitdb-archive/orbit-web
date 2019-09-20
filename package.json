@@ -1,6 +1,6 @@
 {
   "name": "orbit-web",
-  "version": "1.0.0-alpha-9",
+  "version": "1.0.0-alpha-10",
   "description": "Orbit Chat",
   "main": "src/components/index.js",
   "scripts": {
