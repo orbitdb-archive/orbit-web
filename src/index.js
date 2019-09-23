@@ -14,7 +14,7 @@ import './styles/Fonts.scss'
 import './styles/Main.scss'
 import './styles/flaticon.css'
 
-redirectToHttps(process.env.NODE_ENV === 'production')
+redirectToHttps(!window.location.href.match('localhost:'))
 
 const App = lazy(() => import(/* webpackChunkName: "App" */ './views/App'))
 
