@@ -34,6 +34,7 @@ const checkName = name => {
 
 const defaultMessageOffset = 64
 const defaultLoadmoreCount = 64
+const maxEntryCount = 256
 
 export default class ChannelStore {
   constructor ({ network, channelName }) {
@@ -81,30 +82,36 @@ export default class ChannelStore {
   @observable
   messageOffset = defaultMessageOffset
 
-  // Public instance getters
-
+  // Private instance getters
   @computed
-  get entryCount () {
-    return this.entries.length
-  }
-
-  @computed
-  get entries () {
+  get _entries () {
     return Object.values(this.entriesMap).sort(
       // Ascending chronological order by entry timestamp
       (a, b) => a.payload.value.meta.ts - b.payload.value.meta.ts
     )
   }
 
+  // Public instance getters
+
+  @computed
+  get accessableEntries () {
+    return this._entries.slice(-maxEntryCount)
+  }
+
   @computed
   get visibleEntries () {
-    return this.entries.slice(-this.messageOffset)
+    return this.accessableEntries.slice(-this.messageOffset)
   }
 
   @computed
   get unreadEntries () {
     const lastSeenTimestamp = this._storableState.lastSeenTimestamp || 0
-    return this.entries.filter(e => e.payload.value.meta.ts > lastSeenTimestamp)
+    return this.accessableEntries.filter(e => e.payload.value.meta.ts > lastSeenTimestamp)
+  }
+
+  @computed
+  get entryCount () {
+    return this.accessableEntries.length
   }
 
   @computed
@@ -313,7 +320,7 @@ export default class ChannelStore {
   @action.bound
   markEntryAsReadAtIndex (index) {
     if (typeof index !== 'number') return
-    this._markEntryAsRead(this.entries[index])
+    this._markEntryAsRead(this.accessableEntries[index])
   }
 
   @action.bound
