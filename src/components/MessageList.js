@@ -45,7 +45,7 @@ function MessageList ({
 
   useEffect(() => () => resetOffset(), [])
   useLayoutEffect(checkBoundaries, [listRef])
-  useLayoutEffect(stayAtBottom, [atBottom, listRef, entryCount])
+  useLayoutEffect(stayAtBottom, [listRef, entryCount])
 
   const checkBoundariesDebounced = useCallback(debounce(checkBoundaries, 40, { leading: true }), [
     listRef
@@ -66,10 +66,10 @@ function MessageList ({
         onScroll={checkBoundariesDebounced}
         className={classNames('MessageList')}
       >
-        {loading ? (
-          <LoadingMessages />
-        ) : messages.length < entryCount ? (
+        {messages.length < entryCount ? (
           <LoadMore parentElement={listRef} onActivate={onLoadMore} />
+        ) : loading ? (
+          <LoadingMessages />
         ) : (
           <FirstMessage channelName={channelName} />
         )}

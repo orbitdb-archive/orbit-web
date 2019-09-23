@@ -1,7 +1,10 @@
 module.exports = {
   launch: {
-    // dumpio: true,
+    dumpio: false,
     headless: true
-    // args: ['--no-sandbox', '--disable-dev-shm-usage']
+  },
+  server: {
+    command: 'npm run test-server',
+    port: 8088
   }
 }

@@ -16,7 +16,6 @@ import Spinner from '../components/Spinner'
 
 import ChannelLink from './ChannelLink'
 
-import '../styles/flaticon.css'
 import '../styles/ControlPanel.scss'
 
 setConfig({
@@ -53,17 +52,14 @@ function ControlPanel ({ history }) {
   const handleJoinChannel = React.useCallback(e => {
     e.preventDefault()
     if (!inputRef.current) return
-    const channel = inputRef.current.value.trim()
-    networkStore.joinChannel(channel).then(() => {
-      inputRef.current.value = ''
-      setRedirect(`/channel/${channel}`)
-    })
+    setRedirect(`/channel/${inputRef.current.value.trim()}`)
   }, [])
 
   const handleCloseChannel = React.useCallback(
-    channel => {
-      if (uiStore.currentChannelName === channel.channelName) setRedirect('/')
-      networkStore.leaveChannel(channel.channelName)
+    channelName => {
+      networkStore.leaveChannel(channelName).then(() => {
+        if (uiStore.currentChannelName === channelName) setRedirect('/')
+      })
     },
     [uiStore.currentChannelName]
   )
@@ -84,7 +80,6 @@ function ControlPanel ({ history }) {
       <div className='joinChannelInput fadeInAnimation' style={{ animationDuration: '.5s' }}>
         <JoinChannel
           onSubmit={handleJoinChannel}
-          autoFocus
           theme={{ ...uiStore.theme }}
           inputRef={inputRef}
         />
@@ -130,7 +125,10 @@ function ControlPanel ({ history }) {
                   theme={{ ...uiStore.theme }}
                   onClick={e => handleChannelLinkClick(e, c)}
                 />
-                <span className='closeChannelButton' onClick={() => handleCloseChannel(c)}>
+                <span
+                  className='closeChannelButton'
+                  onClick={() => handleCloseChannel(c.channelName)}
+                >
                   {t('controlPanel.closeChannel')}
                 </span>
               </div>

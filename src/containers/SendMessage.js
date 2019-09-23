@@ -9,7 +9,7 @@ import EmojiPicker from '../components/EmojiPicker'
 
 import '../styles/SendMessage.scss'
 
-function SendMessage ({ channelName, onSendMessage, theme, useEmojis, emojiSet }) {
+function SendMessage ({ channelName, onSendMessage, theme, useEmojis, emojiSet, disabled }) {
   const [t] = useTranslation()
 
   const [inputValue, setInputValue] = React.useState('')
@@ -90,7 +90,7 @@ function SendMessage ({ channelName, onSendMessage, theme, useEmojis, emojiSet }
     [inputValue]
   )
 
-  React.useLayoutEffect(focusInput, [channelName, focusInput])
+  React.useLayoutEffect(focusInput, [channelName, disabled, focusInput])
 
   function getEmojiPickerStyle (emojiSize) {
     return {
@@ -122,6 +122,7 @@ function SendMessage ({ channelName, onSendMessage, theme, useEmojis, emojiSet }
           value={inputValue}
           onKeyDown={handleInputKeyDown}
           onChange={handleInputChange}
+          disabled={disabled}
         />
       </form>
     </div>
@@ -133,7 +134,8 @@ SendMessage.propTypes = {
   onSendMessage: PropTypes.func.isRequired,
   theme: PropTypes.object.isRequired,
   useEmojis: PropTypes.bool.isRequired,
-  emojiSet: PropTypes.string.isRequired
+  emojiSet: PropTypes.string.isRequired,
+  disabled: PropTypes.bool
 }
 
 export default SendMessage

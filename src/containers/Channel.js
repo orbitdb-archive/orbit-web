@@ -6,6 +6,8 @@ import { useTranslation } from 'react-i18next'
 
 import RootContext from '../context/RootContext'
 
+import { BigSpinner } from '../components/Spinner'
+
 import '../styles/Channel.scss'
 
 const ChannelControls = lazy(() =>
@@ -32,9 +34,9 @@ function Channel ({ channelName }) {
     }
   }, [])
 
-  useEffect(handleChannelNameChange, [channelName])
-
   function handleChannelNameChange () {
+    setChannel(null)
+
     uiStore.setTitle(`#${channelName} | Orbit`)
     uiStore.setCurrentChannelName(channelName)
 
@@ -44,29 +46,34 @@ function Channel ({ channelName }) {
 
     return () => {
       uiStore.setCurrentChannelName(null)
-      uiStore.closeUserProfilePanel()
     }
   }
 
-  async function onDrop (event) {
-    event.preventDefault()
-    setDragActive(false)
+  useEffect(handleChannelNameChange, [channelName])
 
-    const files = []
-    if (event.dataTransfer.items) {
-      for (let i = 0; i < event.dataTransfer.items.length; i++) {
-        const file = event.dataTransfer.items[i]
-        file.kind === 'file' && files.push(file.getAsFile())
-      }
-    } else {
-      for (let i = 0; i < event.dataTransfer.files.length; i++) {
-        files.push(event.dataTransfer.files.item(i))
-      }
-    }
+  const handleDropFiles = React.useCallback(
+    event => {
+      event.preventDefault()
+      setDragActive(false)
 
-    await channel.sendFiles(files)
-  }
-  return channel ? (
+      const files = []
+      if (event.dataTransfer.items) {
+        for (let i = 0; i < event.dataTransfer.items.length; i++) {
+          const file = event.dataTransfer.items[i]
+          file.kind === 'file' && files.push(file.getAsFile())
+        }
+      } else {
+        for (let i = 0; i < event.dataTransfer.files.length; i++) {
+          files.push(event.dataTransfer.files.item(i))
+        }
+      }
+
+      channel.sendFiles(files)
+    },
+    [channel]
+  )
+
+  return (
     <div
       className='Channel'
       onDragOver={event => {
@@ -78,13 +85,17 @@ function Channel ({ channelName }) {
         <DropZone
           label={t('channel.file.dropzone.add', { channel: channelName })}
           onDragLeave={() => setDragActive(false)}
-          onDrop={event => onDrop(event)}
+          onDrop={handleDropFiles}
         />
       )}
-      <ChannelMessages channel={channel} />
-      <ChannelControls channel={channel} />
+
+      <React.Suspense fallback={<BigSpinner />}>
+        {channel ? <ChannelMessages channel={channel} /> : <BigSpinner />}
+      </React.Suspense>
+
+      <ChannelControls channel={channel} disabled={!channel} />
     </div>
-  ) : null
+  )
 }
 
 Channel.propTypes = {

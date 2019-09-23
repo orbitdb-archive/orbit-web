@@ -14,14 +14,14 @@ import PrivateRouteWithContext from '../containers/PrivateRouteWithContext'
 
 import RootContext from '../context/RootContext'
 
-import Spinner from '../components/Spinner'
+import { BigSpinner } from '../components/Spinner'
 
 import '../styles/App.scss'
 import '../styles/Scrollbars.scss'
 
 const rootStore = new RootStore(i18n)
 
-// Load default settings
+// Load settings
 rootStore.settingsStore.load()
 
 // Load a session (user) from cache
@@ -58,7 +58,7 @@ const AlphaDisclaimer = lazy(() =>
 function AppView () {
   return (
     <div className='App view'>
-      <Suspense fallback={<Spinner className='spinner suspense-fallback' size='64px' />}>
+      <Suspense fallback={<BigSpinner />}>
         {/* Controlpanel */}
         <PrivateRouteWithContext children={props => <ControlPanel {...props} />} />
 

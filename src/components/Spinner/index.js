@@ -33,3 +33,5 @@ Spinner.propTypes = {
 }
 
 export default Spinner
+
+export const BigSpinner = () => <Spinner className='spinner spinner-fixed' size='64px' />

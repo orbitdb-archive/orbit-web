@@ -17,8 +17,6 @@ import ChannelStore from './ChannelStore'
 import Logger from '../utils/logger'
 import WorkerProxy from '../utils/worker-proxy'
 
-import NetworkWorker from '../workers/network.worker.js'
-
 configure({ enforceActions: 'observed' })
 
 const logger = new Logger()
@@ -27,17 +25,13 @@ export default class NetworkStore {
   worker = null
 
   constructor (rootStore) {
+    this.rootStore = rootStore
     this.sessionStore = rootStore.sessionStore
     this.settingsStore = rootStore.settingsStore
 
     this.joinChannel = this.joinChannel.bind(this)
 
-    this.worker = new NetworkWorker()
-    this.worker.addEventListener('message', this._onWorkerMessage.bind(this))
-    this.worker.addEventListener('error', this._onWorkerError.bind(this))
-
-    this.worker.postMessage('') // Init the worker
-    this.workerProxy = new WorkerProxy(this.worker)
+    this.workerProxy = new WorkerProxy(this)
 
     // Stop if user logs out, start if not already online or not starting
     reaction(
@@ -51,7 +45,7 @@ export default class NetworkStore {
 
   // Public instance variables
 
-  networkName = 'Orbit DEV Network'
+  networkName = window.location.href.match('localhost:') ? 'Orbit DEV Network' : 'Orbit Network'
 
   @observable
   starting = false
@@ -69,7 +63,7 @@ export default class NetworkStore {
   swarmPeers = []
 
   @observable
-  defaultChannels = ['orbitdb']
+  defaultChannels = window.location.href.match('localhost:') ? ['orbit-dev'] : ['orbit']
 
   // Public instance getters
 
@@ -101,7 +95,10 @@ export default class NetworkStore {
     this.settingsStore.networkSettings.channels.forEach(this.joinChannel)
 
     // Join channels that should be joined by default
-    if (this.settingsStore.networkSettings.channels.length === 0) {
+    if (
+      this.rootStore.isNewAppVersion ||
+      this.settingsStore.networkSettings.channels.length === 0
+    ) {
       this.defaultChannels.forEach(this.joinChannel)
     }
   }
@@ -164,88 +161,13 @@ export default class NetworkStore {
     this.swarmPeers = []
   }
 
-  // Private instance methods
-
-  _onWorkerMessage ({ data }) {
-    if (typeof data.action !== 'string') return
-    if (typeof data.name !== 'string') return
-
-    const channel = data.meta ? this.channels[data.meta.channelName] : null
-
-    switch (data.action) {
-      case 'orbit-event':
-        switch (data.name) {
-          case 'connected':
-            this._onOrbitConnected()
-            break
-          case 'disconnected':
-            this._onOrbitDisconnected()
-            break
-          case 'joined':
-            this._onJoinedChannel(...data.args)
-            break
-          case 'left':
-            this._onLeftChannel(...data.args)
-            break
-          case 'peers':
-            this._onSwarmPeerUpdate(...data.args)
-            break
-          default:
-            break
-        }
-        break
-      case 'channel-event':
-        if (!channel) return
-
-        switch (data.name) {
-          case 'error':
-            channel._onError(...data.args)
-            break
-          case 'peer.update':
-            channel._onPeerUpdate(data.meta.peers)
-            break
-          case 'load.progress':
-            // args: [address, hash, entry, progress, total]
-            channel._onLoadProgress(data.args[2], data.meta.replicationStatus)
-            break
-          case 'replicate.progress':
-            // args: [address, hash, entry, progress, have]
-            channel._onReplicateProgress(data.args[2], data.meta.replicationStatus)
-            break
-          case 'ready': // load.done
-            channel._onLoaded()
-            break
-          case 'replicated': // replicate.done
-            channel._onReplicated()
-            break
-          case 'write':
-            // args: [dbname, hash, entry]
-            channel._onWrite(data.args[2][0])
-            break
-          default:
-            break
-        }
-        break
-      default:
-        break
-    }
-  }
-
-  _onWorkerError (error) {
-    console.error(error.message)
-  }
-
   // Public instance methods
 
   async joinChannel (channelName) {
     if (typeof channelName !== 'string') return
     if (!this.isOnline) throw new Error('Network is not online')
     if (!this.channelNames.includes(channelName)) {
-      // await this.orbit.join(channelName)
-      this.worker.postMessage({
-        action: 'orbit:join-channel',
-        options: { channelName }
-      })
+      await this.workerProxy.joinChannel(channelName)
     }
     return this._onJoinedChannel(channelName)
   }
@@ -254,10 +176,7 @@ export default class NetworkStore {
     if (typeof channelName !== 'string') return
     if (!this.isOnline) throw new Error('Network is not online')
     if (this.channelNames.includes(channelName)) {
-      this.worker.postMessage({
-        action: 'orbit:leave-channel',
-        options: { channelName }
-      })
+      await this.workerProxy.leaveChannel(channelName)
     }
     return this._onLeftChannel(channelName)
   }
@@ -280,13 +199,7 @@ export default class NetworkStore {
     orbitOptions.directory = `orbit-chat-orbitdb-${this.sessionStore.username}`
     orbitOptions.id = this.sessionStore.username
 
-    this.worker.postMessage({
-      action: 'network:start',
-      options: {
-        ipfs: ipfsOptions,
-        orbit: orbitOptions
-      }
-    })
+    await this.workerProxy.startNetwork({ ipfs: ipfsOptions, orbit: orbitOptions })
   }
 
   @action.bound
@@ -302,9 +215,7 @@ export default class NetworkStore {
     clearInterval(this.channelPeerInterval)
     clearInterval(this.channelProcessInterval)
 
-    this.worker.postMessage({
-      action: 'network:stop'
-    })
+    await this.workerProxy.stopNetwork()
 
     this.channelNames.forEach(this._removeChannel)
     this._resetSwarmPeers()

@@ -6,5 +6,6 @@
   "useEmojis": true,
   "emojiSet": "emojione",
   "useMonospaceFont": false,
-  "useLargeMessage": false
+  "useLargeMessage": false,
+  "appVersion": ""
 }

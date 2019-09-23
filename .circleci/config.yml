@@ -7,10 +7,13 @@ jobs:
       - checkout
       - run:
           name: Install puppeteer dependencies
-          command: "sh .circleci/setup.sh"
+          command: 'sh .circleci/setup.sh'
       - run:
           name: Install project dependencies
           command: npm ci
+      - run:
+          name: Build
+          command: npm run build
       - run:
           name: Run tests
           command: npm test
