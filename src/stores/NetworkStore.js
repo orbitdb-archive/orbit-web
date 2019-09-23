@@ -84,6 +84,11 @@ export default class NetworkStore {
     )
   }
 
+  @computed
+  get unreadEntriesCount () {
+    return values(this.channels).reduce((sum, c) => sum + c.unreadEntries.length, 0)
+  }
+
   // Private instance actions
 
   @action.bound
