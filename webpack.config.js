@@ -32,13 +32,13 @@ const config = {
     rules: [
       {
         test: /\.worker\.js$/,
-        exclude: /node_modules/,
-        use: ['worker-loader', 'babel-loader']
+        use: ['worker-loader', 'babel-loader'],
+        include: path.resolve('src')
       },
       {
         test: /\.(js|jsx)$/,
-        exclude: /node_modules/,
-        use: ['babel-loader']
+        use: ['babel-loader'],
+        include: path.resolve('src')
       },
       {
         test: /\.css$/,

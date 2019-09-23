@@ -4,13 +4,13 @@
   "description": "Orbit Chat",
   "main": "src/components/index.js",
   "scripts": {
-    "dev": "NODE_ENV=development ./node_modules/.bin/webpack-dev-server --mode=development",
     "build": "webpack --mode=production",
+    "dev": "npm run start",
     "lint": "eslint src/ test/",
     "lint:fix": "eslint --fix src/ test/",
-    "test-server": "http-server ./dist -s -p 8088 &",
-    "pretest": "npm run build && npm run test-server",
-    "test": "npm run lint && jest --runInBand; exit_code=$?; kill $(lsof -t -i:8088); exit $exit_code"
+    "start": "webpack-dev-server --mode=development",
+    "test-server": "http-server ./dist -s -p 8088",
+    "test": "npm run lint && jest --runInBand"
   },
   "repository": {
     "type": "git",

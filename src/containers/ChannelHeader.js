@@ -37,7 +37,7 @@ function ChannelHeader ({ match }) {
     <div className='Header'>
       <div className='ChannelName'>
         <div
-          className='icon flaticon-lines18'
+          className='open-controlpanel icon flaticon-lines18'
           onClick={handleMenuButtonClick}
           style={{ ...uiStore.theme }}
         />
