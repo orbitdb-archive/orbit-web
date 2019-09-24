@@ -41,16 +41,16 @@ describe('User scenario', () => {
 
   describe('Log in', () => {
     it('is able to log in', async () => {
-      // Wait for the username input, write "testuser" and press enter to log in
+      // Wait for the username input, write username and press enter to log in
       await page.waitForSelector('.LoginView input[type=text]')
       await expect(page).toFill('.LoginView input[type=text]', username)
       await page.keyboard.press('Enter')
 
-      // Wait for the default channel to show up, press the name to open the side panel
-      await page.waitForSelector('.Header .ChannelName .open-controlpanel')
-      await expect(page).toClick('.Header .ChannelName .open-controlpanel')
+      // Wait for the default channel to show up, press the menu button to open the side panel
+      await page.waitForSelector('.Header .open-controlpanel')
+      await expect(page).toClick('.Header .open-controlpanel')
 
-      // Shown username should equal "testuser" and the darkener(curtain) element should be visible
+      // Shown username should match and the darkener(curtain) element should be visible
       await page.waitForSelector('.username')
       await page.waitForSelector('.darkener')
       await expect(page).toMatchElement('.username', { text: username })
@@ -60,10 +60,10 @@ describe('User scenario', () => {
 
   describe('Joining default channels', () => {
     it('joins #orbit-dev by default', async () => {
-      // New user should join #orbitdb by default with the channel opened
+      // New user should join #orbit-dev by default with the channel opened
       await page.waitForSelector('.Controls .SendMessage input[type=text]')
-      await page.waitForSelector('.Header .ChannelName .currentChannel')
-      await expect(page).toMatchElement('.Header .ChannelName .currentChannel', {
+      await page.waitForSelector('.Header .currentChannel')
+      await expect(page).toMatchElement('.Header .currentChannel', {
         text: '#orbit-dev'
       })
     })
@@ -72,18 +72,18 @@ describe('User scenario', () => {
   describe('First channel', () => {
     describe('Joining', () => {
       it('joins a channel', async () => {
-        // Open the sidebar
-        await page.waitForSelector('.Header .ChannelName .open-controlpanel')
-        await expect(page).toClick('.Header .ChannelName .open-controlpanel')
+        // Open control panel
+        await page.waitForSelector('.Header .open-controlpanel')
+        await expect(page).toClick('.Header .open-controlpanel')
 
-        // Fill in "testchannel" and press enter
+        // Fill in channel name and press enter
         await page.waitForSelector('.JoinChannel input[type=text]')
         await expect(page).toFill('.JoinChannel input[type=text]', testChannel1)
         await page.keyboard.press('Enter')
 
-        // Current channel name should equal "testchannel" in the header
-        await page.waitForSelector('.Header .ChannelName .currentChannel')
-        await expect(page).toMatchElement('.Header .ChannelName .currentChannel', {
+        // Current channel name should match
+        await page.waitForSelector('.Header .currentChannel')
+        await expect(page).toMatchElement('.Header .currentChannel', {
           text: `#${testChannel1}`
         })
       })
@@ -92,8 +92,8 @@ describe('User scenario', () => {
     describe('Sending', () => {
       it('sends a message to channel', async () => {
         // Make sure we are in the right channel
-        await page.waitForSelector('.Header .ChannelName .currentChannel')
-        await expect(page).toMatchElement('.Header .ChannelName .currentChannel', {
+        await page.waitForSelector('.Header .currentChannel')
+        await expect(page).toMatchElement('.Header .currentChannel', {
           text: `#${testChannel1}`
         })
 
@@ -112,8 +112,8 @@ describe('User scenario', () => {
 
       it('sends a video file to channel', async () => {
         // Make sure we are in the right channel
-        await page.waitForSelector('.Header .ChannelName .currentChannel')
-        await expect(page).toMatchElement('.Header .ChannelName .currentChannel', {
+        await page.waitForSelector('.Header .currentChannel')
+        await expect(page).toMatchElement('.Header .currentChannel', {
           text: `#${testChannel1}`
         })
 
@@ -134,8 +134,8 @@ describe('User scenario', () => {
 
       it('sends another message to channel', async () => {
         // Make sure we are in the right channel
-        await page.waitForSelector('.Header .ChannelName .currentChannel')
-        await expect(page).toMatchElement('.Header .ChannelName .currentChannel', {
+        await page.waitForSelector('.Header .currentChannel')
+        await expect(page).toMatchElement('.Header .currentChannel', {
           text: `#${testChannel1}`
         })
 
@@ -157,25 +157,19 @@ describe('User scenario', () => {
   describe('Second channel', () => {
     describe('Joining', () => {
       it('is able to join another channel', async () => {
-        // Press the current channel's name to open the sidebar
-        await page.waitForSelector('.Header .ChannelName .open-controlpanel')
-        await expect(page).toClick('.Header .ChannelName .open-controlpanel')
+        // Open control panel
+        await page.waitForSelector('.Header .open-controlpanel')
+        await expect(page).toClick('.Header .open-controlpanel')
 
-        // Write "testchannel2" as the channel name, press enter
+        // Write the channel name, press enter
         await page.waitForSelector('.JoinChannel input[type=text]')
         await expect(page).toFill('.JoinChannel input[type=text]', testChannel2)
         await page.keyboard.press('Enter')
 
-        // Current channel should equal "testchannel2"
-        await page.waitForSelector('.Header .ChannelName .currentChannel')
-        await expect(page).toMatchElement('.Header .ChannelName .currentChannel', {
+        // Current channel should match
+        await page.waitForSelector('.Header .currentChannel')
+        await expect(page).toMatchElement('.Header .currentChannel', {
           text: `#${testChannel2}`
-        })
-
-        // Expect the previous channel, "testchannel" to exist as a link in the header
-        await page.waitForSelector('.Header .ChannelName .ChannelLink')
-        await expect(page).toMatchElement('.Header .ChannelName .ChannelLink', {
-          text: `#${testChannel1}`
         })
       })
     })
@@ -199,26 +193,40 @@ describe('User scenario', () => {
 
   describe('Changing channels', () => {
     it('is able to change channels', async () => {
-      // Press "testchannel" link in the header
-      await page.waitForSelector('.Header .ChannelName .ChannelLink')
-      await expect(page).toClick('.Header .ChannelName .ChannelLink', { text: `#${testChannel1}` })
+      // Open control panel
+      await page.waitForSelector('.Header .open-controlpanel')
+      await expect(page).toClick('.Header .open-controlpanel')
 
-      // "testchannel" should be the current channel instead of "testchannel2"
-      await page.waitForSelector('.Header .ChannelName .currentChannel')
-      await expect(page).toMatchElement('.Header .ChannelName .currentChannel', {
+      // Change channel
+      await page.waitForSelector('.ControlPanel .channelsList .ChannelLink')
+      await expect(page).toClick('.ControlPanel .channelsList .ChannelLink', {
+        text: `#${testChannel1}`
+      })
+
+      // Channel name should match
+      await page.waitForSelector('.Header .currentChannel')
+      await expect(page).toMatchElement('.Header .currentChannel', {
         text: `#${testChannel1}`
       })
     })
 
     it('persists messages between channel changes', async () => {
-      // Both previously sent messages should be loaded in "testchannel"
+      // Both previously sent messages should be loaded
       await page.waitForSelector('.Channel .Messages .Message')
       await expect(page).toMatch(timedMessage)
       await expect(page).toMatch(timedMessage2)
 
-      // A previously sent message should be loaded on join in "testchannel2"
-      await page.waitForSelector('.Header .ChannelName .ChannelLink')
-      await expect(page).toClick('.Header .ChannelName .ChannelLink', { text: `#${testChannel2}` })
+      // Open control panel
+      await page.waitForSelector('.Header .open-controlpanel')
+      await expect(page).toClick('.Header .open-controlpanel')
+
+      // Change channel
+      await page.waitForSelector('.ControlPanel .channelsList .ChannelLink')
+      await expect(page).toClick('.ControlPanel .channelsList .ChannelLink', {
+        text: `#${testChannel2}`
+      })
+
+      // A previously sent message should be loaded on join in other channel
       await page.waitForSelector('.Channel .Messages .Message')
       await expect(page).toMatch(timedMessage3)
     })
@@ -227,8 +235,8 @@ describe('User scenario', () => {
   describe('Log out', () => {
     it('user is able to log out', async () => {
       // Press the current channel's name to open the sidebar
-      await page.waitForSelector('.Header .ChannelName .open-controlpanel ')
-      await expect(page).toClick('.Header .ChannelName .open-controlpanel ')
+      await page.waitForSelector('.Header .open-controlpanel ')
+      await expect(page).toClick('.Header .open-controlpanel ')
 
       // Wait for logout button, click it
       await page.waitForSelector('.flaticon-prohibition35')
@@ -248,8 +256,8 @@ describe('User scenario', () => {
       await page.keyboard.press('Enter')
 
       // Press the current channel's name to open the sidebar
-      await page.waitForSelector('.Header .ChannelName .open-controlpanel')
-      await expect(page).toClick('.Header .ChannelName .open-controlpanel')
+      await page.waitForSelector('.Header .open-controlpanel')
+      await expect(page).toClick('.Header .open-controlpanel')
 
       // Expect recent channels to be shown in the side panel
       await page.waitForSelector('.ChannelLink')
