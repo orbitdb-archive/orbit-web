@@ -100,7 +100,7 @@ export default class ChannelStore {
 
   @computed
   get _userNameRegex () {
-    return new RegExp(`@(${this._username})(?!\\w{1})`, 'gu')
+    return new RegExp(`@(${this._username})(?!\\w)`, 'gu')
   }
 
   // Public instance getters
