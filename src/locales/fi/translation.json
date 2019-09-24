@@ -47,7 +47,8 @@
       "useEmojis": "Käytä hymiöitä",
       "emojiSet": "Hymiö teema",
       "useMonospaceFont": "Käytä monospace fonttia",
-      "useLargeMessage": "Käytä suuria viestejä"
+      "useLargeMessage": "Käytä suuria viestejä",
+      "messageNotifications": "Ilmoitukset"
     },
     "descriptions": {},
     "options": {
@@ -82,6 +83,11 @@
         "google": "Google",
         "messenger": "Messenger",
         "twitter": "Twitter"
+      },
+      "messageNotifications": {
+        "all": "Kaikki",
+        "mentions": "Vain maininnat",
+        "none": "Ei mitään"
       }
     }
   },

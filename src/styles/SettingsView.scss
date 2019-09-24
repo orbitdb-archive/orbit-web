@@ -7,17 +7,14 @@
   width: 100%;
   height: 100%;
   margin: 0;
+  padding-top: 1em;
 
-  font-size: 1em;
   color: rgba(240, 240, 240, 0.9);
 
   .row {
     display: flex;
     align-items: center;
-    padding: 0.2em;
-    padding-left: 1.2em;
-    background-color: rgba(38, 38, 38, 1);
-    border-bottom: 1px solid rgb(34, 34, 34);
+    margin: 0.1em 1.2em;
 
     select,
     option {

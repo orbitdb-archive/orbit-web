@@ -7,5 +7,6 @@
   "emojiSet": "emojione",
   "useMonospaceFont": false,
   "useLargeMessage": false,
+  "messageNotifications": "mentions",
   "appVersion": ""
 }

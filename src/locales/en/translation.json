@@ -47,7 +47,8 @@
       "useEmojis": "Use emojis",
       "emojiSet": "Emoji theme",
       "useMonospaceFont": "Use monospace font",
-      "useLargeMessage": "Use large messages"
+      "useLargeMessage": "Use large messages",
+      "messageNotifications": "Notifications"
     },
     "descriptions": {},
     "options": {
@@ -82,6 +83,11 @@
         "google": "Google",
         "messenger": "Messenger",
         "twitter": "Twitter"
+      },
+      "messageNotifications": {
+        "all": "All",
+        "mentions": "Only mentions",
+        "none": "None"
       }
     }
   },

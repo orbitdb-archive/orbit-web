@@ -84,6 +84,13 @@ export default class NetworkStore {
     )
   }
 
+  @computed
+  get unreadEntriesCount () {
+    return values(this.channels)
+      .filter(c => !c.active) // Consider only non-active channels
+      .reduce((sum, c) => sum + c.unreadEntries.length, 0)
+  }
+
   // Private instance actions
 
   @action.bound
