@@ -49,6 +49,8 @@ export default class ChannelStore {
 
     // Save channel state on changes
     reaction(() => values(this._storableState), this._saveState.bind(this))
+
+    reaction(() => this.unreadMessages, this._checkForNotification.bind(this))
   }
 
   // Private instance variables
@@ -89,6 +91,16 @@ export default class ChannelStore {
       // Ascending chronological order by entry timestamp
       (a, b) => a.payload.value.meta.ts - b.payload.value.meta.ts
     )
+  }
+
+  @computed
+  get _username () {
+    return this.network.sessionStore.username
+  }
+
+  @computed
+  get _userNameRegex () {
+    return new RegExp(`@(${this._username})(?!\\w{1})`, 'gu')
   }
 
   // Public instance getters
@@ -150,6 +162,21 @@ export default class ChannelStore {
   @computed
   get userCount () {
     return this.peers.length + 1
+  }
+
+  @computed
+  get active () {
+    return this.network.rootStore.uiStore.currentChannelName === this.channelName
+  }
+
+  @computed
+  get newMessageNotificationsEnabled () {
+    return this.network.rootStore.uiStore.messageNotifications === 'all'
+  }
+
+  @computed
+  get newMentionNotificationsEnabled () {
+    return ['all', 'mentions'].indexOf(this.network.rootStore.uiStore.messageNotifications) > -1
   }
 
   // Private instance actions
@@ -285,23 +312,40 @@ export default class ChannelStore {
     }
   }
 
-  _sendNotification (entry) {
-    const {
-      sessionStore: {
-        rootStore: { uiStore: currentChannelName }
-      }
-    } = this.network
-    const payload = entry.payload.value
-    if (document.hidden || this.channelName !== currentChannelName) {
-      if (this.unreadMessages.length > 1) {
-        notify(`${this.unreadMessages.length} unread messages in #${this.channelName}`, '')
-      } else {
-        notify(
-          `New message in #${this.channelName}`,
-          `${payload.meta.from.name}: ${payload.content}`
-        )
-      }
-    }
+  _checkForNotification (newMessages) {
+    if (!document.hidden && this.active) return
+    newMessages
+      .filter(m => m.meta.type === 'text')
+      .forEach(m => {
+        let sent = false
+        if (!sent && this.newMentionNotificationsEnabled) {
+          sent = this._sendNewMentionNotification(m)
+        }
+        if (!sent && this.newMessageNotificationsEnabled) {
+          sent = this._sendNewMessageNotification(m)
+        }
+      })
+  }
+
+  _sendNewMessageNotification (message) {
+    // TODO: Localise title
+    notify(
+      'New message in orbit.chat',
+      `#${this.channelName}\n${message.meta.from.name}: ${message.content}`,
+      message.hash
+    )
+    return true
+  }
+
+  _sendNewMentionNotification (message) {
+    // TODO: Localise title
+    if (!this._userNameRegex.test(message.content)) return false
+    notify(
+      'You were mentioned in orbit.chat',
+      `#${this.channelName}\n${message.meta.from.name}: ${message.content}`,
+      message.hash
+    )
+    return true
   }
 
   _sendFile (file) {

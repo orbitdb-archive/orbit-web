@@ -1,21 +1,22 @@
-/* eslint-disable no-new */
 import debounce from 'lodash.debounce'
+
+import orbitLogo from '../images/orbit_logo_32x32.png'
 
 export function askPermission () {
   Notification.requestPermission()
 }
 
-const notify = (title, body) => {
+const notify = (title, body, tag) => {
   const options = {
-    body: body,
-    icon: 'src/images/orbit_logo_32x32.png'
+    body,
+    tag,
+    icon: orbitLogo
   }
 
-  if ('Notification' in window) {
-    if (Notification.permission === 'granted') {
-      new Notification(title, options)
-    }
+  if ('Notification' in window && Notification.permission === 'granted') {
+    // eslint-disable-next-line no-new
+    new Notification(title, options)
   }
 }
 
-export default debounce(notify, 5000)
+export default debounce(notify, 2000)
