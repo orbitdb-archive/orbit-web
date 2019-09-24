@@ -9,5 +9,6 @@
     "options": ["apple", "emojione", "facebook", "google", "messenger", "twitter"]
   },
   "useMonospaceFont": { "type": "boolean" },
-  "useLargeMessage": { "type": "boolean" }
+  "useLargeMessage": { "type": "boolean" },
+  "messageNotifications": { "type": "select", "options": ["all", "mentions", "none"] }
 }

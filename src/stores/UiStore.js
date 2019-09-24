@@ -205,6 +205,15 @@ export default class UiStore {
   }
 
   @computed
+  get messageNotifications () {
+    return this.settingsStore.uiSettings.messageNotifications
+  }
+
+  set messageNotifications (val) {
+    this.settingsStore.uiSettings.messageNotifications = val
+  }
+
+  @computed
   get useLargeMessage () {
     return this.settingsStore.uiSettings.useLargeMessage
   }
