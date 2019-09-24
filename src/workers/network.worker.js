@@ -106,7 +106,7 @@ async function handleStop () {
 async function handleJoinChannel ({ options: { channelName } }) {
   const channel = await this.orbit.join(channelName)
 
-  channel.load()
+  channel.load(256)
 
   // Bind all relevant events
   CHANNEL_FEED_EVENTS.forEach(eventName => {
