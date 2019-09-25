@@ -1,18 +1,19 @@
 'use strict'
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import React from 'react'
+import { useRouteMatch } from 'react-router-dom'
 import debounce from 'lodash.debounce'
 
 import { isRectInside } from './rect'
 
 export function useTimeout (callback, delay) {
-  const savedCallback = useRef()
+  const savedCallback = React.useRef()
 
-  useEffect(() => {
+  React.useEffect(() => {
     savedCallback.current = callback
   }, [callback])
 
-  useEffect(() => {
+  React.useEffect(() => {
     function run () {
       savedCallback.current()
     }
@@ -24,11 +25,11 @@ export function useTimeout (callback, delay) {
 }
 
 export function useRefCallback () {
-  const ref = useRef(null)
+  const ref = React.useRef(null)
 
-  const [element, setElement] = useState()
+  const [element, setElement] = React.useState()
 
-  const setRef = useCallback(node => {
+  const setRef = React.useCallback(node => {
     if (ref.current) setElement(undefined)
     if (node) setElement(node)
     ref.current = node
@@ -38,7 +39,7 @@ export function useRefCallback () {
 }
 
 export function useVisibility (element, parentElement, margins, delay = 100) {
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = React.useState(false)
 
   function checkVisibility () {
     if (!element || !parentElement) return
@@ -48,14 +49,14 @@ export function useVisibility (element, parentElement, margins, delay = 100) {
     setIsVisible(visible)
   }
 
-  const checkVisibilityDebounced = useCallback(debounce(checkVisibility, delay), [
+  const checkVisibilityDebounced = React.useCallback(debounce(checkVisibility, delay), [
     element,
     parentElement,
     margins,
     delay
   ])
 
-  useLayoutEffect(() => {
+  React.useLayoutEffect(() => {
     if (!parentElement) return
     parentElement.addEventListener('scroll', checkVisibilityDebounced)
     return () => {
@@ -64,7 +65,25 @@ export function useVisibility (element, parentElement, margins, delay = 100) {
     }
   }, [parentElement, checkVisibilityDebounced])
 
-  useLayoutEffect(checkVisibility, [element, parentElement, margins])
+  React.useLayoutEffect(checkVisibility, [element, parentElement, margins])
 
   return isVisible
+}
+
+export function usePrivateRoutes (privatePaths, isAuthenticated) {
+  const [shouldRedirect, setShouldRedirect] = React.useState(false)
+
+  const matched =
+    privatePaths.map(path => useRouteMatch({ path })).filter(match => match && match.isExact)
+      .length > 0
+
+  React.useEffect(() => {
+    if (!shouldRedirect && !isAuthenticated && matched) {
+      setShouldRedirect(true)
+    } else if (shouldRedirect) {
+      setShouldRedirect(false)
+    }
+  }, [matched, privatePaths, isAuthenticated])
+
+  return shouldRedirect
 }

@@ -2,7 +2,7 @@
 
 import React, { lazy } from 'react'
 import { hot } from 'react-hot-loader'
-import { Redirect } from 'react-router-dom'
+import { useLocation, Redirect } from 'react-router-dom'
 import { useObserver } from 'mobx-react'
 import { useTranslation } from 'react-i18next'
 
@@ -22,7 +22,8 @@ const LoginForm = lazy(() => import(/* webpackChunkName: "LoginForm" */ '../comp
 
 const logger = new Logger()
 
-function LoginView ({ location }) {
+function LoginView () {
+  const location = useLocation()
   const { uiStore, sessionStore } = React.useContext(RootContext)
   const [t] = useTranslation()
   const [next, setNext] = React.useState('/')

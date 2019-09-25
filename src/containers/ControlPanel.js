@@ -2,8 +2,7 @@
 
 import React from 'react'
 import { hot, setConfig } from 'react-hot-loader'
-import { Redirect } from 'react-router-dom'
-import PropTypes from 'prop-types'
+import { Redirect, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useObserver } from 'mobx-react'
 import classNames from 'classnames'
@@ -23,11 +22,12 @@ setConfig({
   pureRender: true
 })
 
-function ControlPanel ({ history }) {
+function ControlPanel () {
+  const location = useLocation()
   const { networkStore, uiStore, sessionStore } = React.useContext(RootContext)
   const [t] = useTranslation()
-
   const [redirect, setRedirect] = React.useState('')
+  const [isCloseable, setIsCloseable] = React.useState(false)
 
   const inputRef = React.useRef()
 
@@ -35,13 +35,11 @@ function ControlPanel ({ history }) {
     if (inputRef.current) inputRef.current.focus()
   }, [])
 
-  const isClosable = history.location ? history.location.pathname !== '/' : true
-
   const handleClosePanel = React.useCallback(
     force => {
-      if (force || isClosable) uiStore.closeControlPanel()
+      if (force || isCloseable) uiStore.closeControlPanel()
     },
-    [isClosable]
+    [isCloseable]
   )
 
   const handleChannelLinkClick = React.useCallback((e, channel) => {
@@ -63,6 +61,10 @@ function ControlPanel ({ history }) {
     },
     [uiStore.currentChannelName]
   )
+
+  React.useEffect(() => {
+    setIsCloseable(location.pathname !== '/')
+  }, [location])
 
   React.useLayoutEffect(() => {
     if (uiStore.isControlPanelOpen) focusInput()
@@ -169,7 +171,7 @@ function ControlPanel ({ history }) {
       <>
         <div
           className={classNames('ControlPanel slideInAnimation', uiStore.sidePanelPosition, {
-            'no-close': !isClosable
+            'no-close': !isCloseable
           })}
         >
           <div style={{ opacity: 0.8, zIndex: -1 }}>
@@ -199,7 +201,7 @@ function ControlPanel ({ history }) {
           {renderBottomRow()}
         </div>
         <div
-          className={classNames('darkener fadeInAnimation', { 'no-close': !isClosable })}
+          className={classNames('darkener fadeInAnimation', { 'no-close': !isCloseable })}
           style={{ animationDuration: '1s' }}
           onClick={handleClosePanel}
         />
@@ -207,10 +209,6 @@ function ControlPanel ({ history }) {
       </>
     ) : null
   )
-}
-
-ControlPanel.propTypes = {
-  history: PropTypes.object.isRequired
 }
 
 export default hot(module)(ControlPanel)

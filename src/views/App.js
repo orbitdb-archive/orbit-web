@@ -1,7 +1,8 @@
 'use strict'
 
-import React, { Suspense, lazy } from 'react'
-import { HashRouter as Router, Route, Switch } from 'react-router-dom'
+import React from 'react'
+import { HashRouter as Router, Route, Switch, Redirect, useLocation } from 'react-router-dom'
+import { useObserver } from 'mobx-react'
 
 import i18n from '../config/i18n.config'
 
@@ -9,8 +10,7 @@ import RootStore from '../stores/RootStore'
 
 import { addDebug } from '../utils/debug'
 import { askPermission } from '../utils/notify'
-
-import PrivateRouteWithContext from '../containers/PrivateRouteWithContext'
+import { usePrivateRoutes } from '../utils/hooks'
 
 import RootContext from '../context/RootContext'
 
@@ -33,72 +33,86 @@ askPermission()
 
 const loginPath = '/connect'
 
-const ControlPanel = lazy(() =>
+const ControlPanel = React.lazy(() =>
   import(/* webpackChunkName: "ControlPanel" */ '../containers/ControlPanel')
 )
 
-const ChannelHeader = lazy(() =>
+const ChannelHeader = React.lazy(() =>
   import(/* webpackChunkName: "ChannelHeader" */ '../containers/ChannelHeader')
 )
 
-const ChannelView = lazy(() => import(/* webpackChunkName: "ChannelView" */ './ChannelView'))
+const ChannelView = React.lazy(() => import(/* webpackChunkName: "ChannelView" */ './ChannelView'))
 
-const IndexView = lazy(() => import(/* webpackChunkName: "IndexView" */ './IndexView'))
+const IndexView = React.lazy(() => import(/* webpackChunkName: "IndexView" */ './IndexView'))
 
-const LoginView = lazy(() => import(/* webpackChunkName: "LoginView" */ './LoginView'))
+const LoginView = React.lazy(() => import(/* webpackChunkName: "LoginView" */ './LoginView'))
 
-const LogoutView = lazy(() => import(/* webpackChunkName: "LogoutView" */ './LogoutView'))
+const LogoutView = React.lazy(() => import(/* webpackChunkName: "LogoutView" */ './LogoutView'))
 
-const SettingsView = lazy(() => import(/* webpackChunkName: "SettingsView" */ './SettingsView'))
+const SettingsView = React.lazy(() =>
+  import(/* webpackChunkName: "SettingsView" */ './SettingsView')
+)
 
-const AlphaDisclaimer = lazy(() =>
+const AlphaDisclaimer = React.lazy(() =>
   import(/* webpackChunkName: "AlphaDisclaimer" */ '../containers/AlphaDisclaimer')
 )
 
-function AppView () {
+function AppView ({ isAuthenticated }) {
+  const location = useLocation()
+  const redirectToLogin = usePrivateRoutes(['/', '/settings', '/channel/:channel'], isAuthenticated)
+
   return (
     <div className='App view'>
-      <Suspense fallback={<BigSpinner />}>
+      <React.Suspense fallback={<BigSpinner />}>
         {/* Controlpanel */}
-        <PrivateRouteWithContext children={props => <ControlPanel {...props} />} />
+        <ControlPanel />
 
         {/* Channelheader */}
-        <PrivateRouteWithContext
-          exact
-          path={['/channel/:channel', '/settings']}
-          component={ChannelHeader}
-        />
+        <Route path={['/channel/:channel', '/settings']}>
+          <ChannelHeader />
+        </Route>
 
         <Switch>
           {/* Channel */}
-          <PrivateRouteWithContext
-            exact
-            path='/channel/:channel'
-            loginPath={loginPath}
-            component={ChannelView}
-          />
+          <Route exact path='/channel/:channel'>
+            <ChannelView />
+          </Route>
 
           {/* Settings */}
-          <PrivateRouteWithContext
-            exact
-            path='/settings'
-            loginPath={loginPath}
-            component={SettingsView}
-          />
+          <Route exact path='/settings'>
+            <SettingsView />
+          </Route>
 
           {/* Log out */}
-          <Route exact path='/logout' component={LogoutView} />
+          <Route exact path='/logout'>
+            <LogoutView />
+          </Route>
 
           {/* Log in */}
-          <Route exact path={loginPath} component={LoginView} />
+          <Route exact path={loginPath}>
+            <LoginView />
+          </Route>
 
           {/* Index */}
-          <PrivateRouteWithContext loginPath={loginPath} component={IndexView} />
+          <Route>
+            <IndexView />
+          </Route>
         </Switch>
 
         {/* Render an alpha disclaimer on login page */}
-        <Route exact path={loginPath} component={AlphaDisclaimer} />
-      </Suspense>
+        <Route path={loginPath}>
+          <AlphaDisclaimer />
+        </Route>
+
+        {redirectToLogin ? (
+          <Redirect
+            to={{
+              pathname: loginPath,
+              state: { from: location }
+            }}
+          />
+        ) : null}
+      </React.Suspense>
     </div>
   )
 }
@@ -107,9 +121,9 @@ function App () {
   return (
     <RootContext.Provider value={rootStore}>
       <Router>
-        {/* Render App in a route so it will receive the "location"
-              prop and rerender properly on location changes */}
-        <Route children={props => <AppView {...props} />} />
+        {useObserver(() => (
+          <AppView isAuthenticated={rootStore.sessionStore.isAuthenticated} />
+        ))}
       </Router>
     </RootContext.Provider>
   )
