@@ -1,5 +1,6 @@
 'use strict'
 
+import React from 'react'
 import { HashRouter as Router, Route, Switch, Redirect, useLocation } from 'react-router-dom'
 import { useObserver } from 'mobx-react'
 
@@ -10,8 +11,6 @@ import RootStore from '../stores/RootStore'
 import { addDebug } from '../utils/debug'
 import { askPermission } from '../utils/notify'
 import { usePrivateRoutes } from '../utils/hooks'
-
-import PrivateRouteWithContext from '../containers/PrivateRouteWithContext'
 
 import RootContext from '../context/RootContext'
 
@@ -34,25 +33,27 @@ askPermission()
 
 const loginPath = '/connect'
 
-const ControlPanel = lazy(() =>
+const ControlPanel = React.lazy(() =>
   import(/* webpackChunkName: "ControlPanel" */ '../containers/ControlPanel')
 )
 
-const ChannelHeader = lazy(() =>
+const ChannelHeader = React.lazy(() =>
   import(/* webpackChunkName: "ChannelHeader" */ '../containers/ChannelHeader')
 )
 
-const ChannelView = lazy(() => import(/* webpackChunkName: "ChannelView" */ './ChannelView'))
+const ChannelView = React.lazy(() => import(/* webpackChunkName: "ChannelView" */ './ChannelView'))
 
-const IndexView = lazy(() => import(/* webpackChunkName: "IndexView" */ './IndexView'))
+const IndexView = React.lazy(() => import(/* webpackChunkName: "IndexView" */ './IndexView'))
 
-const LoginView = lazy(() => import(/* webpackChunkName: "LoginView" */ './LoginView'))
+const LoginView = React.lazy(() => import(/* webpackChunkName: "LoginView" */ './LoginView'))
 
-const LogoutView = lazy(() => import(/* webpackChunkName: "LogoutView" */ './LogoutView'))
+const LogoutView = React.lazy(() => import(/* webpackChunkName: "LogoutView" */ './LogoutView'))
 
-const SettingsView = lazy(() => import(/* webpackChunkName: "SettingsView" */ './SettingsView'))
+const SettingsView = React.lazy(() =>
+  import(/* webpackChunkName: "SettingsView" */ './SettingsView')
+)
 
-const AlphaDisclaimer = lazy(() =>
+const AlphaDisclaimer = React.lazy(() =>
   import(/* webpackChunkName: "AlphaDisclaimer" */ '../containers/AlphaDisclaimer')
 )
 

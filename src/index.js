@@ -1,6 +1,6 @@
 'use strict'
 
-import React, { lazy, Suspense } from 'react'
+import React from 'react'
 import { render } from 'react-dom'
 
 import { version } from '../package.json'
@@ -16,12 +16,12 @@ import './styles/flaticon.css'
 
 redirectToHttps(!window.location.href.match('localhost:'))
 
-const App = lazy(() => import(/* webpackChunkName: "App" */ './views/App'))
+const App = React.lazy(() => import(/* webpackChunkName: "App" */ './views/App'))
 
 render(
-  <Suspense fallback={<BigSpinner />}>
+  <React.Suspense fallback={<BigSpinner />}>
     <App />
-  </Suspense>,
+  </React.Suspense>,
   document.getElementById('root')
 )
 
