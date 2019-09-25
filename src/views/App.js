@@ -1,7 +1,7 @@
 'use strict'
 
-import React, { Suspense, lazy } from 'react'
-import { HashRouter as Router, Route, Switch } from 'react-router-dom'
+import { HashRouter as Router, Route, Switch, Redirect, useLocation } from 'react-router-dom'
+import { useObserver } from 'mobx-react'
 
 import i18n from '../config/i18n.config'
 
@@ -9,6 +9,7 @@ import RootStore from '../stores/RootStore'
 
 import { addDebug } from '../utils/debug'
 import { askPermission } from '../utils/notify'
+import { usePrivateRoutes } from '../utils/hooks'
 
 import PrivateRouteWithContext from '../containers/PrivateRouteWithContext'
 
@@ -55,36 +56,25 @@ const AlphaDisclaimer = lazy(() =>
   import(/* webpackChunkName: "AlphaDisclaimer" */ '../containers/AlphaDisclaimer')
 )
 
-function AppView () {
+function AppView ({ isAuthenticated }) {
+  const location = useLocation()
+  const redirectToLogin = usePrivateRoutes(['/', '/settings', '/channel/:channel'], isAuthenticated)
+
   return (
     <div className='App view'>
-      <Suspense fallback={<BigSpinner />}>
+      <React.Suspense fallback={<BigSpinner />}>
         {/* Controlpanel */}
-        <PrivateRouteWithContext children={props => <ControlPanel {...props} />} />
+        <Route children={props => <ControlPanel {...props} />} />
 
         {/* Channelheader */}
-        <PrivateRouteWithContext
-          exact
-          path={['/channel/:channel', '/settings']}
-          component={ChannelHeader}
-        />
+        <Route exact path={['/channel/:channel', '/settings']} component={ChannelHeader} />
 
         <Switch>
           {/* Channel */}
-          <PrivateRouteWithContext
-            exact
-            path='/channel/:channel'
-            loginPath={loginPath}
-            component={ChannelView}
-          />
+          <Route exact path='/channel/:channel' component={ChannelView} />
 
           {/* Settings */}
-          <PrivateRouteWithContext
-            exact
-            path='/settings'
-            loginPath={loginPath}
-            component={SettingsView}
-          />
+          <Route exact path='/settings' component={SettingsView} />
 
           {/* Log out */}
           <Route exact path='/logout' component={LogoutView} />
@@ -93,12 +83,21 @@ function AppView () {
           <Route exact path={loginPath} component={LoginView} />
 
           {/* Index */}
-          <PrivateRouteWithContext loginPath={loginPath} component={IndexView} />
+          <Route component={IndexView} />
         </Switch>
 
         {/* Render an alpha disclaimer on login page */}
         <Route exact path={loginPath} component={AlphaDisclaimer} />
-      </Suspense>
+
+        {redirectToLogin ? (
+          <Redirect
+            to={{
+              pathname: loginPath,
+              state: { from: location }
+            }}
+          />
+        ) : null}
+      </React.Suspense>
     </div>
   )
 }
@@ -107,9 +106,9 @@ function App () {
   return (
     <RootContext.Provider value={rootStore}>
       <Router>
-        {/* Render App in a route so it will receive the "location"
-              prop and rerender properly on location changes */}
-        <Route children={props => <AppView {...props} />} />
+        {useObserver(() => (
+          <AppView isAuthenticated={rootStore.sessionStore.isAuthenticated} />
+        ))}
       </Router>
     </RootContext.Provider>
   )

@@ -50,7 +50,7 @@
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-i18next": "^10.12.5",
-    "react-router-dom": "^5.0.1",
+    "react-router-dom": "^5.1.0",
     "react-transition-group": "^4.3.0"
   },
   "devDependencies": {

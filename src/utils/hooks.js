@@ -1,6 +1,6 @@
 'use strict'
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useRouteMatch } from 'react-router-dom'
 import debounce from 'lodash.debounce'
 
 import { isRectInside } from './rect'
@@ -67,4 +67,22 @@ export function useVisibility (element, parentElement, margins, delay = 100) {
   useLayoutEffect(checkVisibility, [element, parentElement, margins])
 
   return isVisible
+}
+
+export function usePrivateRoutes (privatePaths, isAuthenticated) {
+  const [shouldRedirect, setShouldRedirect] = React.useState(false)
+
+  const matched =
+    privatePaths.map(path => useRouteMatch({ path })).filter(match => match && match.isExact)
+      .length > 0
+
+  React.useEffect(() => {
+    if (!shouldRedirect && !isAuthenticated && matched) {
+      setShouldRedirect(true)
+    } else if (shouldRedirect) {
+      setShouldRedirect(false)
+    }
+  }, [matched, privatePaths, isAuthenticated])
+
+  return shouldRedirect
 }
