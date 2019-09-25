@@ -65,30 +65,44 @@ function AppView ({ isAuthenticated }) {
     <div className='App view'>
       <React.Suspense fallback={<BigSpinner />}>
         {/* Controlpanel */}
-        <Route children={props => <ControlPanel {...props} />} />
+        <ControlPanel />
 
         {/* Channelheader */}
-        <Route exact path={['/channel/:channel', '/settings']} component={ChannelHeader} />
+        <Route path={['/channel/:channel', '/settings']}>
+          <ChannelHeader />
+        </Route>
 
         <Switch>
           {/* Channel */}
-          <Route exact path='/channel/:channel' component={ChannelView} />
+          <Route exact path='/channel/:channel'>
+            <ChannelView />
+          </Route>
 
           {/* Settings */}
-          <Route exact path='/settings' component={SettingsView} />
+          <Route exact path='/settings'>
+            <SettingsView />
+          </Route>
 
           {/* Log out */}
-          <Route exact path='/logout' component={LogoutView} />
+          <Route exact path='/logout'>
+            <LogoutView />
+          </Route>
 
           {/* Log in */}
-          <Route exact path={loginPath} component={LoginView} />
+          <Route exact path={loginPath}>
+            <LoginView />
+          </Route>
 
           {/* Index */}
-          <Route component={IndexView} />
+          <Route>
+            <IndexView />
+          </Route>
         </Switch>
 
         {/* Render an alpha disclaimer on login page */}
-        <Route exact path={loginPath} component={AlphaDisclaimer} />
+        <Route path={loginPath}>
+          <AlphaDisclaimer />
+        </Route>
 
         {redirectToLogin ? (
           <Redirect

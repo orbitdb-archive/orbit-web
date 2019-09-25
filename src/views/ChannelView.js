@@ -1,8 +1,8 @@
 'use strict'
 
 import React, { Suspense, lazy, useContext } from 'react'
+import { useParams } from 'react-router-dom'
 import { hot } from 'react-hot-loader'
-import PropTypes from 'prop-types'
 import { useObserver } from 'mobx-react'
 
 import RootContext from '../context/RootContext'
@@ -16,8 +16,9 @@ const MessageUserProfilePanel = lazy(() =>
   import(/* webpackChunkName: "MessageUserProfilePanel" */ '../containers/MessageUserProfilePanel')
 )
 
-function ChannelView (props) {
+function ChannelView () {
   const { networkStore } = useContext(RootContext)
+  const { channel } = useParams()
 
   return useObserver(() =>
     networkStore.isOnline ? (
@@ -28,17 +29,13 @@ function ChannelView (props) {
           <MessageUserProfilePanel />
 
           {/* Render the channel */}
-          <Channel channelName={props.match.params.channel} />
+          <Channel channelName={channel} />
         </Suspense>
       </div>
     ) : (
       <BigSpinner />
     )
   )
-}
-
-ChannelView.propTypes = {
-  match: PropTypes.object.isRequired
 }
 
 export default hot(module)(ChannelView)

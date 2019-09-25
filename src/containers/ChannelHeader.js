@@ -1,8 +1,8 @@
 'use strict'
 
 import React, { useContext } from 'react'
+import { useLocation, useParams } from 'react-router-dom'
 import { hot } from 'react-hot-loader'
-import PropTypes from 'prop-types'
 import { useObserver } from 'mobx-react'
 import { useTranslation } from 'react-i18next'
 
@@ -10,7 +10,9 @@ import RootContext from '../context/RootContext'
 
 import '../styles/ChannelHeader.scss'
 
-function ChannelHeader ({ match }) {
+function ChannelHeader () {
+  const location = useLocation()
+  const { channel } = useParams()
   const { networkStore, uiStore } = useContext(RootContext)
   const [t] = useTranslation()
 
@@ -19,12 +21,7 @@ function ChannelHeader ({ match }) {
     uiStore.openControlPanel()
   }
 
-  const {
-    path,
-    params: { channel: currentChannelName }
-  } = match
-
-  const overrideName = t(`viewNames.${path.slice(1)}`)
+  const overrideName = t(`viewNames.${location.pathname.slice(1)}`)
 
   return useObserver(() => (
     <div className='Header'>
@@ -37,15 +34,9 @@ function ChannelHeader ({ match }) {
           <span className='unreadMessages'>{networkStore.unreadEntriesCount}</span>
         ) : null}
       </div>
-      <div className='currentChannel'>
-        {currentChannelName ? `#${currentChannelName}` : overrideName}
-      </div>
+      <div className='currentChannel'>{channel ? `#${channel}` : overrideName}</div>
     </div>
   ))
-}
-
-ChannelHeader.propTypes = {
-  match: PropTypes.object.isRequired
 }
 
 export default hot(module)(ChannelHeader)
