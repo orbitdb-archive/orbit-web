@@ -69,6 +69,8 @@ export default class ChannelStore {
   _replicationStatus = { progress: 0, max: 0 }
 
   // Public instance variables
+  maxEntryCount = maxEntryCount
+
   @observable
   entriesMap = {}
 

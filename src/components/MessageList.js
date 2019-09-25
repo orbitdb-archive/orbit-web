@@ -18,6 +18,7 @@ function MessageList ({
   loading,
   hasUnreadMessages,
   entryCount,
+  maxEntryCount,
   loadMore,
   resetOffset,
   theme,
@@ -71,7 +72,11 @@ function MessageList ({
         ) : loading ? (
           <LoadingMessages />
         ) : (
-          <FirstMessage channelName={channelName} />
+          <FirstMessage
+            channelName={channelName}
+            filtering={entryCount >= maxEntryCount}
+            showing={maxEntryCount}
+          />
         )}
         {messages.map((m, index) => (
           <MessageListRow
@@ -97,6 +102,7 @@ MessageList.propTypes = {
   loading: PropTypes.bool.isRequired,
   hasUnreadMessages: PropTypes.bool.isRequired,
   entryCount: PropTypes.number.isRequired,
+  maxEntryCount: PropTypes.number.isRequired,
   loadMore: PropTypes.func.isRequired,
   resetOffset: PropTypes.func.isRequired
 }
