@@ -1,6 +1,8 @@
 {
   "channel": {
     "beginningOf": "Beginning of #{{channel}}",
+    "showingLast": "Showing only one message of #{{channel}}",
+    "showingLast_plural": "Showing the last {{count}} messages of #{{channel}}",
     "file": {
       "download": "Download",
       "previewLoading": "$t(loading)...",

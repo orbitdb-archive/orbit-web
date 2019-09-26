@@ -69,6 +69,8 @@ export default class ChannelStore {
   _replicationStatus = { progress: 0, max: 0 }
 
   // Public instance variables
+  maxEntryCount = maxEntryCount
+
   @observable
   entriesMap = {}
 
@@ -100,7 +102,7 @@ export default class ChannelStore {
 
   @computed
   get _userNameRegex () {
-    return new RegExp(`@(${this._username})(?!\\w)`, 'gu')
+    return new RegExp(`@(${this._username})(?!\\w)`, 'u')
   }
 
   // Public instance getters
@@ -312,9 +314,11 @@ export default class ChannelStore {
     }
   }
 
-  _checkForNotification (newMessages) {
+  _checkForNotification (unreadMessages) {
+    // 'unreadMessages' will contain all _unread_ messages in this channel in correct order
+    // even ones that were already handled by this function
     if (!document.hidden && this.active) return
-    newMessages
+    unreadMessages
       .filter(m => m.meta.type === 'text')
       .forEach(m => {
         let sent = false

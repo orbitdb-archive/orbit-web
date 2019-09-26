@@ -36,6 +36,7 @@ function ChannelMessages ({ channel }) {
         loading={channel.loading || channel.replicating}
         hasUnreadMessages={channel.hasUnreadMessages}
         entryCount={channel.entryCount}
+        maxEntryCount={channel.maxEntryCount}
         loadMore={channel.increaseMessageOffset}
         resetOffset={channel.resetMessageOffset}
         highlightWords={[sessionStore.username]}

@@ -1,6 +1,8 @@
 {
   "channel": {
     "beginningOf": "Kanavan #{{channel}} alku",
+    "showingLast": "Näytetään vain yksi kanavan #{{channel}} viesti",
+    "showingLast_plural": "Näytetään kanavan #{{channel}} viimeiset {{count}} viestiä",
     "file": {
       "download": "Lataa",
       "previewLoading": "$t(loading)...",
