@@ -98,5 +98,10 @@
     "webpack-cli": "^3.3.9",
     "webpack-dev-server": "^3.8.1",
     "worker-loader": "^2.0.0"
-  }
+  },
+  "localMaintainers": [
+    "haad <haad@haja.io>",
+    "shamb0t <shams@haja.io>",
+    "hajamark <mark@haja.io>"
+  ]
 }
