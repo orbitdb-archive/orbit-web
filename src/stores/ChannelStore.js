@@ -405,27 +405,11 @@ export default class ChannelStore {
     return Promise.all(promises)
   }
 
-  async loadFile (hash, asStream) {
-    const response = await this.network.workerProxy.getFile({ hash, asStream, timeout: 20 * 1000 })
-    return { buffer: response.value, url: null, stream: null }
-
-    // return new Promise((resolve, reject) => {
-    //   // TODO: Handle electron
-    //   const stream = this.network.orbit.getFile(hash)
-    //   if (asStream) resolve({ buffer: null, url: null, stream })
-    //   else {
-    //     let buffer = new Uint8Array(0)
-    //     stream.on('error', reject)
-    //     stream.on('data', chunk => {
-    //       const tmp = new Uint8Array(buffer.length + chunk.length)
-    //       tmp.set(buffer)
-    //       tmp.set(chunk, buffer.length)
-    //       buffer = tmp
-    //     })
-    //     stream.on('end', () => {
-    //       resolve({ buffer, url: null, stream: null })
-    //     })
-    //   }
-    // })
+  async loadFile (hash, onStreamEvent) {
+    const response = await this.network.workerProxy.getFile(
+      { hash, timeout: 20 * 1000 },
+      onStreamEvent
+    )
+    return response.data
   }
 }

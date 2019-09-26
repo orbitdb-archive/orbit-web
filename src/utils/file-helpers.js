@@ -45,3 +45,10 @@ export function toArrayBuffer (buffer) {
   }
   return ab
 }
+
+export function concatUint8Arrays (a, b) {
+  const tmp = new Uint8Array(a.length + b.length)
+  tmp.set(a)
+  tmp.set(b, a.length)
+  return tmp
+}
