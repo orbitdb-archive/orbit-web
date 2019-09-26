@@ -6,7 +6,9 @@ export function getHumanReadableSize (size) {
   if (size < 0) return 0
   const i = Math.floor(Math.log(size) / Math.log(1024))
   return (
-    (size / Math.pow(1024, i)).toFixed(i > 2 ? 2 : 0) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i]
+    (size / Math.pow(1024, i)).toFixed(i > 2 ? 2 : 0) * 1 +
+    '\u00a0' +
+    ['B', 'kB', 'MB', 'GB', 'TB'][i]
   )
 }
 

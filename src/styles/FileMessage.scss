@@ -12,7 +12,6 @@ $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
   align-items: center;
 
   font-weight: bold;
-  white-space: nowrap;
   overflow: hidden;
   box-sizing: content-box;
 
@@ -42,6 +41,7 @@ $directory-link-hover-color2: rgba(240, 240, 240, 0.9);
     audio,
     video {
       max-height: 30em;
+      max-width: 100%;
     }
   }
 
