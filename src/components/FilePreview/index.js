@@ -4,15 +4,12 @@ import React, { useCallback, useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
 
-import PreviewAudioFile from './PreviewAudioFile'
-import PreviewImageFile from './PreviewImageFile'
 import PreviewTextFile from './PreviewTextFile'
-import PreviewVideoFile from './PreviewVideoFile'
 
 import CustomSuspense from '../Suspense'
 
 import Logger from '../../utils/logger'
-import { isAudio, isImage, isVideo, toArrayBuffer } from '../../utils/file-helpers'
+import { isAudio, isImage, isVideo } from '../../utils/file-helpers'
 
 const logger = new Logger()
 
@@ -21,37 +18,18 @@ async function loadPreviewContent (loadFunc, hash, name, mimeType, onLoad) {
   const fileIsImage = isImage(name)
   const fileIsVideo = isVideo(name)
 
-  const asStream = fileIsVideo
-  const { buffer, url, stream } = await loadFunc(hash, asStream)
+  const buffer = await loadFunc(hash)
+  const blob = new Blob([buffer], { type: mimeType })
+  const url = window.URL.createObjectURL(blob)
 
-  let blob = new Blob([])
-
-  if (buffer instanceof Blob) {
-    blob = buffer
-  } else if (buffer && mimeType) {
-    blob = new Blob([toArrayBuffer(buffer)], { type: mimeType })
-  }
-
-  const srcUrl = buffer ? window.URL.createObjectURL(blob) : url
-
-  if (buffer || url || stream) {
-    if (fileIsAudio) {
-      return <PreviewAudioFile src={srcUrl} onLoad={onLoad} />
-    } else if (fileIsImage) {
-      return <PreviewImageFile src={srcUrl} onLoad={onLoad} />
-    } else if (fileIsVideo) {
-      return (
-        <PreviewVideoFile
-          loadAsBlob={async () => loadFunc(hash, false)}
-          stream={stream}
-          filename={name}
-          mimeType={mimeType}
-          onLoad={onLoad}
-        />
-      )
-    } else {
-      return <PreviewTextFile blob={blob} filename={name} onLoad={onLoad} />
-    }
+  if (fileIsAudio) {
+    return <audio src={url} controls autoPlay onLoad={onLoad} />
+  } else if (fileIsImage) {
+    return <img src={url} onLoad={onLoad} />
+  } else if (fileIsVideo) {
+    return <video src={url} controls autoPlay onLoad={onLoad} />
+  } else {
+    return <PreviewTextFile blob={blob} filename={name} onLoad={onLoad} />
   }
 }
 

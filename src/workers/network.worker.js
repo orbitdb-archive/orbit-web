@@ -7,6 +7,7 @@ import IPFS from 'ipfs'
 import Orbit from 'orbit_'
 
 import promiseQueue from '../utils/promise-queue'
+import { concatUint8Arrays } from '../utils/file-helpers'
 
 const ORBIT_EVENTS = ['connected', 'disconnected', 'joined', 'left', 'peers']
 const CHANNEL_FEED_EVENTS = ['write', 'load.progress', 'replicate.progress', 'ready', 'replicated']
@@ -43,9 +44,8 @@ async function onMessage ({ data }) {
       break
   }
 
-  if (!response) response = [{}, null]
+  if (!response) response = [{}]
   if (data.asyncKey) response[0].asyncKey = data.asyncKey
-
   this.postMessage(...response)
 }
 
@@ -173,26 +173,17 @@ function refreshChannelPeers () {
 
 async function handleIpfsGetFile ({ options }) {
   try {
-    if (!options.asStream) {
-      const array = await getFileBuffer(this.orbit, options.hash, options)
-      return [{ value: array }, array.buffer]
-    } else {
-      return [
-        {
-          value: null,
-          errorMsg: 'Streams are not supported yet'
-        }
-      ]
-    }
+    const array = await getFile(this.orbit, options.hash, this.postMessage, options)
+    return [{ data: array }, [array.buffer]]
   } catch (error) {
-    return [{ value: null, errorMsg: error.message }]
+    return [{ data: null, errorMsg: error.message }]
   }
 }
 
-function getFileBuffer (orbit, hash, options = {}) {
-  const timeoutError = new Error('Timeout while fetching file')
-  const timeout = options.timeout || 5 * 1000
+function getFile (orbit, hash, postMessage, options = {}) {
   return new Promise((resolve, reject) => {
+    const timeoutError = new Error('Timeout while fetching file')
+    const timeout = options.timeout || 5 * 1000
     let timeoutTimer = setTimeout(() => {
       reject(timeoutError)
     }, timeout)
@@ -200,20 +191,20 @@ function getFileBuffer (orbit, hash, options = {}) {
     let array = new Uint8Array(0)
     stream.on('error', error => {
       clearTimeout(timeoutTimer)
+      postMessage({ streamEvent: 'error', hash, error })
       reject(error)
     })
     stream.on('data', chunk => {
       clearTimeout(timeoutTimer)
-      const tmp = new Uint8Array(array.length + chunk.length)
-      tmp.set(array)
-      tmp.set(chunk, array.length)
-      array = tmp
+      array = concatUint8Arrays(array, chunk)
+      postMessage({ streamEvent: 'data', hash, chunk }, [chunk.buffer])
       timeoutTimer = setTimeout(() => {
         reject(timeoutError)
       }, timeout)
     })
     stream.on('end', () => {
       clearTimeout(timeoutTimer)
+      postMessage({ streamEvent: 'end', hash })
       resolve(array)
     })
   })
@@ -221,6 +212,7 @@ function getFileBuffer (orbit, hash, options = {}) {
 
 // Get a reference just so we can bind onmessage and use 'call' on setinterval
 const worker = self || {}
+worker.writableStream = ''
 onmessage = onMessage.bind(worker)
 
 setInterval(() => {

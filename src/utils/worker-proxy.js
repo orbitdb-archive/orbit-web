@@ -12,6 +12,27 @@ function WorkerProxy (store, worker) {
   this.worker.postMessage('') // Init the worker
 }
 
+function asyncListenerFactory (promise, worker, asyncKey) {
+  return function ({ data: response }) {
+    if (!response.asyncKey || response.asyncKey !== asyncKey) return
+    worker.removeEventListener('message', this)
+    delete response.asyncKey
+    if (response.errorMsg) promise.reject(response.errorMsg)
+    else promise.resolve(response)
+  }
+}
+
+function fileStreamListenerFactory (worker, hash, callback) {
+  return function ({ data }) {
+    if (!data.streamEvent || data.hash !== hash) return
+    if (data.streamEvent === 'end' || data.streamEvent === 'error') {
+      worker.removeEventListener('message', this)
+    }
+    delete data.hash
+    callback(data)
+  }
+}
+
 /**
  * Async wrapper for worker.postMessage
  */
@@ -19,14 +40,10 @@ WorkerProxy.prototype.postMessage = function (data) {
   return new Promise((resolve, reject) => {
     const key = uuid()
     data.asyncKey = key
-    const asyncListener = ({ data }) => {
-      if (!data.asyncKey || data.asyncKey !== key) return
-      this.worker.removeEventListener('message', asyncListener)
-      delete data.asyncKey
-      if (data.errorMsg) reject(data.errorMsg)
-      else resolve(data)
-    }
-    this.worker.addEventListener('message', asyncListener)
+    this.worker.addEventListener(
+      'message',
+      asyncListenerFactory({ resolve, reject }, this.worker, key)
+    )
     this.worker.postMessage(data)
   })
 }
@@ -79,14 +96,21 @@ WorkerProxy.prototype.sendFileMessage = function (channelName, file, buffer) {
   })
 }
 
-WorkerProxy.prototype.getFile = function ({ hash, asStream, timeout }) {
+WorkerProxy.prototype.getFile = function (options, onStreamEvent) {
+  if (typeof onStreamEvent === 'function') {
+    this.worker.addEventListener(
+      'message',
+      fileStreamListenerFactory(this.worker, options.hash, onStreamEvent)
+    )
+  }
   return this.postMessage({
     action: 'ipfs:get-file',
-    options: { hash, asStream, timeout }
+    options
   })
 }
 
 WorkerProxy.prototype.onMessage = function ({ data }) {
+  if (data.asyncKey || data.stream) return // They are handled separately
   if (typeof data.action !== 'string') return
   if (typeof data.name !== 'string') return
 
