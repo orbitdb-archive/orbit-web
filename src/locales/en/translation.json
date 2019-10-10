@@ -72,7 +72,8 @@
       "language": {
         "en": "English",
         "fi": "Suomi",
-        "pt": "Portuguese"
+        "pt": "Portuguese",
+        "zh": "Simplified Chinese"
       },
       "sidePanelPosition": {
         "left": "Left",

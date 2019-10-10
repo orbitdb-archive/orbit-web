@@ -10,6 +10,10 @@ fi
 
 pt
 
+-
+
+zh
+
 - `channel.showingLast`
 - `channel.showingLast_plural`
 - `settings.names.messageNotifications`
