@@ -1,0 +1,106 @@
+{
+  "channel": {
+    "beginningOf": "连接到 #{{channel}}",
+    "showingLast": "显示 #{{channel}} 最后一条消息",
+    "showingLast_plural": "显示 #{{channel}} 的最后 {{count}}　条消息",
+    "file": {
+      "download": "下载",
+      "previewLoading": "$t(loading)...",
+      "open": "打开",
+      "unableToDisplay": "无法显示文件",
+      "dropzone": {
+        "add": "将文件添加到 #{{channel}}"
+      }
+    },
+    "loadingHistory": "载入消息纪录...",
+    "loadMore": "单击或向上滚动以加载较早消息",
+    "sendMessagePlaceholder": "输入...",
+    "status": {
+      "users": "用户",
+      "users_plural": "用户"
+    }
+  },
+  "configuration": "配置",
+  "controlPanel": {
+    "channels": "频道",
+    "closeChannel": "关闭",
+    "startJsIpfs": "启动 js-ipfs"
+  },
+  "disclaimer": {
+    "alpha": {
+      "content": "This is an alpha version of the software. Things will break and change \u2014 chats will be lost. Use at your own risk."
+    }
+  },
+  "joinChannel": {
+    "inputPlaceholder": "加入频道"
+  },
+  "login": {
+    "nickname": "昵称",
+    "orLoginWith": "登录",
+    "pressEnterToLogin": "按回车确认登录"
+  },
+  "loading": "载入中",
+  "settings": {
+    "names": {
+      "themeName": "主题",
+      "language": "语言",
+      "sidePanelPosition": "侧面板位置",
+      "colorifyUsernames": "用户名着色",
+      "useEmojis": "使用emojis",
+      "emojiSet": "Emoji主题",
+      "useMonospaceFont": "使用monospace字体",
+      "useLargeMessage": "使用大消息",
+      "messageNotifications": "通知"
+    },
+    "descriptions": {},
+    "options": {
+      "themeName": {
+        "default": "Default",
+        "purple1": "Purple 1",
+        "purple2": "Purple 2",
+        "magenta": "Magenta",
+        "red": "Red",
+        "orange": "Orange",
+        "brown": "Brown",
+        "lime": "Lime",
+        "green": "Green",
+        "cyan": "Cyan",
+        "blue1": "Blue 1",
+        "blue2": "Blue 2",
+        "grey": "Grey"
+      },
+      "language": {
+        "en": "英文",
+        "fi": "芬兰语",
+        "pt": "葡萄牙语",
+        "zh": "简体中文"
+      },
+      "sidePanelPosition": {
+        "left": "左",
+        "right": "右"
+      },
+      "emojiSet": {
+        "apple": "Apple",
+        "emojione": "Emojione",
+        "facebook": "Facebook",
+        "google": "Google",
+        "messenger": "Messenger",
+        "twitter": "Twitter"
+      },
+      "messageNotifications": {
+        "all": "全部",
+        "mentions": "仅当被提及时",
+        "none": "无"
+      }
+    }
+  },
+  "userProfile": {
+    "identityType": "身份提供者",
+    "identityId": "id",
+    "identityPublicKey": "公钥"
+  },
+  "version": "版本",
+  "viewNames": {
+    "settings": "设置"
+  }
+}
