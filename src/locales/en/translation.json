@@ -32,7 +32,7 @@
     }
   },
   "joinChannel": {
-    "inputPlaceholder": "Join channel"
+    "inputPlaceholder": "Join or Create Channel"
   },
   "login": {
     "nickname": "Nickname",

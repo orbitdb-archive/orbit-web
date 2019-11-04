@@ -32,7 +32,7 @@
     }
   },
   "joinChannel": {
-    "inputPlaceholder": "Liity kanavalle"
+    "inputPlaceholder": "Liity kanavalle / luo uusi"
   },
   "login": {
     "nickname": "Nimimerkki",
