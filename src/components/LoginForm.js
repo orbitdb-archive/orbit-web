@@ -16,12 +16,17 @@ function LoginForm ({ theme, onSubmit, usernameInputRef }) {
   }, [])
 
   const handleUsernameInputChange = React.useCallback(() => {
-    if (usernameInputRef.current) setCurrentLength(usernameInputRef.current.value.length)
+    if (usernameInputRef.current) {
+      setCurrentLength(usernameInputRef.current.value.length)
+    }
   }, [])
 
   return (
     <form onSubmit={onSubmit}>
-      <div className='usernameRow fadeInAnimation' onClick={handleUsernameRowClick}>
+      <div
+        className='usernameRow fadeInAnimation inputs'
+        onClick={handleUsernameRowClick}
+      >
         <input
           ref={usernameInputRef}
           type='text'
@@ -33,7 +38,9 @@ function LoginForm ({ theme, onSubmit, usernameInputRef }) {
         />
       </div>
       <div className='connectButtonRow'>
-        <span className='hint'>{currentLength > 0 ? t('login.pressEnterToLogin') : null}</span>
+        <span className='hint'>
+          {currentLength > 0 ? t('login.pressEnterToLogin') : null}
+        </span>
         <input type='submit' value='Connect' style={{ display: 'none' }} />
       </div>
     </form>
