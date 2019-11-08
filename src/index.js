@@ -14,7 +14,7 @@ import './styles/Fonts.scss'
 import './styles/Main.scss'
 import './styles/flaticon.css'
 
-redirectToHttps(!(window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"))
+redirectToHttps(!(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
 
 const App = React.lazy(() => import(/* webpackChunkName: "App" */ './views/App'))
 
