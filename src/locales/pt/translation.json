@@ -30,7 +30,7 @@
     }
   },
   "joinChannel": {
-    "inputPlaceholder": "Junte-se ao canal"
+    "inputPlaceholder": "Junte-se ou criar um canal"
   },
   "login": {
     "nickname": "Apelido",

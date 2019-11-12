@@ -1,5 +1,5 @@
-@import 'Animations';
-@import 'Colors';
+@import "Animations";
+@import "Colors";
 
 $channel-name-max-height: 5.5vmin;
 $channel-name-min-height: 1.5em;
@@ -33,12 +33,12 @@ $channel-name-min-height: 1.5em;
 
   &.left {
     left: 0;
-    border-left: '0';
+    border-left: "0";
   }
 
   &.right {
     right: 0;
-    border-right: '0';
+    border-right: "0";
   }
 
   .panelHeader {
@@ -72,6 +72,9 @@ $channel-name-min-height: 1.5em;
     box-sizing: border-box;
     margin: 2em 0em;
     margin-bottom: 1em;
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.8);
+    }
   }
 
   .spinner {
@@ -183,7 +186,7 @@ $channel-name-min-height: 1.5em;
       }
 
       &.active .ChannelLink:before {
-        content: '➭';
+        content: "➭";
         margin-right: 4px;
       }
 
@@ -241,7 +244,7 @@ $channel-name-min-height: 1.5em;
   }
 
   .submitButton,
-  input[type='submit'] {
+  input[type="submit"] {
     display: flex;
     align-self: flex-end;
     margin: 0.75em;

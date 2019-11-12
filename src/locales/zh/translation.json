@@ -32,7 +32,7 @@
     }
   },
   "joinChannel": {
-    "inputPlaceholder": "加入频道"
+    "inputPlaceholder": "加入或創建頻道"
   },
   "login": {
     "nickname": "昵称",
