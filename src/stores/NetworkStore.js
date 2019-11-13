@@ -16,6 +16,7 @@ import ChannelStore from './ChannelStore'
 
 import Logger from '../utils/logger'
 import WorkerProxy from '../utils/worker-proxy'
+import { createWeeklyChannelName } from '../utils/channels'
 
 configure({ enforceActions: 'observed' })
 
@@ -63,7 +64,7 @@ export default class NetworkStore {
   swarmPeers = []
 
   @observable
-  defaultChannels = window.location.href.match('localhost:') ? ['orbit-dev'] : ['orbit']
+  defaultChannels = window.location.href.match('localhost:') ? [createWeeklyChannelName('orbit-dev')] : [createWeeklyChannelName('orbit')]
 
   // Public instance getters
 
