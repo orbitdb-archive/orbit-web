@@ -19,6 +19,7 @@ const MessageUserProfilePanel = lazy(() =>
 function ChannelView () {
   const { networkStore } = useContext(RootContext)
   const { channel } = useParams()
+  window.lastChannel = (channel == undefined) ? window.lastChannel : channel
 
   return useObserver(() =>
     networkStore.isOnline ? (

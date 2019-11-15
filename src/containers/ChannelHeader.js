@@ -21,6 +21,11 @@ function ChannelHeader () {
     uiStore.openControlPanel()
   }
 
+  function goBack(e){
+	e.stopPropagation()
+	window.location.hash = (window.lastChannel == undefined) ? '#' : '#/channel/'+window.lastChannel
+  }
+
   const overrideName = t(`viewNames.${location.pathname.slice(1)}`)
 
   return useObserver(() => (
@@ -35,6 +40,18 @@ function ChannelHeader () {
         ) : null}
       </div>
       <div className='currentChannel'>{channel ? `#${channel}` : overrideName}</div>
+	  {
+	  	(window.location.hash == '#/settings') ?
+	  	(
+		  <div
+        	className='go-back icon flaticon-lines18'
+        	onClick={goBack}
+        	style={{ ...uiStore.theme }}
+		  ></div>
+		) : (
+			<div></div>
+		)
+	  }
     </div>
   ))
 }
