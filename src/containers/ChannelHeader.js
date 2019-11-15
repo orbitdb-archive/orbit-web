@@ -44,10 +44,10 @@ function ChannelHeader () {
 	  	(window.location.hash == '#/settings') ?
 	  	(
 		  <div
-        	className='go-back icon flaticon-lines18'
+        	className='exit-button icon'
         	onClick={goBack}
         	style={{ ...uiStore.theme }}
-		  ></div>
+		  >&times;</div>
 		) : (
 			<div></div>
 		)
