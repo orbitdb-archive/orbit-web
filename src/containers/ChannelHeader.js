@@ -40,18 +40,18 @@ function ChannelHeader () {
         ) : null}
       </div>
       <div className='currentChannel'>{channel ? `#${channel}` : overrideName}</div>
-	  {
-	  	(window.location.hash == '#/settings') ?
-	  	(
-		  <div
-        	className='exit-button icon'
-        	onClick={goBack}
-        	style={{ ...uiStore.theme }}
-		  >&times;</div>
-		) : (
-			<div></div>
-		)
-	  }
+      {
+        (window.location.hash == '#/settings') ?
+        (
+          <div
+              className='exit-button icon'
+              onClick={goBack}
+              style={{ ...uiStore.theme }}
+          > &times; </div>
+        ) : (
+          <div></div>
+        )
+      }
     </div>
   ))
 }

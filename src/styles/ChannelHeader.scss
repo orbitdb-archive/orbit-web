@@ -30,11 +30,11 @@ $channel-name-min-height: 1.6em;
   .icon {
     font-size: 0.7em;
     cursor: pointer;
-	font-weight: 100;
+    font-weight: 100;
 	
-	&.exit-button{
-		font-size: 1em;
-	}
+    &.exit-button{
+	  	font-size: 1em;
+	  }
   }
 
   .currentChannel {
