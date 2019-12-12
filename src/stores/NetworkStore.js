@@ -60,6 +60,10 @@ export default class NetworkStore {
   @observable
   channels = {}
 
+  // Keeps track of the channel join promises
+  // This helps us to prevent joining same channel multiple times in quick succession
+  _joiningChannelPromises = {}
+
   @observable
   swarmPeers = []
 
@@ -174,10 +178,14 @@ export default class NetworkStore {
   async joinChannel (channelName) {
     if (typeof channelName !== 'string') return
     if (!this.isOnline) throw new Error('Network is not online')
-    if (!this.channelNames.includes(channelName)) {
-      await this.workerProxy.joinChannel(channelName)
+    if (
+      !(channelName in this._joiningChannelPromises) &&
+      !this.channelNames.includes(channelName)) {
+      this._joiningChannelPromises[channelName] = this.workerProxy.joinChannel(channelName)
+        .then(() => this._onJoinedChannel(channelName))
     }
-    return this._onJoinedChannel(channelName)
+
+    return this._joiningChannelPromises[channelName]
   }
 
   async leaveChannel (channelName) {
