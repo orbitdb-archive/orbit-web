@@ -187,7 +187,7 @@ function ControlPanel () {
             className={classNames('header bounceInAnimation', uiStore.sidePanelPosition)}
             onClick={handleClosePanel}
           >
-            <div className='logo'>Orbit</div>
+            <div className='logo'>IPFS中文用户组</div>
           </div>
 
           <div className='networkName fadeInAnimation' style={{ animationDuration: '1s' }}>

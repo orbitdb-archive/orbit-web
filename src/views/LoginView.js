@@ -61,7 +61,7 @@ function LoginView () {
     !sessionStore.isAuthenticated ? (
       <div className='LoginView'>
         <h1 className='loginHeaderAnimation' onClick={focusUsernameInput}>
-          Orbit
+            IPFS中文用户组
         </h1>
 
         <LoginForm

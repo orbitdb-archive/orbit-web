@@ -101,7 +101,6 @@ function AppView ({ isAuthenticated }) {
 
         {/* Render an alpha disclaimer on login page */}
         <Route path={loginPath}>
-          <AlphaDisclaimer />
         </Route>
 
         {redirectToLogin ? (

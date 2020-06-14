@@ -46,7 +46,8 @@ export default class NetworkStore {
 
   // Public instance variables
 
-  networkName = window.location.href.match('localhost:') ? 'Orbit DEV Network' : 'Orbit Network'
+  networkName = '讨论区'
+//  networkName = window.location.href.match('localhost:') ? 'Orbit DEV Network' : 'Orbit Network'
 
   @observable
   starting = false
