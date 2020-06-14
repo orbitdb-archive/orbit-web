@@ -36,8 +36,8 @@ node_modules/
 test/tests.bundle*
 
 # Sourcemaps
-dist/**/*.js.map
+#dist/**/*.js.map
 
-dist
+#dist
 
 .env
