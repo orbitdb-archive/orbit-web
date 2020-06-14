@@ -1,15 +1,26 @@
 import uuid from './uuid'
 
-import NetworkWorker from '../workers/network.worker.js'
+import '@babel/polyfill'
+
+import IPFS from 'ipfs'
+import Orbit from 'orbit_'
+
+import NetworkWorker from '../workers/network'
+import promiseQueue from '../utils/promise-queue'
+import { concatUint8Arrays } from '../utils/file-helpers'
+
+const ORBIT_EVENTS = ['connected', 'disconnected', 'joined', 'left', 'peers']
+const CHANNEL_FEED_EVENTS = ['write', 'load.progress', 'replicate.progress', 'ready', 'replicated']
+
 
 function WorkerProxy (store, worker) {
   this.store = store
-  this.worker = worker || new NetworkWorker()
+  this.worker = worker || new NetworkWorker(this)
 
-  this.worker.addEventListener('message', this.onMessage.bind(this))
-  this.worker.addEventListener('error', this.onError.bind(this))
+//  this.worker.addEventListener('message', this.onMessage.bind(this))
+//  this.worker.addEventListener('error', this.onError.bind(this))
 
-  this.worker.postMessage('') // Init the worker
+//  this.worker.postMessage('') // Init the worker
 }
 
 function asyncListenerFactory (promise, worker, asyncKey) {
@@ -40,11 +51,12 @@ WorkerProxy.prototype.postMessage = function (data) {
   return new Promise((resolve, reject) => {
     const key = uuid()
     data.asyncKey = key
-    this.worker.addEventListener(
-      'message',
-      asyncListenerFactory({ resolve, reject }, this.worker, key)
-    )
-    this.worker.postMessage(data)
+//    this.worker.addEventListener(
+//      'message',
+//      asyncListenerFactory({ resolve, reject }, this.worker, key)
+//    )
+//    this.worker.postMessage(data)
+    this.worker.onMessage(data)
   })
 }
 
@@ -109,7 +121,7 @@ WorkerProxy.prototype.getFile = function (options, onStreamEvent) {
   })
 }
 
-WorkerProxy.prototype.onMessage = function ({ data }) {
+WorkerProxy.prototype.onMessage = function ( data ) {
   if (data.asyncKey || data.stream) return // They are handled separately
   if (typeof data.action !== 'string') return
   if (typeof data.name !== 'string') return
@@ -140,12 +152,13 @@ WorkerProxy.prototype.onMessage = function ({ data }) {
       break
     case 'channel-event':
       if (!channel) return
-
+      console.log(data)
       switch (data.name) {
         case 'error':
           channel._onError(...data.args)
           break
         case 'peer.update':
+          console.log(data);
           channel._onPeerUpdate(data.meta.peers)
           break
         case 'load.progress':
