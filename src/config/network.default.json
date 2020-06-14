@@ -3,7 +3,7 @@
     "preload": { "enabled": false },
     "config": {
       "Addresses": {
-        "Swarm": ["/dns4/star.ipfs-dev.com/tcp/9090/ws/p2p-webrtc-star"]
+        "Swarm": ["/dns4/star.ipfs-dev.com/tcp/8243/wss/p2p-webrtc-star"]
       }
     }
   },
