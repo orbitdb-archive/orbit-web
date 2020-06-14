@@ -196,7 +196,6 @@ function ControlPanel () {
 
           <div className='username'>{sessionStore.username}</div>
 
-          {renderJoinChannelInput()}
           {renderChannelsList()}
           {renderBottomRow()}
         </div>

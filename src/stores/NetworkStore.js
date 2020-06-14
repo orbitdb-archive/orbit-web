@@ -68,7 +68,8 @@ export default class NetworkStore {
   swarmPeers = []
 
   @observable
-  defaultChannels = window.location.href.match('localhost:') ? [createWeeklyChannelName('orbit-dev')] : [createWeeklyChannelName('orbit')]
+  //defaultChannels = window.location.href.match('localhost:') ? [createWeeklyChannelName('orbit-dev')] : [createWeeklyChannelName('orbit')]
+  defaultChannels = ["ipfs-dev"]
 
   // Public instance getters
 

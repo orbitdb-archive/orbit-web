@@ -3,7 +3,7 @@
     "preload": { "enabled": false },
     "config": {
       "Addresses": {
-        "Swarm": ["/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star"]
+        "Swarm": ["/dns4/star.ipfs-dev.com/tcp/9090/ws/p2p-webrtc-star"]
       }
     }
   },
