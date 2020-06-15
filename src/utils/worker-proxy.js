@@ -24,9 +24,9 @@ function WorkerProxy (store, worker) {
 }
 
 function asyncListenerFactory (promise, worker, asyncKey) {
-  return function ({ data: response }) {
+  return function (response) {
     if (!response.asyncKey || response.asyncKey !== asyncKey) return
-    worker.removeEventListener('message', this)
+    //worker.removeEventListener('message', this)
     delete response.asyncKey
     if (response.errorMsg) promise.reject(response.errorMsg)
     else promise.resolve(response)
@@ -56,7 +56,7 @@ WorkerProxy.prototype.postMessage = function (data) {
 //      asyncListenerFactory({ resolve, reject }, this.worker, key)
 //    )
 //    this.worker.postMessage(data)
-    this.worker.onMessage(data)
+    this.worker.onMessage(data,asyncListenerFactory({ resolve, reject }, this.worker, key));
   })
 }
 

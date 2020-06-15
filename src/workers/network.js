@@ -21,7 +21,7 @@ export default class NetworkWorker {
         }, 1000)
     }
 
-    async onMessage ( data ) {
+    async onMessage ( data , callback) {
       if (!data.action || typeof data.action !== 'string') return
     
       let response
@@ -58,7 +58,7 @@ export default class NetworkWorker {
     
       if (!response) response = [{}]
       if (data.asyncKey) response[0].asyncKey = data.asyncKey
-      this.onMessage(...response)
+      callback.call(this,...response)
     }
     
     orbitEvent (eventName, ...args) {
@@ -134,13 +134,13 @@ export default class NetworkWorker {
     handleSendTextMessage ({ options }) {
       const channel = this.orbit.channels[options.channelName]
       const sendFunc = channel.sendMessage.bind(channel, options.message)
-      queueCall.call(this, sendFunc)
+      this.queueCall.call(this, sendFunc)
     }
     
     handleSendFileMessage ({ options }) {
       const channel = this.orbit.channels[options.channelName]
       const sendFunc = channel.sendFile.bind(channel, options.file)
-      queueCall.call(this, sendFunc)
+      this.queueCall.call(this, sendFunc)
     }
     
     // Queue the calls to a promise queue
