@@ -47,8 +47,8 @@ export default class SettingsStore {
     const username = this.sessionStore.username
     if (!username) throw new Error('No logged in user')
     return {
-      networkKey: `orbit-chat.${username}.network-settings`,
-      uiKey: `orbit-chat.${username}.ui-settings`
+      networkKey: `orbit-chat.${username}.network-settings-v1`,
+      uiKey: `orbit-chat.${username}.ui-settings-v1`
     }
   }
 
