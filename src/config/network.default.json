@@ -6,7 +6,7 @@
         "Swarm": ["/dns4/star.ipfs-dev.com/tcp/8243/wss/p2p-webrtc-star"]
       },
       "Bootstrap": [
-        "/dns4/star.ipfs-dev.com/tcp/8888/ws/p2p/Qmdo6uKt4u23wegnU8yhR1PKXP3RAqwiTvqymJY1PmccsQ"
+        "/dns4/star.ipfs-dev.com/tcp/8243/wss/p2p/Qmdo6uKt4u23wegnU8yhR1PKXP3RAqwiTvqymJY1PmccsQ"
       ]
     }
   },

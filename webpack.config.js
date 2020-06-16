@@ -8,7 +8,7 @@ const config = {
   entry: ['@babel/polyfill', './src/index.js'],
   output: {
     path: path.join(__dirname, 'dist'),
-    publicPath: 'https://cdn.jsdelivr.net/gh/skysbird/orbit-web@v1.5/dist/',
+    publicPath: 'https://cdn.jsdelivr.net/gh/skysbird/orbit-web@v1.6/dist/',
     //publicPath: './',
     filename: '[name].[hash:20].js',
     globalObject: 'this'
