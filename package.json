@@ -8,7 +8,7 @@
     "dev": "npm run start",
     "lint": "eslint src/ test/",
     "lint:fix": "eslint --fix src/ test/",
-    "start": "webpack-dev-server --mode=development",
+    "start": "webpack-dev-server --mode=production",
     "test-server": "http-server ./dist -s -p 8088",
     "test": "npm run lint && jest --runInBand"
   },
