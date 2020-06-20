@@ -4,11 +4,11 @@
   "description": "Orbit Chat",
   "main": "src/components/index.js",
   "scripts": {
-    "build": "webpack --mode=development",
+    "build": "webpack --mode=production",
     "dev": "npm run start",
     "lint": "eslint src/ test/",
     "lint:fix": "eslint --fix src/ test/",
-    "start": "webpack-dev-server --mode=production",
+    "start": "webpack-dev-server --mode=development",
     "test-server": "http-server ./dist -s -p 8088",
     "test": "npm run lint && jest --runInBand"
   },
@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "autolinker": "^3.14.1",
+    "buffer": "^5.6.0",
     "classnames": "^2.2.6",
     "datastore-level": "^1.1.0",
     "date-fns": "^2.14.0",

@@ -8,8 +8,8 @@ const config = {
   entry: ['@babel/polyfill', './src/index.js'],
   output: {
     path: path.join(__dirname, 'dist'),
-    publicPath: './dist/',
-    //publicPath: './',
+    //publicPath: './dist/',
+    publicPath: './',
     filename: '[name].[hash:20].js',
     globalObject: 'this'
   },
