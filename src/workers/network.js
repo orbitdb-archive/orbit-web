@@ -98,6 +98,7 @@ export default class NetworkWorker {
     }
     
     async handleStart ({ options }) {
+      console.log("handleStart")
       await this.startIPFS.call(this, options)
       await this.startOrbit.call(this, options)
     
@@ -107,6 +108,7 @@ export default class NetworkWorker {
         }
         console.info(`Running js-ipfs version ${version}`)
       })
+      console.log(this.ipfs)
     }
     
     async handleStop () {
