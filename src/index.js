@@ -24,7 +24,6 @@ const App = React.lazy(() => import(/* webpackChunkName: "App" */ './views/App')
 
 render(
   <React.Suspense fallback={<BigSpinner />}>
-    adsfsadf
     <App />
   </React.Suspense>,
   document.getElementById('root')
