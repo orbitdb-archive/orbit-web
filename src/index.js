@@ -16,7 +16,7 @@ import './styles/flaticon.css'
 
 
 
-import Vconsole from './vconsole'
+//import Vconsole from './vconsole'
 
 //redirectToHttps(!(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === 'orbit.chat.ipns.localhost'))
 
