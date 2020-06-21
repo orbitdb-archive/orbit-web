@@ -13,9 +13,9 @@ import './styles/normalize.css'
 import './styles/Fonts.scss'
 import './styles/Main.scss'
 import './styles/flaticon.css'
-import webrtcSupport from 'webrtcsupport'
+//import webrtcSupport from 'webrtcsupport'
 
-console.log(webrtcSupport)
+//console.log(webrtcSupport)
 
 //import Vconsole from './vconsole'
 
