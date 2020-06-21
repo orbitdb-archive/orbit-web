@@ -14,12 +14,17 @@ import './styles/Fonts.scss'
 import './styles/Main.scss'
 import './styles/flaticon.css'
 
+
+
+import Vconsole from './vconsole'
+
 //redirectToHttps(!(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === 'orbit.chat.ipns.localhost'))
 
 const App = React.lazy(() => import(/* webpackChunkName: "App" */ './views/App'))
 
 render(
   <React.Suspense fallback={<BigSpinner />}>
+    adsfsadf
     <App />
   </React.Suspense>,
   document.getElementById('root')
