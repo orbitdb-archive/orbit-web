@@ -7035,15 +7035,6 @@
         "level": "^5.0.1"
       },
       "dependencies": {
-        "abstract-leveldown": {
-          "version": "6.0.3",
-          "resolved": "https://registry.npm.taobao.org/abstract-leveldown/download/abstract-leveldown-6.0.3.tgz?cache=0&sync_timestamp=1586591554373&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fabstract-leveldown%2Fdownload%2Fabstract-leveldown-6.0.3.tgz",
-          "integrity": "sha1-tLYVk0PHSwxRl7KBeFR4LY90jEo=",
-          "requires": {
-            "level-concat-iterator": "~2.0.0",
-            "xtend": "~4.0.0"
-          }
-        },
         "buffer": {
           "version": "5.6.0",
           "resolved": "https://registry.npm.taobao.org/buffer/download/buffer-5.6.0.tgz",
@@ -7073,22 +7064,9 @@
           "resolved": "https://registry.npm.taobao.org/level/download/level-5.0.1.tgz",
           "integrity": "sha1-hSjMHuN6xBMnASmh6rk4xhC+PMs=",
           "requires": {
-            "level-js": "^4.0.0",
             "level-packager": "^5.0.0",
             "leveldown": "^5.0.0",
             "opencollective-postinstall": "^2.0.0"
-          }
-        },
-        "level-js": {
-          "version": "4.0.2",
-          "resolved": "https://registry.npm.taobao.org/level-js/download/level-js-4.0.2.tgz",
-          "integrity": "sha1-+lFSf6OLh8TREbDQM03kf82jjyE=",
-          "requires": {
-            "abstract-leveldown": "~6.0.1",
-            "immediate": "~3.2.3",
-            "inherits": "^2.0.3",
-            "ltgt": "^2.1.2",
-            "typedarray-to-buffer": "~3.1.5"
           }
         },
         "level-packager": {
@@ -17148,6 +17126,10 @@
           "version": "3.0.0",
           "resolved": "https://registry.npm.taobao.org/p-defer/download/p-defer-3.0.0.tgz",
           "integrity": "sha1-0dzrTumytgSx2U/+yDdgF11Ob4M="
+        },
+        "webrtcsupport": {
+          "version": "github:ipfs/webrtcsupport#0a7099ff04fd36227a32e16966dbb3cca7002378",
+          "from": "github:ipfs/webrtcsupport"
         }
       }
     },
@@ -18469,8 +18451,8 @@
       "dependencies": {
         "buffer": {
           "version": "4.9.2",
-          "resolved": "https://registry.npmjs.org/buffer/-/buffer-4.9.2.tgz",
-          "integrity": "sha512-xq+q3SRMOxGivLhBNaUdC64hDTQwejJ+H0T/NB1XMtTVEwNTrfFF3gAxiyW0Bu/xWEGhjVKgUcMhCrUy2+uCWg==",
+          "resolved": "https://registry.npm.taobao.org/buffer/download/buffer-4.9.2.tgz",
+          "integrity": "sha1-Iw6tNEACmIZEhBqwJEr4xEu+Pvg=",
           "dev": true,
           "requires": {
             "base64-js": "^1.0.2",
@@ -19195,22 +19177,9 @@
           "resolved": "https://registry.npm.taobao.org/level/download/level-5.0.1.tgz",
           "integrity": "sha1-hSjMHuN6xBMnASmh6rk4xhC+PMs=",
           "requires": {
-            "level-js": "^4.0.0",
             "level-packager": "^5.0.0",
             "leveldown": "^5.0.0",
             "opencollective-postinstall": "^2.0.0"
-          }
-        },
-        "level-js": {
-          "version": "4.0.2",
-          "resolved": "https://registry.npm.taobao.org/level-js/download/level-js-4.0.2.tgz",
-          "integrity": "sha1-+lFSf6OLh8TREbDQM03kf82jjyE=",
-          "requires": {
-            "abstract-leveldown": "~6.0.1",
-            "immediate": "~3.2.3",
-            "inherits": "^2.0.3",
-            "ltgt": "^2.1.2",
-            "typedarray-to-buffer": "~3.1.5"
           }
         },
         "level-packager": {
@@ -19306,7 +19275,6 @@
       "integrity": "sha1-wnlzU7MCJ5yi/V6lJLXe53WZv5Y=",
       "requires": {
         "elliptic": "^6.4.1",
-        "level-js": "~4.0.1",
         "leveldown": "~5.1.1",
         "levelup": "~4.1.0",
         "libp2p-crypto": "^0.16.0",
@@ -19332,18 +19300,6 @@
           "requires": {
             "abstract-leveldown": "~6.0.0",
             "inherits": "^2.0.3"
-          }
-        },
-        "level-js": {
-          "version": "4.0.2",
-          "resolved": "https://registry.npm.taobao.org/level-js/download/level-js-4.0.2.tgz",
-          "integrity": "sha1-+lFSf6OLh8TREbDQM03kf82jjyE=",
-          "requires": {
-            "abstract-leveldown": "~6.0.1",
-            "immediate": "~3.2.3",
-            "inherits": "^2.0.3",
-            "ltgt": "^2.1.2",
-            "typedarray-to-buffer": "~3.1.5"
           }
         },
         "leveldown": {
@@ -19415,22 +19371,9 @@
           "resolved": "https://registry.npm.taobao.org/level/download/level-5.0.1.tgz",
           "integrity": "sha1-hSjMHuN6xBMnASmh6rk4xhC+PMs=",
           "requires": {
-            "level-js": "^4.0.0",
             "level-packager": "^5.0.0",
             "leveldown": "^5.0.0",
             "opencollective-postinstall": "^2.0.0"
-          }
-        },
-        "level-js": {
-          "version": "4.0.2",
-          "resolved": "https://registry.npm.taobao.org/level-js/download/level-js-4.0.2.tgz",
-          "integrity": "sha1-+lFSf6OLh8TREbDQM03kf82jjyE=",
-          "requires": {
-            "abstract-leveldown": "~6.0.1",
-            "immediate": "~3.2.3",
-            "inherits": "^2.0.3",
-            "ltgt": "^2.1.2",
-            "typedarray-to-buffer": "~3.1.5"
           }
         },
         "level-packager": {
@@ -25442,8 +25385,8 @@
       }
     },
     "webrtcsupport": {
-      "version": "github:ipfs/webrtcsupport#0a7099ff04fd36227a32e16966dbb3cca7002378",
-      "from": "github:ipfs/webrtcsupport"
+      "version": "git+https://github.com/skysbird/webrtcsupport.git#120dbb1095c69a3ff2832024dc30a8ab3ac48dc4",
+      "from": "git+https://github.com/skysbird/webrtcsupport.git#1.0"
     },
     "websocket-driver": {
       "version": "0.6.5",

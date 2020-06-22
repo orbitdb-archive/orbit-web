@@ -9,8 +9,8 @@ const config = {
   output: {
     path: path.join(__dirname, 'dist'),
     //publicPath: './dist/',
-    //publicPath: './',
-    publicPath: 'https://cdn.jsdelivr.net/gh/skysbird/orbit-web@v1.7/dist/',
+    publicPath: './',
+    //publicPath: 'https://cdn.jsdelivr.net/gh/skysbird/orbit-web@v1.7/dist/',
     filename: '[name].[hash:20].js',
     globalObject: 'this'
   },
